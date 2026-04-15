@@ -15,16 +15,41 @@ use Fhp\Segment\Paginateable;
 class HKKAZv7 extends BaseSegment implements Paginateable
 {
     public \Fhp\Segment\Common\Kti $kontoverbindungInternational;
-    /** Only allowed if {@link ParameterKontoumsaetzeV2::$alleKontenErlaubt} says so. */
     public bool $alleKonten;
-    /** JJJJMMTT gemäß ISO 8601 */
     public ?string $vonDatum = null;
-    /** JJJJMMTT gemäß ISO 8601 */
     public ?string $bisDatum = null;
-    /** Only allowed if {@link ParameterKontoumsaetzeV2::$eingabeAnzahlEintraegeErlaubt} says so. */
     public ?int $maximaleAnzahlEintraege = null;
-    /** Max length: 35 */
     public ?string $aufsetzpunkt = null;
+
+    public function getKontoverbindungInternational(): \Fhp\Segment\Common\Kti
+    {
+        return $this->kontoverbindungInternational;
+    }
+
+    public function getAlleKonten(): bool
+    {
+        return $this->alleKonten;
+    }
+
+    public function getVonDatum(): ?string
+    {
+        return $this->vonDatum;
+    }
+
+    public function getBisDatum(): ?string
+    {
+        return $this->bisDatum;
+    }
+
+    public function getMaximaleAnzahlEintraege(): ?int
+    {
+        return $this->maximaleAnzahlEintraege;
+    }
+
+    public function getAufsetzpunkt(): ?string
+    {
+        return $this->aufsetzpunkt;
+    }
 
     public static function create(\Fhp\Segment\Common\Kti $kti, bool $alleKonten, ?\DateTime $vonDatum, ?\DateTime $bisDatum, ?string $aufsetzpunkt = null): HKKAZv7
     {

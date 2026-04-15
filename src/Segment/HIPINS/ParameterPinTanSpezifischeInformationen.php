@@ -16,10 +16,41 @@ class ParameterPinTanSpezifischeInformationen extends BaseDeg
     public ?int $minimalePinLaenge = null;
     public ?int $maximalePinLaenge = null;
     public ?int $maximaleTanLaenge = null;
-    /** Max length: 30; Label for the username field in the UI. */
     public ?string $textZurBelegungDerBenutzerkennung = null;
-    /** Max length: 30; */
     public ?string $textZurBelegungDerKundenId = null;
     /** @var GeschaeftsvorfallspezifischePinTanInformationen[] @Max(999) */
     public array $geschaeftsvorfallspezifischePinTanInformationen;
+
+    public function getMinimalePinLaenge(): ?int
+    {
+        return $this->minimalePinLaenge;
+    }
+
+    public function getMaximalePinLaenge(): ?int
+    {
+        return $this->maximalePinLaenge;
+    }
+
+    public function getMaximaleTanLaenge(): ?int
+    {
+        return $this->maximaleTanLaenge;
+    }
+
+    public function getTextZurBelegungDerBenutzerkennung(): ?string
+    {
+        return $this->textZurBelegungDerBenutzerkennung;
+    }
+
+    public function getTextZurBelegungDerKundenId(): ?string
+    {
+        return $this->textZurBelegungDerKundenId;
+    }
+
+    /**
+     * @return GeschaeftsvorfallspezifischePinTanInformationen[]
+     */
+    public function getGeschaeftsvorfallspezifischePinTanInformationen(): array
+    {
+        return $this->geschaeftsvorfallspezifischePinTanInformationen;
+    }
 }

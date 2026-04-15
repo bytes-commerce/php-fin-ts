@@ -14,8 +14,16 @@ use Fhp\Segment\BaseDeg;
  */
 class GeschaeftsvorfallspezifischePinTanInformationen extends BaseDeg
 {
-    /** Max length: 6; The segment name of the potential client request. */
     public string $segmentkennung;
-    /** Whether a TAN is needed. */
     public bool $tanErforderlich;
+
+    public function getSegmentkennung(): string
+    {
+        return $this->segmentkennung;
+    }
+
+    public function getTanErforderlich(): bool
+    {
+        return $this->tanErforderlich;
+    }
 }

@@ -13,6 +13,10 @@ use Fhp\Segment\BaseDeg;
  */
 class ParameterChallengeKlasse extends BaseDeg
 {
-    /** Max length 999 */
     public ?string $challengeKlasseParameter = null;
+
+    public function getChallengeKlasseParameter(): ?string
+    {
+        return $this->challengeKlasseParameter;
+    }
 }

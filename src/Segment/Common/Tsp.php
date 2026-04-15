@@ -25,6 +25,16 @@ class Tsp extends BaseDeg
         return $result;
     }
 
+    public function getDatum(): string
+    {
+        return $this->datum;
+    }
+
+    public function getUhrzeit(): ?string
+    {
+        return $this->uhrzeit;
+    }
+
     public function asDateTime(): \DateTime
     {
         return \DateTime::createFromFormat('Ymd His', $this->datum . ' ' . ($this->uhrzeit ?? '000000'));

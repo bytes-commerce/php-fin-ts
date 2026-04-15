@@ -17,8 +17,33 @@ class HKWPDv5 extends BaseSegment implements Paginateable
     public \Fhp\Segment\Common\KtvV3 $depot;
     public ?string $waehrungDerDepotaufstellung = null;
     public ?\Fhp\Segment\Common\Kursqualitaet $kursqualitaet = null;
-    /** Only allowed if {@link ParameterDepotaufstellungV2::$eingabeAnzahlEintraegeErlaubt} says so. */
     public ?int $maximaleAnzahlEintraege = null;
+    public ?string $aufsetzpunkt = null;
+
+    public function getDepot(): \Fhp\Segment\Common\KtvV3
+    {
+        return $this->depot;
+    }
+
+    public function getWaehrungDerDepotaufstellung(): ?string
+    {
+        return $this->waehrungDerDepotaufstellung;
+    }
+
+    public function getKursqualitaet(): ?\Fhp\Segment\Common\Kursqualitaet
+    {
+        return $this->kursqualitaet;
+    }
+
+    public function getMaximaleAnzahlEintraege(): ?int
+    {
+        return $this->maximaleAnzahlEintraege;
+    }
+
+    public function getAufsetzpunkt(): ?string
+    {
+        return $this->aufsetzpunkt;
+    }
 
     public static function create(\Fhp\Segment\Common\KtvV3 $ktv): HKWPDv5
     {

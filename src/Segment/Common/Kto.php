@@ -40,4 +40,14 @@ class Kto extends BaseDeg implements AccountInfo
     {
         return $this->kik->kreditinstitutscode;
     }
+
+    public function getKontonummer(): string
+    {
+        return $this->kontonummer;
+    }
+
+    public function getKik(): Kik
+    {
+        return $this->kik;
+    }
 }

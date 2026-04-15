@@ -34,4 +34,14 @@ class Kik extends BaseDeg
         $result->kreditinstitutscode = $kreditinstitutscode;
         return $result;
     }
+
+    public function getLaenderkennzeichen(): ?string
+    {
+        return $this->laenderkennzeichen;
+    }
+
+    public function getKreditinstitutscode(): ?string
+    {
+        return $this->kreditinstitutscode;
+    }
 }

@@ -36,6 +36,26 @@ class MinimaleVorlaufzeitSEPALastschrift
     /** After this time the request will fail when the value of is used, for example 130000 meaning 1pm */
     public string $cutOffZeit;
 
+    public function getUnterstuetzteSEPALastschriftartenCodiert(): int
+    {
+        return $this->unterstuetzteSEPALastschriftartenCodiert;
+    }
+
+    public function getSequenceTypeCodiert(): int
+    {
+        return $this->sequenceTypeCodiert;
+    }
+
+    public function getMinimaleSEPAVorlaufzeit(): int
+    {
+        return $this->minimaleSEPAVorlaufzeit;
+    }
+
+    public function getCutOffZeit(): string
+    {
+        return $this->cutOffZeit;
+    }
+
     public static function create(int $minimaleSEPAVorlaufzeit, string $cutOffZeit, ?int $unterstuetzteSEPALastschriftartenCodiert = null,
         ?int $sequenceTypeCodiert = null): MinimaleVorlaufzeitSEPALastschrift
     {
