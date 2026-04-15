@@ -66,4 +66,29 @@ class Kti extends BaseDeg implements AccountInfo
     {
         return $this->bic ?? $this->kreditinstitutskennung->kreditinstitutscode;
     }
+
+    public function getIban(): ?string
+    {
+        return $this->iban;
+    }
+
+    public function getBic(): ?string
+    {
+        return $this->bic;
+    }
+
+    public function getKontonummer(): ?string
+    {
+        return $this->kontonummer;
+    }
+
+    public function getUnterkontomerkmal(): ?string
+    {
+        return $this->unterkontomerkmal;
+    }
+
+    public function getKreditinstitutskennung(): ?Kik
+    {
+        return $this->kreditinstitutskennung;
+    }
 }

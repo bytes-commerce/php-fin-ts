@@ -46,4 +46,19 @@ class KtvV3 extends BaseDeg implements AccountInfo
     {
         return $this->kik->kreditinstitutscode;
     }
+
+    public function getKontonummer(): ?string
+    {
+        return $this->kontonummer;
+    }
+
+    public function getUnterkontomerkmal(): ?string
+    {
+        return $this->unterkontomerkmal;
+    }
+
+    public function getKik(): ?Kik
+    {
+        return $this->kik;
+    }
 }

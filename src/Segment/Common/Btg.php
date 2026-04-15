@@ -12,6 +12,16 @@ class Btg extends BaseDeg
     public float $wert;
     public string $waehrung;
 
+    public function getWert(): float
+    {
+        return $this->wert;
+    }
+
+    public function getWaehrung(): string
+    {
+        return $this->waehrung;
+    }
+
     public static function create(float $wert, string $waehrung = 'EUR'): Btg
     {
         $result = new Btg();

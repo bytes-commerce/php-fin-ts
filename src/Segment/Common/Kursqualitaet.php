@@ -16,4 +16,9 @@ class Kursqualitaet extends BaseDeg
     public const REALTIME = 2; // Echtzeit-Kurs
 
     public int $kursqualitaet;
+
+    public function getKursqualitaet(): int
+    {
+        return $this->kursqualitaet;
+    }
 }

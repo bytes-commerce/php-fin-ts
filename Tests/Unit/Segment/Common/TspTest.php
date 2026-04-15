@@ -3,18 +3,53 @@
 namespace Fhp\Tests\Unit\Segment\Common;
 
 use Fhp\Segment\Common\Tsp;
+use PHPUnit\Framework\TestCase;
 
-class TspTest extends \PHPUnit\Framework\TestCase
+final class TspTest extends TestCase
 {
-    public function testParseWithoutTime()
+    public function testCreate(): void
     {
-        $this->assertEquals(new \DateTime('2020-01-02T00:00:00'), Tsp::parse('20200102')->asDateTime());
-        $this->assertEquals(new \DateTime('2020-07-02T00:00:00'), Tsp::parse('20200702')->asDateTime());
+        $tsp = Tsp::create('20240115', '123045');
+
+        $this->assertSame('20240115', $tsp->datum);
+        $this->assertSame('123045', $tsp->uhrzeit);
     }
 
-    public function testParseWithTime()
+    public function testCreateWithNullUhrzeit(): void
     {
-        $this->assertEquals(new \DateTime('2020-01-02T11:22:33'), Tsp::parse('20200102:112233')->asDateTime());
-        $this->assertEquals(new \DateTime('2020-01-02T22:00:00'), Tsp::parse('20200102:220000')->asDateTime());
+        $tsp = Tsp::create('20240115', null);
+
+        $this->assertSame('20240115', $tsp->datum);
+        $this->assertNull($tsp->uhrzeit);
+    }
+
+    public function testGetDatum(): void
+    {
+        $tsp = Tsp::create('20241225', '000000');
+
+        $this->assertSame('20241225', $tsp->getDatum());
+    }
+
+    public function testGetUhrzeit(): void
+    {
+        $tsp = Tsp::create('20241225', '143000');
+
+        $this->assertSame('143000', $tsp->getUhrzeit());
+    }
+
+    public function testGetUhrzeitReturnsNullWhenNotSet(): void
+    {
+        $tsp = Tsp::create('20241225', null);
+
+        $this->assertNull($tsp->getUhrzeit());
+    }
+
+    public function testAsDateTime(): void
+    {
+        $tsp = Tsp::create('20240115', '123045');
+
+        $result = $tsp->asDateTime();
+
+        $this->assertInstanceOf(\DateTime::class, $result);
     }
 }
