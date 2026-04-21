@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\HNSHK;
 
-namespace Fhp\Segment\HNSHK;
-
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Signaturalgorithmus (Version 2)

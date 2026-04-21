@@ -1,8 +1,12 @@
 <?php
 
-namespace Fhp\Model\FlickerTan;
+declare(strict_types=1);
 
-use Fhp\Syntax\Bin;
+
+
+namespace BytesCommerce\Model\FlickerTan;
+
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Parses the HHDUC Flicker Tan Challenge to a Flicker pattern with suffixed control sequence
@@ -13,7 +17,7 @@ class TanRequestChallengeFlicker
     /**
      * @var string original challenge data
      */
-    private $challenge;
+    private string $challenge;
 
     /**
      * @var StartCode holds and parses the startcode block of the challenge
@@ -38,7 +42,7 @@ class TanRequestChallengeFlicker
         $lc = (int) substr($reducedChallenge, 0, 3);
         $reducedChallenge = substr($reducedChallenge, 3);
         if (strlen($reducedChallenge) !== $lc) {
-            throw new \InvalidArgumentException("Wrong length of TAN Challenge expected: $lc - found: ". strlen($reducedChallenge). ' - only Version 1.4 supported');
+            throw new \InvalidArgumentException(sprintf('Wrong length of TAN Challenge expected: %d - found: ', $lc). strlen($reducedChallenge). ' - only Version 1.4 supported');
         }
 
         [$reducedChallenge, $this->startCode] = StartCode::parseNextBlock($reducedChallenge);
@@ -46,8 +50,9 @@ class TanRequestChallengeFlicker
             [$reducedChallenge, $de] = DataElement::parseNextBlock($reducedChallenge);
             $this->dataElements[$i] = $de;
         }
+
         if (!empty($reducedChallenge)) {
-            throw new \InvalidArgumentException("Challenge has unexpected ending $reducedChallenge");
+            throw new \InvalidArgumentException('Challenge has unexpected ending ' . $reducedChallenge);
         }
     }
 
@@ -62,6 +67,7 @@ class TanRequestChallengeFlicker
             $intVal = (int) base_convert($hexChar, 16, 10);
             $xor ^= $intVal; // xor operator
         }
+
         return base_convert($xor, 10, 16);
     }
 
@@ -74,6 +80,7 @@ class TanRequestChallengeFlicker
         for ($i = 0; $i < 3; ++$i) {
             $hex .= $this->dataElements[$i]->toHex();
         }
+
         $lc = strlen($hex) / 2 + 1;
         $lc = str_pad(base_convert($lc, 10, 16), 2, '0', STR_PAD_LEFT);
         return $lc . $hex;
@@ -88,6 +95,7 @@ class TanRequestChallengeFlicker
         for ($i = 0; $i < 3; ++$i) {
             $luhn += $this->dataElements[$i]->getLuhnChecksum();
         }
+
         return (10 - ($luhn % 10)) % 10;
     }
 
@@ -137,6 +145,7 @@ class TanRequestChallengeFlicker
             $bitPattern[] = $secondHalfByte;
             $bitPattern[] = $firstHalfByte;
         }
+
         return $bitPattern;
     }
 

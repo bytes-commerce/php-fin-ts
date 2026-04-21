@@ -1,9 +1,11 @@
 <?php
 
-namespace Fhp\Segment\VPA;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
-use Fhp\Syntax\Bin;
+namespace BytesCommerce\Segment\VPA;
+
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Segment: Namensabgleich Ausführungsauftrag

@@ -1,23 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp;
+namespace BytesCommerce;
 
-use Fhp\Model\PollingInfo;
-use Fhp\Model\TanRequest;
-use Fhp\Model\VopConfirmationRequest;
-use Fhp\Protocol\ActionIncompleteException;
-use Fhp\Protocol\ActionPendingException;
-use Fhp\Protocol\BPD;
-use Fhp\Protocol\Message;
-use Fhp\Protocol\TanRequiredException;
-use Fhp\Protocol\UnexpectedResponseException;
-use Fhp\Protocol\UPD;
-use Fhp\Protocol\VopConfirmationRequiredException;
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\HIRMS\Rueckmeldung;
-use Fhp\Segment\HIRMS\Rueckmeldungscode;
+use BytesCommerce\Model\PollingInfo;
+use BytesCommerce\Model\TanRequest;
+use BytesCommerce\Model\VopConfirmationRequest;
+use BytesCommerce\Protocol\ActionIncompleteException;
+use BytesCommerce\Protocol\ActionPendingException;
+use BytesCommerce\Protocol\BPD;
+use BytesCommerce\Protocol\Message;
+use BytesCommerce\Protocol\TanRequiredException;
+use BytesCommerce\Protocol\UnexpectedResponseException;
+use BytesCommerce\Protocol\UPD;
+use BytesCommerce\Protocol\VopConfirmationRequiredException;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\HIRMS\Rueckmeldung;
+use BytesCommerce\Segment\HIRMS\Rueckmeldungscode;
 
 /**
  * Base class for actions that can be performed against a bank server. On a high level, there are two kinds of actions:

@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\HISYN;
 
-namespace Fhp\Segment\HISYN;
-
-use Fhp\Segment\BaseSegment;
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: Synchronisierungsantwort (Version 4)
@@ -16,10 +17,13 @@ class HISYNv4 extends BaseSegment
 {
     /** Present if HKSYN.synchronisierungsmodus==0 */
     public ?string $kundensystemId = null;
+
     /** Present if HKSYN.synchronisierungsmodus==1 */
     public ?int $nachrichtennummer = null;
+
     /** Present if HKSYN.synchronisierungsmodus==2 */
     public ?int $sicherheitsreferenznummerFuerSignierschluessel = null;
+
     /** Present if HKSYN.synchronisierungsmodus==2 */
     public ?int $sicherheitsreferenznummerFuerDigitaleSignatur = null;
 }

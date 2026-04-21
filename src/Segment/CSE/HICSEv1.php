@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\CSE;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
+namespace BytesCommerce\Segment\CSE;
+
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: SEPA Einzelüberweisung Parameter (Version 1)

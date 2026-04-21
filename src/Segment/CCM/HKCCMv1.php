@@ -1,9 +1,11 @@
 <?php
 
-namespace Fhp\Segment\CCM;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
-use Fhp\Syntax\Bin;
+namespace BytesCommerce\Segment\CCM;
+
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Segment: SEPA Einzelüberweisung (Version 1)
@@ -14,10 +16,10 @@ use Fhp\Syntax\Bin;
 class HKCCMv1 extends BaseSegment
 {
     /** IBAN/BIC must match <DbtrAcct> and <DbtrAgt> in the XML Below. */
-    public \Fhp\Segment\Common\Kti $kontoverbindungInternational;
+    public \BytesCommerce\Segment\Common\Kti $kontoverbindungInternational;
 
     /** Required if BDP „Summenfeld benötigt“ = J */
-    public ?\Fhp\Segment\Common\Btg $summenfeld = null;
+    public ?\BytesCommerce\Segment\Common\Btg $summenfeld = null;
 
     /** Optional only if „Einzelbuchung erlaubt“ = J */
     public ?bool $einzelbuchungGewuenscht = null;

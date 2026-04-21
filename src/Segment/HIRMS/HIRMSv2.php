@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\HIRMS;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
+namespace BytesCommerce\Segment\HIRMS;
+
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: Rückmeldungen zu Segmenten (Version 2)

@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\KAZ;
 
-namespace Fhp\Segment\KAZ;
-
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Parameter Kontoumsätze (Version 1)
@@ -16,6 +18,7 @@ class ParameterKontoumsaetzeV1 extends BaseDeg implements ParameterKontoumsaetze
 {
     /** Positive, number of days. */
     public int $speicherzeitraum;
+
     public bool $eingabeAnzahlEintraegeErlaubt;
 
     public function getAlleKontenErlaubt(): bool

@@ -1,10 +1,14 @@
 <?php
 
-namespace Fhp\Options;
+declare(strict_types=1);
 
-use Fhp\Model\Account;
-use Fhp\Model\SEPAAccount;
-use Fhp\Syntax\Serializer;
+
+
+namespace BytesCommerce\Options;
+
+use BytesCommerce\Model\Account;
+use BytesCommerce\Model\SEPAAccount;
+use BytesCommerce\Syntax\Serializer;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -16,10 +20,8 @@ use Psr\Log\LoggerInterface;
  */
 class SanitizingLogger extends \Psr\Log\AbstractLogger
 {
-    /** @var LoggerInterface */
-    private $logger;
     /** @var string[] */
-    private $needles;
+    private array $needles;
 
     /**
      * @param LoggerInterface $logger The inner logger, to which the SanitizingLogger forwards its output.
@@ -27,23 +29,22 @@ class SanitizingLogger extends \Psr\Log\AbstractLogger
      *     some sensitive information. This array may also contain plain strings, which are themselves interpreted as
      *     sensitive.
      */
-    public function __construct(LoggerInterface $logger, array $sensitiveMaterial)
+    public function __construct(private LoggerInterface $logger, array $sensitiveMaterial)
     {
-        $this->logger = $logger;
         $this->needles = static::computeNeedles($sensitiveMaterial);
     }
 
     /**
      * @param array $sensitiveMaterial See the constructor.
      */
-    public function addSensitiveMaterial(array $sensitiveMaterial)
+    public function addSensitiveMaterial(array $sensitiveMaterial): void
     {
         $this->needles = array_merge($this->needles, static::computeNeedles($sensitiveMaterial));
     }
 
     public function log($level, $message, array $context = []): void
     {
-        $message .= count($context) === 0 ? '' : ' ' . implode(', ', $context);
+        $message .= $context === [] ? '' : ' ' . implode(', ', $context);
         $this->logger->log($level, static::sanitizeForLogging($message, $this->needles));
     }
 
@@ -76,11 +77,11 @@ class SanitizingLogger extends \Psr\Log\AbstractLogger
                 throw new \InvalidArgumentException('Unsupported type of sensitive material ' . gettype($item));
             }
         }
+
         $needles = array_filter($needles); // Filter out empty entries.
-        $escapedNeedles = array_map(function (string $needle) {
+        $escapedNeedles = array_map(
             // The wire format is ISO-8859-1, so that's what will be logged and that's what to look for when replacing.
-            return mb_convert_encoding(Serializer::escape($needle), 'ISO-8859-1', 'UTF-8');
-        }, $needles);
+            fn(string $needle) => mb_convert_encoding(Serializer::escape($needle), 'ISO-8859-1', 'UTF-8'), $needles);
         return array_merge($needles, $escapedNeedles);
     }
 
@@ -93,7 +94,7 @@ class SanitizingLogger extends \Psr\Log\AbstractLogger
      */
     public static function sanitizeForLogging(string $str, array $needles): string
     {
-        $replacements = array_map(function ($needle) {
+        $replacements = array_map(function (string $needle): string {
             $len = strlen($needle);
             $prefix = 'PRIVATE';
             return substr($prefix, 0, $len) . str_repeat('_', max(0, $len - strlen($prefix)));

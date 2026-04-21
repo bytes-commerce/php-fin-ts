@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\HNVSK;
 
-namespace Fhp\Segment\HNVSK;
-
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Zertifikat (Version 2)
@@ -15,6 +17,7 @@ class ZertifikatV2 extends BaseDeg
 {
     /** Allowed values: 1, 2, 3 */
     public int $zertifikatstyp;
+
     /** Binary, max length 4096 */
     public string $zertifikatsinhalt;
 }

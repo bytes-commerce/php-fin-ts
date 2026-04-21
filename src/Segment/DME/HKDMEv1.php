@@ -1,9 +1,11 @@
 <?php
 
-namespace Fhp\Segment\DME;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
-use Fhp\Syntax\Bin;
+namespace BytesCommerce\Segment\DME;
+
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Einreichung terminierter SEPA-Sammellastschrift (Segmentversion 1)
@@ -14,10 +16,10 @@ use Fhp\Syntax\Bin;
 class HKDMEv1 extends BaseSegment
 {
     /** IBAN/BIC must match <DbtrAcct> and <DbtrAgt> in the XML Below. */
-    public \Fhp\Segment\Common\Kti $kontoverbindungInternational;
+    public \BytesCommerce\Segment\Common\Kti $kontoverbindungInternational;
 
     /** Required if BDP „Summenfeld benötigt“ = J */
-    public ?\Fhp\Segment\Common\Btg $summenfeld = null;
+    public ?\BytesCommerce\Segment\Common\Btg $summenfeld = null;
 
     /** Optional only if „Einzelbuchung erlaubt“ = J */
     public ?bool $einzelbuchungGewuenscht = null;

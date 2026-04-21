@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\TAN;
 
-namespace Fhp\Segment\TAN;
-
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Challenge-Klasse Parameter (Version 1)

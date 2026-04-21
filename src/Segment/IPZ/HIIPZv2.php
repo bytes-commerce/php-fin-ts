@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp\Segment\IPZ;
+declare(strict_types=1);
+
+namespace BytesCommerce\Segment\IPZ;
 
 /**
  * Segment: SEPA-Instant Payment Zahlung (Version 2)

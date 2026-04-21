@@ -1,9 +1,11 @@
 <?php
 
-namespace Fhp\Segment\KAZ;
+declare(strict_types=1);
 
-use Fhp\Segment\SegmentInterface;
-use Fhp\Syntax\Bin;
+namespace BytesCommerce\Segment\KAZ;
+
+use BytesCommerce\Segment\SegmentInterface;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Segment: Kontoumsätze rückmelden/Zeitraum

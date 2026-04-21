@@ -1,10 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\SPA;
 
-namespace Fhp\Segment\SPA;
-
-use Fhp\Segment\BaseDeg;
-use Fhp\Segment\UnterstuetzteSEPADatenformateTrait;
+use BytesCommerce\Segment\BaseDeg;
+use BytesCommerce\Segment\UnterstuetzteSEPADatenformateTrait;
 
 /**
  * Data Element Group: Parameter SEPA-Kontoverbindung anfordern (Version 2)
@@ -17,9 +19,13 @@ class ParameterSepaKontoverbindungAnfordernV2 extends BaseDeg implements Paramet
     use UnterstuetzteSEPADatenformateTrait;
 
     public bool $einzelkontenabrufErlaubt;
+
     public bool $nationaleKontoverbindungErlaubt;
+
     public bool $strukturierterVerwendungszweckErlaubt;
+
     public bool $eingabeAnzahlEintraegeErlaubt;
+
     /** @var string[] @Max(99) Max length each: 256 */
     public array $unterstuetzteSepaDatenformate;
 }

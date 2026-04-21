@@ -1,12 +1,16 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Protocol;
+namespace BytesCommerce\Protocol;
 
-use Fhp\Segment\HIRMG\HIRMGv2;
-use Fhp\Segment\HIRMS\HIRMSv2;
-use Fhp\Segment\HIRMS\Rueckmeldung;
-use Fhp\Segment\HIRMS\Rueckmeldungscode;
+use BytesCommerce\Segment\HIRMG\HIRMGv2;
+use BytesCommerce\Segment\HIRMS\HIRMSv2;
+use BytesCommerce\Segment\HIRMS\Rueckmeldung;
+use BytesCommerce\Segment\HIRMS\Rueckmeldungscode;
 
 /**
  * Thrown when the server response with a response code that indicates an error when executing the request.

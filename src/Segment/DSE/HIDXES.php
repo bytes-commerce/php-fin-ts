@@ -1,9 +1,11 @@
 <?php
 
-namespace Fhp\Segment\DSE;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\SegmentInterface;
+namespace BytesCommerce\Segment\DSE;
+
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\SegmentInterface;
 
 interface HIDXES extends SegmentInterface
 {

@@ -1,11 +1,13 @@
 <?php
 
-namespace Fhp\Segment\DME;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseGeschaeftsvorfallparameter;
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\DSE\HIDXES;
-use Fhp\Segment\DSE\SEPADirectDebitMinimalLeadTimeProvider;
+namespace BytesCommerce\Segment\DME;
+
+use BytesCommerce\Segment\BaseGeschaeftsvorfallparameter;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\DSE\HIDXES;
+use BytesCommerce\Segment\DSE\SEPADirectDebitMinimalLeadTimeProvider;
 
 /**
  * Segment: Terminierte SEPA-Sammellastschrift einreichen Parameter

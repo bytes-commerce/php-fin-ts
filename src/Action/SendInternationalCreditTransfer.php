@@ -1,15 +1,19 @@
 <?php
 
-namespace Fhp\Action;
+declare(strict_types=1);
 
-use Fhp\BaseAction;
-use Fhp\Model\SEPAAccount;
-use Fhp\Protocol\BPD;
-use Fhp\Protocol\UPD;
-use Fhp\Segment\AUB\HIAUBSv9;
-use Fhp\Segment\AUB\HKAUBv9;
-use Fhp\Segment\Common\Kti;
-use Fhp\Syntax\Bin;
+
+
+namespace BytesCommerce\Action;
+
+use BytesCommerce\BaseAction;
+use BytesCommerce\Model\SEPAAccount;
+use BytesCommerce\Protocol\BPD;
+use BytesCommerce\Protocol\UPD;
+use BytesCommerce\Segment\AUB\HIAUBSv9;
+use BytesCommerce\Segment\AUB\HKAUBv9;
+use BytesCommerce\Segment\Common\Kti;
+use BytesCommerce\Syntax\Bin;
 
 class SendInternationalCreditTransfer extends BaseAction
 {

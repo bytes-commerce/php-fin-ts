@@ -1,6 +1,10 @@
 <?php
 
-namespace Fhp\Segment;
+declare(strict_types=1);
+
+
+
+namespace BytesCommerce\Segment;
 
 /**
  * Contains meta information about a data element group, i.e. anything that can be statically known about a sub-class of
@@ -17,10 +21,11 @@ class DegDescriptor extends BaseDescriptor
      */
     public static function get(string $class): DegDescriptor
     {
-        if (!array_key_exists($class, static::$descriptors)) {
-            static::$descriptors[$class] = new DegDescriptor($class);
+        if (!array_key_exists($class, self::$descriptors)) {
+            self::$descriptors[$class] = new DegDescriptor($class);
         }
-        return static::$descriptors[$class];
+
+        return self::$descriptors[$class];
     }
 
     /**
@@ -31,18 +36,19 @@ class DegDescriptor extends BaseDescriptor
     {
         $this->class = $class;
         try {
-            $clazz = new \ReflectionClass($class);
-            if (!$clazz->isSubclassOf(BaseDeg::class)) {
-                throw new \InvalidArgumentException("Must inherit from BaseDeg: $class");
+            $reflectionClass = new \ReflectionClass($class);
+            if (!$reflectionClass->isSubclassOf(BaseDeg::class)) {
+                throw new \InvalidArgumentException('Must inherit from BaseDeg: ' . $class);
             }
-            parent::__construct($clazz);
+
+            parent::__construct($reflectionClass);
 
             // Check if the name ends in V2 or so, implicitly assume V1.
-            if (preg_match('/^[A-Z]+[vV]([0-9]+)$/', $clazz->getShortName(), $match) === 1) {
+            if (preg_match('/^[A-Z]+[vV](\d+)$/', $reflectionClass->getShortName(), $match) === 1) {
                 $this->version = intval($match[1]);
             }
-        } catch (\ReflectionException $e) {
-            throw new \RuntimeException($e);
+        } catch (\ReflectionException $reflectionException) {
+            throw new \RuntimeException($reflectionException, $reflectionException->getCode(), $reflectionException);
         }
     }
 }

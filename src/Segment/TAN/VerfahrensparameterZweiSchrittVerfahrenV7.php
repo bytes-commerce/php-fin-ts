@@ -1,18 +1,23 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\TAN;
 
-namespace Fhp\Segment\TAN;
-
-use Fhp\Model\TanMode;
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Model\TanMode;
+use BytesCommerce\Segment\BaseDeg;
 
 class VerfahrensparameterZweiSchrittVerfahrenV7 extends BaseDeg implements TanMode
 {
     /** Allowed values: 900 through 997 */
     public int $sicherheitsfunktion;
+
     /** Allowed values: 1, 2; See specification or {@link HKTANv7::$$tanProzess} for details. */
     public string $tanProzess;
+
     public string $technischeIdentifikationTanVerfahren;
+
     /**
      * Allowed values:
      * - HHD
@@ -25,18 +30,26 @@ class VerfahrensparameterZweiSchrittVerfahrenV7 extends BaseDeg implements TanMo
      * Max length: 32
      */
     public ?string $dkTanVerfahren = null;
+
     /** Max length: 10 */
     public ?string $versionDkTanVerfahren = null;
+
     /** Max length: 30 */
     public string $nameDesZweiSchrittVerfahrens;
+
     /** Present iff !isDecoupled. */
     public ?int $maximaleLaengeDesTanEingabewertes = null;
+
     /** Present iff !isDecoupled. Allowed values: 1 = numerisch, 2 = alfanumerisch */
     public ?int $erlaubtesFormat = null;
+
     public string $textZurBelegungDesRueckgabewertes;
+
     /** Allowed values: 1 through 256 */
     public int $maximaleLaengeDesRueckgabewertes;
+
     public bool $mehrfachTanErlaubt;
+
     /**
      * In case of multi-TAN (see {@link $mehrfachTanErlaubt}), this specifies whether all TANs must be entered in the
      * same dialog and at the same time, or not.
@@ -46,27 +59,41 @@ class VerfahrensparameterZweiSchrittVerfahrenV7 extends BaseDeg implements TanMo
      * 4 nicht zutreffend
      */
     public int $tanZeitUndDialogbezug;
+
     public bool $auftragsstornoErlaubt;
+
     /** Allowed values: 0 (cannot), 2 (must) */
     public int $smsAbbuchungskontoErforderlich;
+
     /** Allowed values: 0 (cannot), 2 (must) */
     public int $auftraggeberkontoErforderlich;
+
     public bool $challengeKlasseErforderlich;
+
     public bool $challengeStrukturiert;
+
     /** Allowed values: 00 (cleartext PIN, no TAN), 01 (Schablone 01, encrypted PIN), 02 (reserved) */
     public string $initialisierungsmodus;
+
     /** Allowed values: 0 (cannot), 2 (must) */
     public int $bezeichnungDesTanMediumsErforderlich;
+
     public bool $antwortHhdUcErforderlich;
+
     public ?int $anzahlUnterstuetzterAktiverTanMedien = null;
+
     /** Present iff isDecoupled. 0 means infinity. */
     public ?int $maximaleAnzahlStatusabfragen = null;
+
     /** Present iff isDecoupled. In seconds. */
     public ?int $wartezeitVorErsterStatusabfrage = null;
+
     /** Present iff isDecoupled. In seconds. */
     public ?int $wartezeitVorNaechsterStatusabfrage = null;
+
     /** Maybe present if isDecoupled. */
     public ?bool $manuelleBestaetigungMoeglich = null;
+
     /** Maybe present if isDecoupled. */
     public ?bool $automatisierteStatusabfragenErlaubt = null;
 
@@ -125,9 +152,11 @@ class VerfahrensparameterZweiSchrittVerfahrenV7 extends BaseDeg implements TanMo
         if ($this->isDecoupled()) {
             throw new \RuntimeException('getMaxTanLength is not available for decoupled TAN modes');
         }
+
         if ($this->maximaleLaengeDesTanEingabewertes === null) {
             throw new \AssertionError('maximaleLaengeDesTanEingabewertes is unexpectedly absent');
         }
+
         return $this->maximaleLaengeDesTanEingabewertes;
     }
 
@@ -136,9 +165,11 @@ class VerfahrensparameterZweiSchrittVerfahrenV7 extends BaseDeg implements TanMo
         if ($this->isDecoupled()) {
             throw new \RuntimeException('getTanFormat is not available for decoupled TAN modes');
         }
+
         if ($this->erlaubtesFormat === null) {
             throw new \AssertionError('erlaubtesFormat is unexpectedly absent');
         }
+
         return $this->erlaubtesFormat;
     }
 
@@ -152,9 +183,11 @@ class VerfahrensparameterZweiSchrittVerfahrenV7 extends BaseDeg implements TanMo
         if (!$this->isDecoupled()) {
             throw new \RuntimeException('Only allowed for decoupled TAN modes');
         }
+
         if ($this->maximaleAnzahlStatusabfragen === null) {
             throw new \AssertionError('maximaleAnzahlStatusabfragen is unexpectedly absent');
         }
+
         return $this->maximaleAnzahlStatusabfragen;
     }
 
@@ -163,9 +196,11 @@ class VerfahrensparameterZweiSchrittVerfahrenV7 extends BaseDeg implements TanMo
         if (!$this->isDecoupled()) {
             throw new \RuntimeException('Only allowed for decoupled TAN modes');
         }
+
         if ($this->wartezeitVorErsterStatusabfrage === null) {
             throw new \AssertionError('wartezeitVorErsterStatusabfrage is unexpectedly absent');
         }
+
         return $this->wartezeitVorErsterStatusabfrage;
     }
 
@@ -174,9 +209,11 @@ class VerfahrensparameterZweiSchrittVerfahrenV7 extends BaseDeg implements TanMo
         if (!$this->isDecoupled()) {
             throw new \RuntimeException('Only allowed for decoupled TAN modes');
         }
+
         if ($this->wartezeitVorNaechsterStatusabfrage === null) {
             throw new \AssertionError('wartezeitVorNaechsterStatusabfrage is unexpectedly absent');
         }
+
         return $this->wartezeitVorNaechsterStatusabfrage;
     }
 
@@ -185,9 +222,11 @@ class VerfahrensparameterZweiSchrittVerfahrenV7 extends BaseDeg implements TanMo
         if (!$this->isDecoupled()) {
             throw new \RuntimeException('Only allowed for decoupled TAN modes');
         }
+
         if ($this->manuelleBestaetigungMoeglich === null) {
             throw new \AssertionError('manuelleBestaetigungMoeglich is unexpectedly absent');
         }
+
         return $this->manuelleBestaetigungMoeglich;
     }
 
@@ -196,9 +235,11 @@ class VerfahrensparameterZweiSchrittVerfahrenV7 extends BaseDeg implements TanMo
         if (!$this->isDecoupled()) {
             throw new \RuntimeException('Only allowed for decoupled TAN modes');
         }
+
         if ($this->automatisierteStatusabfragenErlaubt === null) {
             throw new \AssertionError('automatisierteStatusabfragenErlaubt is unexpectedly absent');
         }
+
         return $this->automatisierteStatusabfragenErlaubt;
     }
 

@@ -1,6 +1,10 @@
 <?php
 
-namespace Fhp;
+declare(strict_types=1);
+
+
+
+namespace BytesCommerce;
 
 /**
  * Thin wrapper around curl that does base64 encoding/decoding and converts errors to {@link CurlException}s.

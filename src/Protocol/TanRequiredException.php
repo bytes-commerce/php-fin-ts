@@ -1,22 +1,20 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Protocol;
 
-namespace Fhp\Protocol;
-
-use Fhp\Model\TanRequest;
+use BytesCommerce\Model\TanRequest;
 
 /**
  * Thrown when an action result is read, but it is not available because the action requires a TAN to be completed.
  */
 class TanRequiredException extends \RuntimeException
 {
-    /** @var TanRequest */
-    private $tanRequest;
-
-    public function __construct(TanRequest $tanRequest)
+    public function __construct(private TanRequest $tanRequest)
     {
         parent::__construct('This action requires a TAN to be completed.');
-        $this->tanRequest = $tanRequest;
     }
 
     public function getTanRequest()

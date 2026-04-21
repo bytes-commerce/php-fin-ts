@@ -1,10 +1,14 @@
 <?php
 
-namespace Fhp\Segment;
+declare(strict_types=1);
 
-use Fhp\Syntax\Parser;
-use Fhp\Syntax\Serializer;
-use Fhp\UnsupportedException;
+
+
+namespace BytesCommerce\Segment;
+
+use BytesCommerce\Syntax\Parser;
+use BytesCommerce\Syntax\Serializer;
+use BytesCommerce\UnsupportedException;
 
 /**
  * Base class for Data Element Groups (Datenelement-Gruppen; DEGs).
@@ -14,17 +18,18 @@ abstract class BaseDeg implements \Serializable
     /**
      * Reference to the descriptor for this type of segment.
      */
-    private ?DegDescriptor $descriptor = null;
+    private ?DegDescriptor $degDescriptor = null;
 
     /**
      * @return DegDescriptor The descriptor for this Deg type.
      */
     public function getDescriptor(): DegDescriptor
     {
-        if ($this->descriptor === null) {
-            $this->descriptor = DegDescriptor::get(static::class);
+        if ($this->degDescriptor === null) {
+            $this->degDescriptor = DegDescriptor::get(static::class);
         }
-        return $this->descriptor;
+
+        return $this->degDescriptor;
     }
 
     public function __debugInfo()
@@ -37,7 +42,7 @@ abstract class BaseDeg implements \Serializable
     /**
      * @throws \InvalidArgumentException If any element in this DEG is invalid.
      */
-    public function validate()
+    public function validate(): void
     {
         $this->getDescriptor()->validateObject($this);
     }
@@ -59,7 +64,7 @@ abstract class BaseDeg implements \Serializable
      * Parses into the current instance.
      * @param string $serialized The HBCI wire format for a DEG of this type.
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         self::__unserialize([$serialized]);
     }
@@ -94,6 +99,7 @@ abstract class BaseDeg implements \Serializable
         if (static::class === BaseDeg::class) {
             throw new UnsupportedException('Must not call BaseDeg::parse() on the base class');
         }
+
         return Parser::parseDeg($rawElements, static::class);
     }
 }

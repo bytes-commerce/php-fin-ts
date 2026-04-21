@@ -1,10 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\HKIDN;
+namespace BytesCommerce\Segment\HKIDN;
 
-use Fhp\Options\Credentials;
-use Fhp\Segment\BaseSegment;
+use BytesCommerce\Options\Credentials;
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: Identifikation (Version 2)
@@ -19,13 +23,17 @@ class HKIDNv2 extends BaseSegment
      * Section C.5
      */
     public const ANONYMOUS_KUNDEN_ID = '9999999999';
+
     public const MISSING_KUNDENSYSTEM_ID = '0';
 
-    public \Fhp\Segment\Common\Kik $kreditinstitutskennung;
+    public \BytesCommerce\Segment\Common\Kik $kreditinstitutskennung;
+
     /** Max length: 30 */
     public string $kundenId;
+
     /** Max length: 30 */
     public string $kundensystemId;
+
     /**
      * 0: Kundensystem-ID wird nicht benötigt (HBCI DDV-Verfahren und chipkartenbasierte Verfahren ab
      *    Sicherheitsprofil-Version 3)
@@ -35,21 +43,21 @@ class HKIDNv2 extends BaseSegment
 
     public static function create(string $kreditinstitutionscode, Credentials $credentials, string $kundensystemId): HKIDNv2
     {
-        $result = HKIDNv2::createEmpty();
-        $result->kreditinstitutskennung = \Fhp\Segment\Common\Kik::create($kreditinstitutionscode);
-        $result->kundenId = $credentials->getBenutzerkennung();
-        $result->kundensystemId = $kundensystemId;
-        $result->kundensystemStatus = 1; // This library only supports PIN/TAN, hence 1 is the right choice.
-        return $result;
+        $hkidNv2 = HKIDNv2::createEmpty();
+        $hkidNv2->kreditinstitutskennung = \BytesCommerce\Segment\Common\Kik::create($kreditinstitutionscode);
+        $hkidNv2->kundenId = $credentials->getBenutzerkennung();
+        $hkidNv2->kundensystemId = $kundensystemId;
+        $hkidNv2->kundensystemStatus = 1; // This library only supports PIN/TAN, hence 1 is the right choice.
+        return $hkidNv2;
     }
 
     public static function createAnonymous(string $kreditinstitutionscode): HKIDNv2
     {
-        $result = HKIDNv2::createEmpty();
-        $result->kreditinstitutskennung = \Fhp\Segment\Common\Kik::create($kreditinstitutionscode);
-        $result->kundenId = static::ANONYMOUS_KUNDEN_ID;
-        $result->kundensystemId = static::MISSING_KUNDENSYSTEM_ID;
-        $result->kundensystemStatus = 0; // Prescribed value for anonymous access.
-        return $result;
+        $hkidNv2 = HKIDNv2::createEmpty();
+        $hkidNv2->kreditinstitutskennung = \BytesCommerce\Segment\Common\Kik::create($kreditinstitutionscode);
+        $hkidNv2->kundenId = static::ANONYMOUS_KUNDEN_ID;
+        $hkidNv2->kundensystemId = static::MISSING_KUNDENSYSTEM_ID;
+        $hkidNv2->kundensystemStatus = 0; // Prescribed value for anonymous access.
+        return $hkidNv2;
     }
 }

@@ -1,6 +1,10 @@
 <?php
 
-namespace Fhp\Options;
+declare(strict_types=1);
+
+
+
+namespace BytesCommerce\Options;
 
 /**
  * Login information for a user.
@@ -9,6 +13,7 @@ class Credentials
 {
     /** @var string */
     protected $benutzerkennung;
+
     /** @var string */
     protected $pin;
 
@@ -28,17 +33,18 @@ class Credentials
      */
     public static function create(string $benutzerkennung, string $pin): Credentials
     {
-        if (strlen($benutzerkennung) === 0) {
+        if ($benutzerkennung === '') {
             throw new \InvalidArgumentException('benutzerkennung cannot be empty');
         }
-        if (strlen($pin) === 0) {
+
+        if ($pin === '') {
             throw new \InvalidArgumentException('pin cannot be empty');
         }
 
-        $result = new Credentials();
-        $result->benutzerkennung = $benutzerkennung;
-        $result->pin = $pin;
-        return $result;
+        $credentials = new Credentials();
+        $credentials->benutzerkennung = $benutzerkennung;
+        $credentials->pin = $pin;
+        return $credentials;
     }
 
     public function getBenutzerkennung(): string

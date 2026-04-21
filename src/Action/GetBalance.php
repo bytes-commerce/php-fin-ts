@@ -1,23 +1,26 @@
 <?php
 
-namespace Fhp\Action;
+declare(strict_types=1);
 
-use Fhp\Model\SEPAAccount;
-use Fhp\PaginateableAction;
-use Fhp\Protocol\BPD;
-use Fhp\Protocol\Message;
-use Fhp\Protocol\UnexpectedResponseException;
-use Fhp\Protocol\UPD;
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\Common\Kti;
-use Fhp\Segment\Common\Kto;
-use Fhp\Segment\Common\KtvV3;
-use Fhp\Segment\SAL\HISAL;
-use Fhp\Segment\SAL\HKSALv4;
-use Fhp\Segment\SAL\HKSALv5;
-use Fhp\Segment\SAL\HKSALv6;
-use Fhp\Segment\SAL\HKSALv7;
-use Fhp\UnsupportedException;
+
+
+namespace BytesCommerce\Action;
+
+use BytesCommerce\Model\SEPAAccount;
+use BytesCommerce\PaginateableAction;
+use BytesCommerce\Protocol\BPD;
+use BytesCommerce\Protocol\Message;
+use BytesCommerce\Protocol\UnexpectedResponseException;
+use BytesCommerce\Protocol\UPD;
+use BytesCommerce\Segment\Common\Kti;
+use BytesCommerce\Segment\Common\Kto;
+use BytesCommerce\Segment\Common\KtvV3;
+use BytesCommerce\Segment\SAL\HISAL;
+use BytesCommerce\Segment\SAL\HKSALv4;
+use BytesCommerce\Segment\SAL\HKSALv5;
+use BytesCommerce\Segment\SAL\HKSALv6;
+use BytesCommerce\Segment\SAL\HKSALv7;
+use BytesCommerce\UnsupportedException;
 
 /**
  * Runs an HKSAL request the current balance of the given account.
@@ -25,27 +28,26 @@ use Fhp\UnsupportedException;
 class GetBalance extends PaginateableAction
 {
     // Request (if you add a field here, update __serialize() and __unserialize() as well).
-    /** @var SEPAAccount */
-    private $account;
-    /** @var bool */
-    private $allAccounts;
+    private ?SEPAAccount $sepaAccount = null;
+
+    private ?bool $allAccounts = null;
 
     // Response
     /** @var HISAL[] */
-    private $response = [];
+    private array $response = [];
 
     /**
-     * @param SEPAAccount $account The account to get the balance for. This can be constructed based on information
+     * @param SEPAAccount $sepaAccount The account to get the balance for. This can be constructed based on information
      *     that the user entered, or it can be {@link SEPAAccount} instance retrieved from {@link GetSEPAAccounts}.
      * @param bool $allAccounts If set to true, will return balances for all accounts of the user. You still need to
      *     pass one of the accounts into $account, though.
      */
-    public static function create(SEPAAccount $account, bool $allAccounts = false): GetBalance
+    public static function create(SEPAAccount $sepaAccount, bool $allAccounts = false): GetBalance
     {
-        $result = new GetBalance();
-        $result->account = $account;
-        $result->allAccounts = $allAccounts;
-        return $result;
+        $getBalance = new GetBalance();
+        $getBalance->sepaAccount = $sepaAccount;
+        $getBalance->allAccounts = $allAccounts;
+        return $getBalance;
     }
 
     /**
@@ -60,7 +62,7 @@ class GetBalance extends PaginateableAction
     {
         return [
             parent::__serialize(),
-            $this->account, $this->allAccounts,
+            $this->sepaAccount, $this->allAccounts,
         ];
     }
 
@@ -68,9 +70,8 @@ class GetBalance extends PaginateableAction
      * @deprecated Beginning from PHP7.4 __unserialize is used for new generated strings, then this method is only used for previously generated strings - remove after May 2023
      *
      * @param string $serialized
-     * @return void
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         self::__unserialize(unserialize($serialized));
     }
@@ -79,7 +80,7 @@ class GetBalance extends PaginateableAction
     {
         list(
             $parentSerialized,
-            $this->account, $this->allAccounts,
+            $this->sepaAccount, $this->allAccounts,
         ) = $serialized;
 
         is_array($parentSerialized) ?
@@ -96,32 +97,27 @@ class GetBalance extends PaginateableAction
         return $this->response;
     }
 
-    protected function createRequest(BPD $bpd, ?UPD $upd)
+    protected function createRequest(BPD $bpd, ?UPD $upd): HKSALv4|HKSALv5|HKSALv6|HKSALv7
     {
-        /** @var BaseSegment $hisals */
-        $hisals = $bpd->requireLatestSupportedParameters('HISALS');
-        switch ($hisals->getVersion()) {
-            case 4:
-                return HKSALv4::create(Kto::fromAccount($this->account));
-            case 5:
-                return HKSALv5::create(KtvV3::fromAccount($this->account), $this->allAccounts);
-            case 6:
-                return HKSALv6::create(KtvV3::fromAccount($this->account), $this->allAccounts);
-            case 7:
-                return HKSALv7::create(Kti::fromAccount($this->account), $this->allAccounts);
-            default:
-                throw new UnsupportedException('Unsupported HKSAL version: ' . $hisals->getVersion());
-        }
+        $baseSegment = $bpd->requireLatestSupportedParameters('HISALS');
+        return match ($baseSegment->getVersion()) {
+            4 => HKSALv4::create(Kto::fromAccount($this->sepaAccount)),
+            5 => HKSALv5::create(KtvV3::fromAccount($this->sepaAccount), $this->allAccounts),
+            6 => HKSALv6::create(KtvV3::fromAccount($this->sepaAccount), $this->allAccounts),
+            7 => HKSALv7::create(Kti::fromAccount($this->sepaAccount), $this->allAccounts),
+            default => throw new UnsupportedException('Unsupported HKSAL version: ' . $baseSegment->getVersion()),
+        };
     }
 
-    public function processResponse(Message $response)
+    public function processResponse(Message $message): void
     {
-        parent::processResponse($response);
+        parent::processResponse($message);
 
-        $responseSegments = $response->findSegments(HISAL::class);
-        if (count($responseSegments) === 0) {
+        $responseSegments = $message->findSegments(HISAL::class);
+        if ($responseSegments === []) {
             throw new UnexpectedResponseException('No HISAL segments received!');
         }
+
         $this->response = array_merge($this->response, $responseSegments);
     }
 }

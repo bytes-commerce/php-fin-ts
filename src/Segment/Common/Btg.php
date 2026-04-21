@@ -1,8 +1,12 @@
 <?php
 
-namespace Fhp\Segment\Common;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseDeg;
+
+
+namespace BytesCommerce\Segment\Common;
+
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Mehrfach verwendetes Element: Betrag (Version 1)
@@ -10,6 +14,7 @@ use Fhp\Segment\BaseDeg;
 class Btg extends BaseDeg
 {
     public float $wert;
+
     public string $waehrung;
 
     public function getWert(): float
@@ -24,9 +29,9 @@ class Btg extends BaseDeg
 
     public static function create(float $wert, string $waehrung = 'EUR'): Btg
     {
-        $result = new Btg();
-        $result->wert = $wert;
-        $result->waehrung = $waehrung;
-        return $result;
+        $btg = new Btg();
+        $btg->wert = $wert;
+        $btg->waehrung = $waehrung;
+        return $btg;
     }
 }

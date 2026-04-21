@@ -1,9 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\TAB;
+namespace BytesCommerce\Segment\TAB;
 
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: TAN-Medium-Liste (Version 4)
@@ -21,6 +25,7 @@ class TanMediumListeV4 extends BaseDeg implements TanMediumListe
      * S: Secoder
      */
     public string $tanMediumKlasse;
+
     /**
      * 1: Aktiv
      * 2: Verfügbar
@@ -28,31 +33,45 @@ class TanMediumListeV4 extends BaseDeg implements TanMediumListe
      * 4: Verfügbar Folgekarte
      */
     public int $status;
+
     /** Only for tanMediumKlasse=='G' */
     public ?string $kartennummer = null;
+
     /** Only for tanMediumKlasse=='G' */
     public ?string $kartenfolgenummer = null;
+
     /** Only and optional for tanMediumKlasse=='G' and if BPD allows it */
     public ?int $kartenart = null;
+
     /** Only and optional for tanMediumKlasse=='G' */
-    public ?\Fhp\Segment\Common\KtvV3 $kontoverbindungAuftraggeber = null;
+    public ?\BytesCommerce\Segment\Common\KtvV3 $kontoverbindungAuftraggeber = null;
+
     /** JJJJMMTT gemäß ISO 8601 Only and optional for tanMediumKlasse=='G' */
     public ?string $gueltigAb = null;
+
     /** JJJJMMTT gemäß ISO 8601 Only and optional for tanMediumKlasse=='G' */
     public ?string $gueltigBis = null;
+
     /** Only for tanMediumKlasse=='L' */
     public ?string $tanListennumer = null;
+
     /** Must for tanMediumKlasse=='M', optional otherwise. Max length: 32 */
     public ?string $bezeichnungDesTanMediums = null;
+
     /** Only and optional for tanMediumKlasse=='M' */
     public ?string $mobiltelefonnummerVerschleiert = null;
+
     /** Only and optional for tanMediumKlasse=='M' */
     public ?string $mobiltelefonnummer = null;
+
     /** Only and optional for tanMediumKlasse=='M' */
-    public ?\Fhp\Segment\Common\Kti $smsAbbuchungskonto = null;
+    public ?\BytesCommerce\Segment\Common\Kti $smsAbbuchungskonto = null;
+
     public ?int $anzahlFreieTans = null;
+
     /** JJJJMMTT gemäß ISO 8601 */
     public ?string $letzteBenutzung = null;
+
     /** JJJJMMTT gemäß ISO 8601 */
     public ?string $freigeschaltetAm = null;
 
@@ -63,6 +82,6 @@ class TanMediumListeV4 extends BaseDeg implements TanMediumListe
 
     public function getPhoneNumber(): ?string
     {
-        return $this->mobiltelefonnummer !== null ? $this->mobiltelefonnummer : $this->mobiltelefonnummerVerschleiert;
+        return $this->mobiltelefonnummer ?? $this->mobiltelefonnummerVerschleiert;
     }
 }

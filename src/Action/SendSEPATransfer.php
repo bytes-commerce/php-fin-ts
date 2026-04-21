@@ -1,18 +1,22 @@
 <?php
 
-namespace Fhp\Action;
+declare(strict_types=1);
 
-use Fhp\BaseAction;
-use Fhp\Model\SEPAAccount;
-use Fhp\Protocol\BPD;
-use Fhp\Protocol\Message;
-use Fhp\Protocol\UnexpectedResponseException;
-use Fhp\Protocol\UPD;
-use Fhp\Segment\Common\Kti;
-use Fhp\Segment\HIRMS\Rueckmeldungscode;
-use Fhp\Segment\SPA\HISPAS;
-use Fhp\Syntax\Bin;
-use Fhp\UnsupportedException;
+
+
+namespace BytesCommerce\Action;
+
+use BytesCommerce\BaseAction;
+use BytesCommerce\Model\SEPAAccount;
+use BytesCommerce\Protocol\BPD;
+use BytesCommerce\Protocol\Message;
+use BytesCommerce\Protocol\UnexpectedResponseException;
+use BytesCommerce\Protocol\UPD;
+use BytesCommerce\Segment\Common\Kti;
+use BytesCommerce\Segment\HIRMS\Rueckmeldungscode;
+use BytesCommerce\Segment\SPA\HISPAS;
+use BytesCommerce\Syntax\Bin;
+use BytesCommerce\UnsupportedException;
 
 /**
  * Initiates an outgoing wire transfer in SEPA format (PAIN XML).
@@ -119,19 +123,19 @@ class SendSEPATransfer extends BaseAction
         if ($numberOfTransactions > 1 && $hasReqdExDates) {
             // Terminierte SEPA-Sammelüberweisung (Segment HKCME / Kennung HICMES)
             $segmentID = 'HICMES';
-            $segment = \Fhp\Segment\CME\HKCMEv1::createEmpty();
+            $segment = \BytesCommerce\Segment\CME\HKCMEv1::createEmpty();
         } elseif ($numberOfTransactions == 1 && $hasReqdExDates) {
             // Terminierte SEPA-Überweisung (Segment HKCSE / Kennung HICSES)
             $segmentID = 'HICSES';
-            $segment = \Fhp\Segment\CSE\HKCSEv1::createEmpty();
+            $segment = \BytesCommerce\Segment\CSE\HKCSEv1::createEmpty();
         } elseif ($numberOfTransactions > 1 && !$hasReqdExDates) {
             // SEPA-Sammelüberweisungen (Segment HKCCM / Kennung HICSES)
             $segmentID = 'HICSES';
-            $segment = \Fhp\Segment\CCM\HKCCMv1::createEmpty();
+            $segment = \BytesCommerce\Segment\CCM\HKCCMv1::createEmpty();
         } else {
             // SEPA Einzelüberweisung (Segment HKCCS / Kennung HICCSS).
             $segmentID = 'HICCSS';
-            $segment = \Fhp\Segment\CCS\HKCCSv1::createEmpty();
+            $segment = \BytesCommerce\Segment\CCS\HKCCSv1::createEmpty();
         }
 
         if (!$bpd->supportsParameters($segmentID, 1)) {

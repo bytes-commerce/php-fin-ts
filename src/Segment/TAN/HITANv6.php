@@ -1,10 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\TAN;
+namespace BytesCommerce\Segment\TAN;
 
-use Fhp\Segment\BaseSegment;
-use Fhp\Syntax\Bin;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Segment: Geschäftsvorfall Zwei-Schritt-TAN-Einreichung Rückmeldung (Version 6)
@@ -19,12 +23,14 @@ class HITANv6 extends BaseSegment implements HITAN
      *     NOTE: This field is re-used in HITANv7, where the value 'S' is also allowed.
      */
     public string $tanProzess;
+
     /**
      * This will just return the same hash as was passed in HKTAN.
      * M: bei AuftragsHashwertverfahren<>0 und TAN-Prozess=1
      * N: sonst
      */
     public ?Bin $auftragsHashwert = null;
+
     /**
      * Special value "noref" means that no TAN is needed.
      * M: bei TAN-Prozess=2, 3, 4 (and S)
@@ -32,6 +38,7 @@ class HITANv6 extends BaseSegment implements HITAN
      * Max length: 35
      */
     public ?string $auftragsreferenz = null;
+
     /**
      * This is the challenge that needs to be presented to the user, so that they can generate and enter a TAN.
      * Special value "nochallenge" means that no TAN is needed. If $challengeStrukturiert in HITANS is set, this may
@@ -43,8 +50,11 @@ class HITANv6 extends BaseSegment implements HITAN
      * Max length: 2048
      */
     public ?string $challenge = null;
+
     public ?Bin $challengeHhdUc = null;
+
     public ?GueltigkeitsdatumUndUhrzeitFuerChallenge $gueltigkeitsdatumUndUhrzeitFuerChallenge = null;
+
     /**
      * Note: There are generally two ways to treat TAN media, see also HKTAN's $bezeichnungDesTanMediums field. This
      * field here is set if the user does not choose the TAN medium beforehand, but the bank chooses it instead.

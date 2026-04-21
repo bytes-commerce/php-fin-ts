@@ -8,7 +8,7 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
-         bootstrap="./Tests/phpunit_bootstrap.php"
+         bootstrap="./tests/phpunit_bootstrap.php"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd">
   <coverage processUncoveredFiles="true">
     <include>
@@ -17,7 +17,7 @@
   </coverage>
   <testsuites>
     <testsuite name="FHP Test Suite">
-      <directory>Tests/Unit/</directory>
+      <directory>tests/Unit/</directory>
     </testsuite>
   </testsuites>
 </phpunit>

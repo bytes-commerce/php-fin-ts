@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Protocol;
 
-namespace Fhp\Protocol;
-
-use Fhp\Model\PollingInfo;
+use BytesCommerce\Model\PollingInfo;
 
 /**
  * Thrown when an action result is read, but the action is still pending a long-running operation on the server and
@@ -11,12 +13,9 @@ use Fhp\Model\PollingInfo;
  */
 class ActionPendingException extends \RuntimeException
 {
-    private PollingInfo $pollingInfo;
-
-    public function __construct(PollingInfo $pollingInfo)
+    public function __construct(private PollingInfo $pollingInfo)
     {
         parent::__construct('This action needs polling to await finishing a server-side operation.');
-        $this->pollingInfo = $pollingInfo;
     }
 
     public function getPollingInfo(): PollingInfo

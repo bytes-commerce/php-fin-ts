@@ -1,43 +1,35 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Model;
+namespace BytesCommerce\Model;
 
 /**
  * Note: This account information is obtained from the HIUPD contained in the UPD data, but it lacks the BIC.
  */
 class Account
 {
-    /** @var string|null */
-    protected $id;
-    /** @var string|null */
-    protected $accountNumber;
-    /** @var string|null */
-    protected $bankCode;
-    /** @var string|null */
-    protected $iban;
-    /** @var string|null */
-    protected $customerId;
-    /** @var string|null */
-    protected $currency;
-    /** @var string|null */
-    protected $accountOwnerName;
-    /** @var string|null */
-    protected $accountDescription;
+    public function __construct(
+        private ?string $id = null,
+        private ?string $accountNumber = null,
+        private ?string $bankCode = null,
+        private ?string $iban = null,
+        private ?string $customerId = null,
+        private ?string $currency = null,
+        private ?string $accountOwnerName = null,
+        private ?string $accountDescription = null,
+    ) {}
 
     public function getId(): ?string
     {
         return $this->id;
     }
 
-    /**
-     * @return $this
-     */
-    public function setId(?string $id)
+    public function withId(?string $id): static
     {
-        $this->id = $id;
-
-        return $this;
+        return new self($id, $this->accountNumber, $this->bankCode, $this->iban, $this->customerId, $this->currency, $this->accountOwnerName, $this->accountDescription);
     }
 
     public function getAccountNumber(): ?string
@@ -45,14 +37,9 @@ class Account
         return $this->accountNumber;
     }
 
-    /**
-     * @return $this
-     */
-    public function setAccountNumber(?string $accountNumber)
+    public function withAccountNumber(?string $accountNumber): static
     {
-        $this->accountNumber = $accountNumber;
-
-        return $this;
+        return new self($this->id, $accountNumber, $this->bankCode, $this->iban, $this->customerId, $this->currency, $this->accountOwnerName, $this->accountDescription);
     }
 
     public function getBankCode(): ?string
@@ -60,14 +47,9 @@ class Account
         return $this->bankCode;
     }
 
-    /**
-     * @return $this
-     */
-    public function setBankCode(?string $bankCode)
+    public function withBankCode(?string $bankCode): static
     {
-        $this->bankCode = $bankCode;
-
-        return $this;
+        return new self($this->id, $this->accountNumber, $bankCode, $this->iban, $this->customerId, $this->currency, $this->accountOwnerName, $this->accountDescription);
     }
 
     public function getIban(): ?string
@@ -75,14 +57,9 @@ class Account
         return $this->iban;
     }
 
-    /**
-     * @return $this
-     */
-    public function setIban(?string $iban)
+    public function withIban(?string $iban): static
     {
-        $this->iban = $iban;
-
-        return $this;
+        return new self($this->id, $this->accountNumber, $this->bankCode, $iban, $this->customerId, $this->currency, $this->accountOwnerName, $this->accountDescription);
     }
 
     public function getCustomerId(): ?string
@@ -90,14 +67,9 @@ class Account
         return $this->customerId;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCustomerId(?string $customerId)
+    public function withCustomerId(?string $customerId): static
     {
-        $this->customerId = $customerId;
-
-        return $this;
+        return new self($this->id, $this->accountNumber, $this->bankCode, $this->iban, $customerId, $this->currency, $this->accountOwnerName, $this->accountDescription);
     }
 
     public function getCurrency(): ?string
@@ -105,14 +77,9 @@ class Account
         return $this->currency;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCurrency(?string $currency)
+    public function withCurrency(?string $currency): static
     {
-        $this->currency = $currency;
-
-        return $this;
+        return new self($this->id, $this->accountNumber, $this->bankCode, $this->iban, $this->customerId, $currency, $this->accountOwnerName, $this->accountDescription);
     }
 
     public function getAccountOwnerName(): ?string
@@ -120,14 +87,9 @@ class Account
         return $this->accountOwnerName;
     }
 
-    /**
-     * @return $this
-     */
-    public function setAccountOwnerName(?string $accountOwnerName)
+    public function withAccountOwnerName(?string $accountOwnerName): static
     {
-        $this->accountOwnerName = $accountOwnerName;
-
-        return $this;
+        return new self($this->id, $this->accountNumber, $this->bankCode, $this->iban, $this->customerId, $this->currency, $accountOwnerName, $this->accountDescription);
     }
 
     public function getAccountDescription(): ?string
@@ -135,13 +97,8 @@ class Account
         return $this->accountDescription;
     }
 
-    /**
-     * @return $this
-     */
-    public function setAccountDescription(?string $accountDescription)
+    public function withAccountDescription(?string $accountDescription): static
     {
-        $this->accountDescription = $accountDescription;
-
-        return $this;
+        return new self($this->id, $this->accountNumber, $this->bankCode, $this->iban, $this->customerId, $this->currency, $this->accountOwnerName, $accountDescription);
     }
 }

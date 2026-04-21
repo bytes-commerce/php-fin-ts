@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp\MT940;
+declare(strict_types=1);
+
+namespace BytesCommerce\MT940;
 
 /**
  * Thrown for MT940-specific parsing errors.

@@ -1,8 +1,12 @@
 <?php
 
-namespace Fhp\Segment\Common;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseDeg;
+
+
+namespace BytesCommerce\Segment\Common;
+
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Mehrfach verwendetes Element: Zeitstempel (Version 1)
@@ -14,15 +18,16 @@ class Tsp extends BaseDeg
 {
     /** JJJJMMTT gemäß ISO 8601 */
     public string $datum;
+
     /** hhmmss gemäß ISO 8601, local time (no time zone support). */
     public ?string $uhrzeit = null;
 
     public static function create(string $datum, ?string $uhrzeit): Tsp
     {
-        $result = new Tsp();
-        $result->datum = $datum;
-        $result->uhrzeit = $uhrzeit;
-        return $result;
+        $tsp = new Tsp();
+        $tsp->datum = $datum;
+        $tsp->uhrzeit = $uhrzeit;
+        return $tsp;
     }
 
     public function getDatum(): string

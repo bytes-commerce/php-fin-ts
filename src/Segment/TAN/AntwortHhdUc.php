@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\TAN;
 
-namespace Fhp\Segment\TAN;
-
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Antwort HHD_UC (Version 1)
@@ -15,12 +17,16 @@ class AntwortHhdUc extends BaseDeg
 {
     /** Max length 5 */
     public string $atc;
+
     /** Binary; Max length 256 */
     public string $applicationCryptogramAc;
+
     /** Binary; Max length 256 */
     public string $efIdData;
+
     /** Binary; Max length 256 */
     public string $cvr;
+
     /** Binary; Max length 256 */
     public string $versionsinfoDerChipTanApplication;
 }

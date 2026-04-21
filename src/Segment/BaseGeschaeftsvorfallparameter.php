@@ -1,7 +1,9 @@
 <?php
-/** @noinspection PhpUnused */
 
-namespace Fhp\Segment;
+declare(strict_types=1);
+
+/** @noinspection PhpUnused */
+namespace BytesCommerce\Segment;
 
 /**
  * This is a base format for segments with various names, each of which describes a potential business transaction that
@@ -19,11 +21,13 @@ abstract class BaseGeschaeftsvorfallparameter extends BaseSegment
      * Maximum number of request segments of this kind that can be included in a single request message
      */
     public int $maximaleAnzahlAuftraege;
+
     /**
      * Minimum number of signatures required for this kind of business transaction. Note that zero signatures is
      * equivalent to an anonymous connection and one signature (the most common case) can be satisfied with PIN/TAN.
      */
     public int $anzahlSignaturenMindestens;
+
     /**
      * Minimum cryptographic security required for this transaction type, where 0 means none.
      */

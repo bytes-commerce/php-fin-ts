@@ -1,9 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\HNHBK;
+namespace BytesCommerce\Segment\HNHBK;
 
-use Fhp\Segment\BaseSegment;
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: Nachrichtenkopf (Version 3)
@@ -26,10 +30,13 @@ class HNHBKv3 extends BaseSegment
      * Version 2.2 : 220 (Spezifikationsstatus: obsolet)
      * Version 3.0 : 300
      */
-    public int $hbciVersion = 300; // This library implements FinTS 3.0.
+    public int $hbciVersion = 300;
+     // This library implements FinTS 3.0.
     public string $dialogId;
+
     /** Must be positive. */
     public int $nachrichtennummer;
+
     /** Never sent to server, but always present in responses. */
     public ?BezugsnachrichtV1 $bezugsnachricht = null;
 
@@ -41,8 +48,8 @@ class HNHBKv3 extends BaseSegment
     /**
      * @param int $nachrichtengroesse Length of the entire message in bytes.
      */
-    public function setNachrichtengroesse(int $nachrichtengroesse)
+    public function setNachrichtengroesse(int $nachrichtengroesse): void
     {
-        $this->nachrichtengroesse = str_pad($nachrichtengroesse, static::NACHRICHTENGROESSE_LENGTH, '0', STR_PAD_LEFT);
+        $this->nachrichtengroesse = str_pad((string) $nachrichtengroesse, static::NACHRICHTENGROESSE_LENGTH, '0', STR_PAD_LEFT);
     }
 }

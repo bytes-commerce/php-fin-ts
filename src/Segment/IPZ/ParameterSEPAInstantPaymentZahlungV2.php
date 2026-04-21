@@ -1,10 +1,12 @@
 <?php
 
-namespace Fhp\Segment\IPZ;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseDeg;
-use Fhp\Segment\UnterstuetzteSEPADatenformate;
-use Fhp\Segment\UnterstuetzteSEPADatenformateTrait;
+namespace BytesCommerce\Segment\IPZ;
+
+use BytesCommerce\Segment\BaseDeg;
+use BytesCommerce\Segment\UnterstuetzteSEPADatenformate;
+use BytesCommerce\Segment\UnterstuetzteSEPADatenformateTrait;
 
 /**
  * Parameter SEPA-Instant Payment Zahlung (Version 2)

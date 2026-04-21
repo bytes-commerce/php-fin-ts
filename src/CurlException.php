@@ -1,6 +1,10 @@
 <?php
 
-namespace Fhp;
+declare(strict_types=1);
+
+
+
+namespace BytesCommerce;
 
 class CurlException extends \Exception
 {

@@ -1,10 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\SAL;
 
-namespace Fhp\Segment\SAL;
-
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\Paginateable;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\Paginateable;
 
 /**
  * Segment: Saldenabfrage (Version 4)
@@ -15,22 +17,26 @@ use Fhp\Segment\Paginateable;
  */
 class HKSALv4 extends BaseSegment implements Paginateable
 {
-    public \Fhp\Segment\Common\Kto $kontoverbindungAuftraggeber;
+    public \BytesCommerce\Segment\Common\Kto $kontoverbindungAuftraggeber;
+
     public bool $alleKonten;
+
     public ?string $kontowaehrung = null;
+
     public ?int $maximaleAnzahlEintraege = null;
+
     /** Max length: 35 */
     public ?string $aufsetzpunkt = null;
 
-    public static function create(\Fhp\Segment\Common\Kto $kto, ?string $aufsetzpunkt = null): HKSALv4
+    public static function create(\BytesCommerce\Segment\Common\Kto $kto, ?string $aufsetzpunkt = null): HKSALv4
     {
-        $result = HKSALv4::createEmpty();
-        $result->kontoverbindungAuftraggeber = $kto;
-        $result->aufsetzpunkt = $aufsetzpunkt;
-        return $result;
+        $hksaLv4 = HKSALv4::createEmpty();
+        $hksaLv4->kontoverbindungAuftraggeber = $kto;
+        $hksaLv4->aufsetzpunkt = $aufsetzpunkt;
+        return $hksaLv4;
     }
 
-    public function setPaginationToken(string $paginationToken)
+    public function setPaginationToken(string $paginationToken): void
     {
         $this->aufsetzpunkt = $paginationToken;
     }

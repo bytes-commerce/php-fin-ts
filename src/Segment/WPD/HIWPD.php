@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\WPD;
+declare(strict_types=1);
 
-use Fhp\Segment\SegmentInterface;
+namespace BytesCommerce\Segment\WPD;
+
+use BytesCommerce\Segment\SegmentInterface;
 
 /**
  * Segment: Depotaufstellung Rückmeldung

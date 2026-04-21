@@ -1,10 +1,12 @@
 <?php
 
-namespace Fhp\Segment\HIRMG;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\HIRMS\FindRueckmeldungTrait;
-use Fhp\Segment\HIRMS\RueckmeldungContainer;
+namespace BytesCommerce\Segment\HIRMG;
+
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\HIRMS\FindRueckmeldungTrait;
+use BytesCommerce\Segment\HIRMS\RueckmeldungContainer;
 
 /**
  * Segment: Rückmeldungen zur Gesamtnachricht (Version 2)
@@ -20,6 +22,6 @@ class HIRMGv2 extends BaseSegment implements RueckmeldungContainer
 {
     use FindRueckmeldungTrait; // For RueckmeldungContainer.
 
-    /** @var \Fhp\Segment\HIRMS\Rueckmeldung[] @Max(99) */
+    /** @var \BytesCommerce\Segment\HIRMS\Rueckmeldung[] @Max(99) */
     public array $rueckmeldung;
 }

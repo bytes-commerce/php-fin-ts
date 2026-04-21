@@ -1,22 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Action;
+namespace BytesCommerce\Action;
 
-use Fhp\Model\SEPAAccount;
-use Fhp\PaginateableAction;
-use Fhp\Protocol\BPD;
-use Fhp\Protocol\Message;
-use Fhp\Protocol\UnexpectedResponseException;
-use Fhp\Protocol\UPD;
-use Fhp\Segment\CAZ\HICAZSv1;
-use Fhp\Segment\CAZ\HICAZv1;
-use Fhp\Segment\CAZ\HKCAZv1;
-use Fhp\Segment\CAZ\UnterstuetzteCamtMessages;
-use Fhp\Segment\Common\Kti;
-use Fhp\Segment\HIRMS\Rueckmeldungscode;
-use Fhp\UnsupportedException;
+use BytesCommerce\Model\SEPAAccount;
+use BytesCommerce\PaginateableAction;
+use BytesCommerce\Protocol\BPD;
+use BytesCommerce\Protocol\Message;
+use BytesCommerce\Protocol\UnexpectedResponseException;
+use BytesCommerce\Protocol\UPD;
+use BytesCommerce\Segment\CAZ\HICAZSv1;
+use BytesCommerce\Segment\CAZ\HICAZv1;
+use BytesCommerce\Segment\CAZ\HKCAZv1;
+use BytesCommerce\Segment\CAZ\UnterstuetzteCamtMessages;
+use BytesCommerce\Segment\Common\Kti;
+use BytesCommerce\Segment\HIRMS\Rueckmeldungscode;
+use BytesCommerce\UnsupportedException;
 
 /**
  * Retrieves statements for one specific account or for all accounts that the user has access to. A statement is a
@@ -89,7 +93,7 @@ class GetStatementOfAccountXML extends PaginateableAction
      * @param string $serialized
      * @return void
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         self::__unserialize(unserialize($serialized));
     }
@@ -148,17 +152,17 @@ class GetStatementOfAccountXML extends PaginateableAction
         }
     }
 
-    public function processResponse(Message $response)
+    public function processResponse(Message $message): void
     {
-        parent::processResponse($response);
+        parent::processResponse($message);
 
         // Banks send just 3010 and no HICAZ in case there are no transactions.
-        if ($response->findRueckmeldung(Rueckmeldungscode::NICHT_VERFUEGBAR) !== null) {
+        if ($message->findRueckmeldung(Rueckmeldungscode::NICHT_VERFUEGBAR) !== null) {
             return;
         }
 
         /** @var HICAZv1[] $responseHicaz */
-        $responseHicaz = $response->findSegments(HICAZv1::class);
+        $responseHicaz = $message->findSegments(HICAZv1::class);
         $numResponseSegments = count($responseHicaz);
         if ($numResponseSegments < count($this->getRequestSegmentNumbers())) {
             throw new UnexpectedResponseException("Only got $numResponseSegments HICAZ response segments!");

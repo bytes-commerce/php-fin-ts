@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp\Segment\WPD;
+declare(strict_types=1);
+
+namespace BytesCommerce\Segment\WPD;
 
 /**
  * Data Element Group: Parameter Kontoaufstellung

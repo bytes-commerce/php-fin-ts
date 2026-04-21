@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\HIUPD;
 
-namespace Fhp\Segment\HIUPD;
-
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * @link https://www.hbci-zka.de/dokumente/spezifikation_deutsch/archiv/HBCI_V2.x_FV.zip
@@ -14,7 +16,9 @@ class KontolimitV1 extends BaseDeg
 {
     /** Allowed values: E, T, W, M, Z */
     public string $limitart;
-    public \Fhp\Segment\Common\Btg $limitbetrag;
+
+    public \BytesCommerce\Segment\Common\Btg $limitbetrag;
+
     /** If present, must be greater than 0 */
     public ?int $limitTage = null;
 }

@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\CSE;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseGeschaeftsvorfallparameter;
+namespace BytesCommerce\Segment\CSE;
+
+use BytesCommerce\Segment\BaseGeschaeftsvorfallparameter;
 
 /**
  * Segment: SEPA Einzelüberweisung Parameter (Version 1)
@@ -14,7 +16,7 @@ class HICSESv1 extends BaseGeschaeftsvorfallparameter
 {
     public ParameterTerminierteSEPAUeberweisungEinreichenV1 $parameter;
 
-    public function getParameter()
+    public function getParameter(): \BytesCommerce\Segment\CSE\ParameterTerminierteSEPAUeberweisungEinreichenV1
     {
         return $this->parameter;
     }

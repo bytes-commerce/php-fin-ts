@@ -1,22 +1,26 @@
 <?php
 
-namespace Fhp\Action;
+declare(strict_types=1);
 
-use Fhp\BaseAction;
-use Fhp\Model\SEPAAccount;
-use Fhp\Protocol\BPD;
-use Fhp\Protocol\Message;
-use Fhp\Protocol\UnexpectedResponseException;
-use Fhp\Protocol\UPD;
-use Fhp\Segment\Common\Kti;
-use Fhp\Segment\HIRMS\Rueckmeldung;
-use Fhp\Segment\HIRMS\Rueckmeldungscode;
-use Fhp\Segment\IPZ\HIIPZSv1;
-use Fhp\Segment\IPZ\HIIPZSv2;
-use Fhp\Segment\IPZ\HKIPZv2;
-use Fhp\Segment\SPA\HISPAS;
-use Fhp\Syntax\Bin;
-use Fhp\UnsupportedException;
+
+
+namespace BytesCommerce\Action;
+
+use BytesCommerce\BaseAction;
+use BytesCommerce\Model\SEPAAccount;
+use BytesCommerce\Protocol\BPD;
+use BytesCommerce\Protocol\Message;
+use BytesCommerce\Protocol\UnexpectedResponseException;
+use BytesCommerce\Protocol\UPD;
+use BytesCommerce\Segment\Common\Kti;
+use BytesCommerce\Segment\HIRMS\Rueckmeldung;
+use BytesCommerce\Segment\HIRMS\Rueckmeldungscode;
+use BytesCommerce\Segment\IPZ\HIIPZSv1;
+use BytesCommerce\Segment\IPZ\HIIPZSv2;
+use BytesCommerce\Segment\IPZ\HKIPZv2;
+use BytesCommerce\Segment\SPA\HISPAS;
+use BytesCommerce\Syntax\Bin;
+use BytesCommerce\UnsupportedException;
 
 /**
  * Initiates an outgoing realtime transfer in SEPA format (PAIN XML).
@@ -132,7 +136,7 @@ class SendSEPARealtimeTransfer extends BaseAction
         return $hkipz;
     }
 
-    public function processResponse(Message $response)
+    public function processResponse(Message $response): void
     {
         parent::processResponse($response);
 

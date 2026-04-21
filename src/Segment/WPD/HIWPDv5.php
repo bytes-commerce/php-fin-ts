@@ -1,10 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\WPD;
 
-namespace Fhp\Segment\WPD;
-
-use Fhp\Segment\BaseSegment;
-use Fhp\Syntax\Bin;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Segment: Depotaufstellung Kreditinstitutsrückmledung (Version 5)

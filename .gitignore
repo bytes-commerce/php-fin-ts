@@ -20,3 +20,7 @@ test.php
 .phpunit.result.cache
 .php_cs.cache
 .php-cs-fixer.cache
+
+xdebug.log
+test_*.php
+debug*.php

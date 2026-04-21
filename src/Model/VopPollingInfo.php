@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Model;
+declare(strict_types=1);
 
-use Fhp\Syntax\Bin;
+namespace BytesCommerce\Model;
+
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Application code should not interact directly with this type, see {@link PollingInfo instead}.
@@ -14,18 +16,8 @@ use Fhp\Syntax\Bin;
  */
 class VopPollingInfo implements PollingInfo
 {
-    // Both of these are effectively opaque tokens that only the server understands. Our job is to relay them back to
-    // the server when polling. And for some reason there's two of them.
-    private string $aufsetzpunkt;
-    private ?Bin $pollingId;
-
-    private ?int $nextAttemptInSeconds = null;
-
-    public function __construct(string $aufsetzpunkt, ?Bin $pollingId, ?int $nextAttemptInSeconds)
+    public function __construct(private string $aufsetzpunkt, private ?Bin $bin, private ?int $nextAttemptInSeconds)
     {
-        $this->aufsetzpunkt = $aufsetzpunkt;
-        $this->pollingId = $pollingId;
-        $this->nextAttemptInSeconds = $nextAttemptInSeconds;
     }
 
     public function getAufsetzpunkt(): string
@@ -35,7 +27,7 @@ class VopPollingInfo implements PollingInfo
 
     public function getPollingId(): ?Bin
     {
-        return $this->pollingId;
+        return $this->bin;
     }
 
     public function getNextAttemptInSeconds(): ?int

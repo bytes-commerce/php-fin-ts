@@ -1,7 +1,9 @@
 <?php
-/** @noinspection PhpUnused */
 
-namespace Fhp\Segment\SPA;
+declare(strict_types=1);
+
+/** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\SPA;
 
 /**
  * Segment: SEPA-Kontoverbindung anfordern (Version 3)

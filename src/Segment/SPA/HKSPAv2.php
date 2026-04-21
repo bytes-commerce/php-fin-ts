@@ -1,10 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\SPA;
 
-namespace Fhp\Segment\SPA;
-
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\Paginateable;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\Paginateable;
 
 /**
  * Segment: SEPA-Kontoverbindung anfordern (Version 2)
@@ -16,15 +18,17 @@ class HKSPAv2 extends BaseSegment implements Paginateable
 {
     /**
      * If left empty, all accounts will be returned.
-     * @var \Fhp\Segment\Common\KtvV3[]|null @Max(999)
+     * @var \BytesCommerce\Segment\Common\KtvV3[]|null @Max(999)
      */
     public ?array $kontoverbindung = null;
+
     /** Only allowed if {@link ParameterSepaKontoverbindungAnfordernV2::$eingabeAnzahlEintraegeErlaubt} says so. */
     public ?int $maximaleAnzahlEintraege = null;
+
     /** For pagination. */
     public ?string $aufsetzpunkt = null;
 
-    public function setPaginationToken(string $paginationToken)
+    public function setPaginationToken(string $paginationToken): void
     {
         $this->aufsetzpunkt = $paginationToken;
     }

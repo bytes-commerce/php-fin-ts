@@ -1,6 +1,10 @@
 <?php
 
-namespace Fhp\Model;
+declare(strict_types=1);
+
+
+
+namespace BytesCommerce\Model;
 
 /**
  * Note: This account information is obtained from the HISPA response to a HKSPA request.
@@ -11,12 +15,16 @@ class SEPAAccount
 
     /** @var string|null */
     protected $iban;
+
     /** @var string|null */
     protected $bic;
+
     /** @var string|null */
     protected $accountNumber;
+
     /** @var string|null */
     protected $subAccount;
+
     /** @var string|null */
     protected $blz;
 
@@ -28,7 +36,7 @@ class SEPAAccount
     /**
      * @return $this
      */
-    public function setIban(?string $iban)
+    public function setIban(?string $iban): static
     {
         $this->iban = $iban;
 
@@ -43,7 +51,7 @@ class SEPAAccount
     /**
      * @return $this
      */
-    public function setBic(?string $bic)
+    public function setBic(?string $bic): static
     {
         $this->bic = $bic;
 
@@ -58,7 +66,7 @@ class SEPAAccount
     /**
      * @return $this
      */
-    public function setAccountNumber(?string $accountNumber)
+    public function setAccountNumber(?string $accountNumber): static
     {
         $this->accountNumber = $accountNumber;
 
@@ -73,7 +81,7 @@ class SEPAAccount
     /**
      * @return $this
      */
-    public function setSubAccount(?string $subAccount)
+    public function setSubAccount(?string $subAccount): static
     {
         $this->subAccount = $subAccount;
 
@@ -88,7 +96,7 @@ class SEPAAccount
     /**
      * @return $this
      */
-    public function setBlz(?string $blz)
+    public function setBlz(?string $blz): static
     {
         $this->blz = $blz;
 

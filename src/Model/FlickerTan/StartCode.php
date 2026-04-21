@@ -1,6 +1,10 @@
 <?php
 
-namespace Fhp\Model\FlickerTan;
+declare(strict_types=1);
+
+
+
+namespace BytesCommerce\Model\FlickerTan;
 
 /**
  * Represents a startcode in the TAN Flicker Challenge. Shortens the given challenge
@@ -11,7 +15,7 @@ class StartCode extends DataElement
     /**
      * @var string[] of the control bytes in hex representation
      */
-    private $controlBytes;
+    private array $controlBytes;
 
     /**
      * Parses Header information, control bytes and start code
@@ -52,6 +56,7 @@ class StartCode extends DataElement
             $rest = substr($challenge, 2);
             $hasControl = self::hexToByte($ctrl)[0] === '1';
         }
+
         return [$controlBytes, $rest];
     }
 
@@ -63,6 +68,7 @@ class StartCode extends DataElement
         if ($ctrlBytes !== ['01']) {
             throw new \InvalidArgumentException('Other versions then 1.4 are not supported');
         }
+
         parent::__construct($data);
         $this->controlBytes = $ctrlBytes;
         $this->headerHighBit = '1';
@@ -76,11 +82,11 @@ class StartCode extends DataElement
     public function getLuhnChecksum(): int
     {
         $luhn = 0;
-        foreach ($this->controlBytes as $ctrl) {
-            $luhn = self::calcLuhn($ctrl);
+        foreach ($this->controlBytes as $controlByte) {
+            $luhn = self::calcLuhn($controlByte);
         }
-        $luhn += parent::getLuhnChecksum(); // Luhn from the data (of the startcode)
-        return $luhn;
+         // Luhn from the data (of the startcode)
+        return $luhn + parent::getLuhnChecksum();
     }
 
     public function __debugInfo(): ?array

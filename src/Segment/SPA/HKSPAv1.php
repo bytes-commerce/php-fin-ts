@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\SPA;
 
-namespace Fhp\Segment\SPA;
-
-use Fhp\Segment\BaseSegment;
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: SEPA-Kontoverbindung anfordern (Version 1)
@@ -15,7 +17,7 @@ class HKSPAv1 extends BaseSegment
 {
     /**
      * If left empty, all accounts will be returned.
-     * @var \Fhp\Segment\Common\KtvV3[]|null @Max(999)
+     * @var \BytesCommerce\Segment\Common\KtvV3[]|null @Max(999)
      */
     public ?array $kontoverbindung = null;
 }

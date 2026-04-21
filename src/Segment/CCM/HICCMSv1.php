@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\CCM;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseGeschaeftsvorfallparameter;
+namespace BytesCommerce\Segment\CCM;
+
+use BytesCommerce\Segment\BaseGeschaeftsvorfallparameter;
 
 /**
  * Segment: SEPA Einzelüberweisung Parameter (Version 1)

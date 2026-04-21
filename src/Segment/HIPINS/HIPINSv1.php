@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\HIPINS;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseGeschaeftsvorfallparameter;
+namespace BytesCommerce\Segment\HIPINS;
+
+use BytesCommerce\Segment\BaseGeschaeftsvorfallparameter;
 
 /**
  * Segment: PIN/TAN-spezifische Informationen (Version 1)

@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\TAB;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseGeschaeftsvorfallparameter;
+namespace BytesCommerce\Segment\TAB;
+
+use BytesCommerce\Segment\BaseGeschaeftsvorfallparameter;
 
 /**
  * Segment: TAN-Generator/Liste anzeigen Bestand Parameter (Version 4)

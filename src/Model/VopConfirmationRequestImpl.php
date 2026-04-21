@@ -1,35 +1,21 @@
 <?php
 
-namespace Fhp\Model;
+declare(strict_types=1);
 
-use Fhp\Syntax\Bin;
+namespace BytesCommerce\Model;
+
+use BytesCommerce\Syntax\Bin;
 
 /** Application code should not interact directly with this type, see {@link VopConfirmationRequest instead}. */
 class VopConfirmationRequestImpl implements VopConfirmationRequest
 {
-    private Bin $vopId;
-    private ?\DateTime $expiration;
-    private ?string $informationForUser;
-    private ?string $verificationResult;
-    private ?string $verificationNotApplicableReason;
-
-    public function __construct(
-        Bin $vopId,
-        ?\DateTime $expiration,
-        ?string $informationForUser,
-        ?string $verificationResult,
-        ?string $verificationNotApplicableReason,
-    ) {
-        $this->vopId = $vopId;
-        $this->expiration = $expiration;
-        $this->informationForUser = $informationForUser;
-        $this->verificationResult = $verificationResult;
-        $this->verificationNotApplicableReason = $verificationNotApplicableReason;
+    public function __construct(private Bin $bin, private ?\DateTime $expiration, private ?string $informationForUser, private ?string $verificationResult, private ?string $verificationNotApplicableReason)
+    {
     }
 
     public function getVopId(): Bin
     {
-        return $this->vopId;
+        return $this->bin;
     }
 
     public function getExpiration(): ?\DateTime

@@ -1,13 +1,17 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\HNVSK;
+namespace BytesCommerce\Segment\HNVSK;
 
-use Fhp\Model\TanMode;
-use Fhp\Options\Credentials;
-use Fhp\Options\FinTsOptions;
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\Common\Kik;
+use BytesCommerce\Model\TanMode;
+use BytesCommerce\Options\Credentials;
+use BytesCommerce\Options\FinTsOptions;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\Common\Kik;
 
 /**
  * Segment: Verschlüsselungskopf (Version 3)
@@ -30,10 +34,12 @@ class HNVSKv3 extends BaseSegment
     public const SEGMENT_NUMBER = 998;
 
     public SicherheitsprofilV1 $sicherheitsprofil;
+
     /**
      * For the PIN/TAN profile, this must be 998 (see section B.9.8).
      */
     public int $sicherheitsfunktion = 998;
+
     /**
      * 1: Der Unterzeichner ist Herausgeber der signierten Nachricht, z. B. Erfasser oder Erstsignatur (ISS)
      * (Not allowed: 3: Der Unterzeichner unterstützt den Inhalt der Nachricht, z. B. bei Zweitsignatur (CON))
@@ -41,10 +47,15 @@ class HNVSKv3 extends BaseSegment
      *    welcher nicht Erfasser ist (WIT)
      */
     public int $rolleDesSicherheitslieferanten = 1;
+
     public SicherheitsidentifikationDetailsV2 $sicherheitsidentifikationDetails;
+
     public SicherheitsdatumUndUhrzeitV2 $sicherheitsdatumUndUhrzeit;
+
     public VerschluesselungsalgorithmusV2 $verschluesselungsalgorithmus;
+
     public SchluesselnameV3 $schluesselname;
+
     /**
      * 0: Keine Kompression (NULL)
      * 1: Lempel, Ziv, Welch (LZW)
@@ -61,23 +72,23 @@ class HNVSKv3 extends BaseSegment
     public ?ZertifikatV2 $zertifikat = null;
 
     /**
-     * @param FinTsOptions $options See {@link FinTsOptions}.
+     * @param FinTsOptions $finTsOptions See {@link FinTsOptions}.
      * @param Credentials $credentials See {@link Credentials}.
      * @param string $kundensystemId See {@link SicherheitsidentifikationDetailsV2::$identifizierungDerPartei}.
      * @param TanMode|null $tanMode Optionally specifies which two-step TAN mode to use, defaults to 999 (single step).
      */
-    public static function create(FinTsOptions $options, Credentials $credentials, string $kundensystemId, ?TanMode $tanMode): HNVSKv3
+    public static function create(FinTsOptions $finTsOptions, Credentials $credentials, string $kundensystemId, ?TanMode $tanMode): HNVSKv3
     {
-        $result = HNVSKv3::createEmpty();
-        $result->segmentkopf->segmentnummer = static::SEGMENT_NUMBER;
-        $result->sicherheitsprofil = SicherheitsprofilV1::createPIN($tanMode);
-        $result->sicherheitsidentifikationDetails = SicherheitsidentifikationDetailsV2::createForSender($kundensystemId);
-        $result->sicherheitsdatumUndUhrzeit = SicherheitsdatumUndUhrzeitV2::now();
-        $result->verschluesselungsalgorithmus = VerschluesselungsalgorithmusV2::create();
-        $result->schluesselname = SchluesselnameV3::create(
-            Kik::create($options->bankCode),
+        $hnvsKv3 = HNVSKv3::createEmpty();
+        $hnvsKv3->segmentkopf->segmentnummer = static::SEGMENT_NUMBER;
+        $hnvsKv3->sicherheitsprofil = SicherheitsprofilV1::createPIN($tanMode);
+        $hnvsKv3->sicherheitsidentifikationDetails = SicherheitsidentifikationDetailsV2::createForSender($kundensystemId);
+        $hnvsKv3->sicherheitsdatumUndUhrzeit = SicherheitsdatumUndUhrzeitV2::now();
+        $hnvsKv3->verschluesselungsalgorithmus = VerschluesselungsalgorithmusV2::create();
+        $hnvsKv3->schluesselname = SchluesselnameV3::create(
+            Kik::create($finTsOptions->bankCode),
             $credentials->getBenutzerkennung(),
             SchluesselnameV3::CHIFFRIERSCHLUESSEL);
-        return $result;
+        return $hnvsKv3;
     }
 }

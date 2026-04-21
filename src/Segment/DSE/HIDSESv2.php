@@ -1,9 +1,11 @@
 <?php
 
-namespace Fhp\Segment\DSE;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseGeschaeftsvorfallparameter;
-use Fhp\Segment\BaseSegment;
+namespace BytesCommerce\Segment\DSE;
+
+use BytesCommerce\Segment\BaseGeschaeftsvorfallparameter;
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: Terminierte SEPA-Einzellastschrift einreichen Parameter

@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp\Segment\HIRMS;
+declare(strict_types=1);
+
+namespace BytesCommerce\Segment\HIRMS;
 
 /**
  * Interface for segments that contain multiple {@link Rueckmeldung} instances.

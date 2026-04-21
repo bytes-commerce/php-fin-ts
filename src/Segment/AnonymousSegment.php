@@ -1,9 +1,13 @@
 <?php
 
-namespace Fhp\Segment;
+declare(strict_types=1);
 
-use Fhp\Syntax\Delimiter;
-use Fhp\Syntax\Parser;
+
+
+namespace BytesCommerce\Segment;
+
+use BytesCommerce\Syntax\Delimiter;
+use BytesCommerce\Syntax\Parser;
 
 /**
  * A fallback for segments that were received from the server but are not implemented in this library.
@@ -17,25 +21,20 @@ final class AnonymousSegment extends BaseSegment implements \Serializable
     public string $type;
 
     /**
+     * @param string[]|string[][] $elements
+     */
+    public function __construct(Segmentkopf $segmentkopf, /**
      * Contains the data elements of the segment. Some of them can be scalar values (represented as strings), and others
      * can be nested data element groups of strings.
      *
      * NOTE: This field is intentionally private and does not have a getter. Reading this field anywhere besides for
      * debugging purposes (e.g. in an interactive debugger or with print_r()) is wrong, please create a concrete
      * subclass of BaseSegment instead.
-     *
-     * @var string[]|string[][]
      */
-    private array $elements;
-
-    /**
-     * @param string[]|string[][] $elements
-     */
-    public function __construct(Segmentkopf $segmentkopf, array $elements)
+    private array $elements)
     {
         $this->segmentkopf = $segmentkopf;
         $this->type = $segmentkopf->segmentkennung . 'v' . $segmentkopf->segmentversion;
-        $this->elements = $elements;
     }
 
     public function getDescriptor(): SegmentDescriptor
@@ -43,7 +42,7 @@ final class AnonymousSegment extends BaseSegment implements \Serializable
         throw new \RuntimeException('AnonymousSegments do not have a descriptor');
     }
 
-    public function validate()
+    public function validate(): void
     {
         // Do nothing, anonymous segments are always valid.
     }
@@ -58,10 +57,8 @@ final class AnonymousSegment extends BaseSegment implements \Serializable
 
     /**
      * @deprecated Beginning from PHP7.4 __unserialize is used for new generated strings, then this method is only used for previously generated strings - remove after May 2023
-     *
-     * @return void
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         self::__unserialize([$serialized]);
     }
@@ -69,13 +66,15 @@ final class AnonymousSegment extends BaseSegment implements \Serializable
     public function __serialize(): array
     {
         $result = $this->segmentkopf->serialize() . Delimiter::ELEMENT .
-            implode(Delimiter::ELEMENT, array_map(function ($element) {
+            implode(Delimiter::ELEMENT, array_map(function (array|string|null $element): string {
                 if ($element === null) {
                     return '';
                 }
+
                 if (is_string($element)) {
                     return $element;
                 }
+
                 return implode(Delimiter::GROUP, $element);
             }, $this->elements))
             . Delimiter::SEGMENT;
@@ -85,10 +84,10 @@ final class AnonymousSegment extends BaseSegment implements \Serializable
 
     public function __unserialize(array $serialized): void
     {
-        $parsed = Parser::parseAnonymousSegment($serialized[0]);
-        $this->type = $parsed->type;
-        $this->segmentkopf = $parsed->segmentkopf;
-        $this->elements = $parsed->elements;
+        $anonymousSegment = Parser::parseAnonymousSegment($serialized[0]);
+        $this->type = $anonymousSegment->type;
+        $this->segmentkopf = $anonymousSegment->segmentkopf;
+        $this->elements = $anonymousSegment->elements;
     }
 
     /**

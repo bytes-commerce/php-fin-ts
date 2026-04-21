@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\AUB;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseGeschaeftsvorfallparameter;
+namespace BytesCommerce\Segment\AUB;
+
+use BytesCommerce\Segment\BaseGeschaeftsvorfallparameter;
 
 /**
  * Segment: Auslandsüberweisung Parameter

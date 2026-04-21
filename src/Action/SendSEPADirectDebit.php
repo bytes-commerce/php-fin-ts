@@ -1,23 +1,27 @@
 <?php
 
-namespace Fhp\Action;
+declare(strict_types=1);
 
-use Fhp\BaseAction;
-use Fhp\Model\SEPAAccount;
-use Fhp\Protocol\BPD;
-use Fhp\Protocol\UPD;
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\Common\Btg;
-use Fhp\Segment\Common\Kti;
-use Fhp\Segment\DME\HIDMESv1;
-use Fhp\Segment\DME\HIDMESv2;
-use Fhp\Segment\DME\HKDMEv2;
-use Fhp\Segment\DSE\HIDSESv2;
-use Fhp\Segment\DSE\HIDXES;
-use Fhp\Segment\DSE\HKDSEv2;
-use Fhp\Segment\SPA\HISPAS;
-use Fhp\Syntax\Bin;
-use Fhp\UnsupportedException;
+
+
+namespace BytesCommerce\Action;
+
+use BytesCommerce\BaseAction;
+use BytesCommerce\Model\SEPAAccount;
+use BytesCommerce\Protocol\BPD;
+use BytesCommerce\Protocol\UPD;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\Common\Btg;
+use BytesCommerce\Segment\Common\Kti;
+use BytesCommerce\Segment\DME\HIDMESv1;
+use BytesCommerce\Segment\DME\HIDMESv2;
+use BytesCommerce\Segment\DME\HKDMEv2;
+use BytesCommerce\Segment\DSE\HIDSESv2;
+use BytesCommerce\Segment\DSE\HIDXES;
+use BytesCommerce\Segment\DSE\HKDSEv2;
+use BytesCommerce\Segment\SPA\HISPAS;
+use BytesCommerce\Syntax\Bin;
+use BytesCommerce\UnsupportedException;
 
 /**
  * Initiate one or multiple SEPA Direct Debits ("Lastschriften")

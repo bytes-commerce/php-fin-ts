@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\HKEND;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
+namespace BytesCommerce\Segment\HKEND;
+
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: Dialogende (Version 1)
@@ -16,8 +18,8 @@ class HKENDv1 extends BaseSegment
 
     public static function create(string $dialogId): HKENDv1
     {
-        $result = HKENDv1::createEmpty();
-        $result->dialogId = $dialogId;
-        return $result;
+        $hkenDv1 = HKENDv1::createEmpty();
+        $hkenDv1->dialogId = $dialogId;
+        return $hkenDv1;
     }
 }

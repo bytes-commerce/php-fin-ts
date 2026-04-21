@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\HIUPA;
 
-namespace Fhp\Segment\HIUPA;
-
-use Fhp\Segment\BaseSegment;
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: Userparameter allgemein (Version 4)
@@ -17,8 +19,10 @@ use Fhp\Segment\BaseSegment;
 class HIUPAv4 extends BaseSegment
 {
     public string $benutzerkennung;
+
     /** Note: The bank may send UPD version 0, which means these UPD are the most recent but should not be persisted. */
     public int $updVersion;
+
     /**
      * 0: If the bank does not explicitly declare a business transaction type (i.e. request segment type) as supported,
      *    it does not support it, so sending such a request to the bank will always lead to failure.
@@ -26,8 +30,10 @@ class HIUPAv4 extends BaseSegment
      *    will check online and accept/reject accordingly.
      */
     public int $updVerwendung;
+
     /** Max length: 35 */
     public ?string $benutzername = null;
+
     /** Max length: 2048 */
     public ?string $erweiterungAllgemein = null;
 }

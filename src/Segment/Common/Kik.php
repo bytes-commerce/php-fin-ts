@@ -1,8 +1,12 @@
 <?php
 
-namespace Fhp\Segment\Common;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseDeg;
+
+
+namespace BytesCommerce\Segment\Common;
+
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Mehrfach verwendetes Element: Kreditinstitutskennung (Version 1)
@@ -15,11 +19,11 @@ class Kik extends BaseDeg
     public const DEFAULT_COUNTRY_CODE = '280'; // Germany
 
     /** (ISO 3166-1; has leading zeros; Germany is 280, see also chapter E.4 */
-    public ?string $laenderkennzeichen;  // Officially it's mandatory, but in practice it can be missing.
+    public ?string $laenderkennzeichen = null;  // Officially it's mandatory, but in practice it can be missing.
     /** Max length: 30 (Mandatory/absent depending on the country) */
     public ?string $kreditinstitutscode = null;
 
-    public function validate()
+    public function validate(): void
     {
         parent::validate();
         if ($this->laenderkennzeichen === self::DEFAULT_COUNTRY_CODE && $this->kreditinstitutscode === null) {
@@ -29,10 +33,10 @@ class Kik extends BaseDeg
 
     public static function create(string $kreditinstitutscode): Kik
     {
-        $result = new Kik();
-        $result->laenderkennzeichen = static::DEFAULT_COUNTRY_CODE;
-        $result->kreditinstitutscode = $kreditinstitutscode;
-        return $result;
+        $kik = new Kik();
+        $kik->laenderkennzeichen = static::DEFAULT_COUNTRY_CODE;
+        $kik->kreditinstitutscode = $kreditinstitutscode;
+        return $kik;
     }
 
     public function getLaenderkennzeichen(): ?string

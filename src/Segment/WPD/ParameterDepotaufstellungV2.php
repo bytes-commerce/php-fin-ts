@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\WPD;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseDeg;
+namespace BytesCommerce\Segment\WPD;
+
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Parameter Depotauftstellung
@@ -12,7 +14,9 @@ use Fhp\Segment\BaseDeg;
 class ParameterDepotaufstellungV2 extends BaseDeg implements ParameterDepotaufstellung
 {
     public bool $eingabeAnzahlEintraegeErlaubt;
+
     public bool $waehrungDepotaufstellungWaehlbar;
+
     public bool $kursqualitaetWaehlbar;
 
     public function getEingabeAnzahlEintraegeErlaubt(): bool

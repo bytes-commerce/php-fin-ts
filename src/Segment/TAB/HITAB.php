@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\TAB;
+declare(strict_types=1);
 
-use Fhp\Segment\SegmentInterface;
+namespace BytesCommerce\Segment\TAB;
+
+use BytesCommerce\Segment\SegmentInterface;
 
 /**
  * Segment: TAN-Generator/Liste anzeigen Bestand Rückmeldung

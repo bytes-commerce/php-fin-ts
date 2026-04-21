@@ -1,17 +1,25 @@
 <?php
 
-namespace Fhp\Segment\AUB;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseDeg;
+namespace BytesCommerce\Segment\AUB;
+
+use BytesCommerce\Segment\BaseDeg;
 
 class ParameterAuslandsueberweisungV2 extends BaseDeg
 {
     public int $DTAZVHandbuch;
+
     public int $maximaleAnzahlTSaetze;
+
     public float $meldepflichtgrenzbetrag;
+
     public ?string $unterstuetzteMeldesaetze = null;
+
     public ?string $zugelasseneWeisungsschluessel = null;
+
     public ?string $maximaleAnzahlDerZugelassenenWeisungschluessel = null;
+
     public ?string $erlaubteZahlungsarten = null;
 
     public function getDTAZVHandbuch(): int

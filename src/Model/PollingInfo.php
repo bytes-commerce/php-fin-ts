@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp\Model;
+declare(strict_types=1);
+
+namespace BytesCommerce\Model;
 
 /**
  * Provides information that the client application should use to poll for the completion of a long-running operation on

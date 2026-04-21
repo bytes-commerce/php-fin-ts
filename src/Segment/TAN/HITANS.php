@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp\Segment\TAN;
+declare(strict_types=1);
+
+namespace BytesCommerce\Segment\TAN;
 
 interface HITANS
 {

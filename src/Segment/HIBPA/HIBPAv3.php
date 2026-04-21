@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\HIBPA;
 
-namespace Fhp\Segment\HIBPA;
-
-use Fhp\Segment\BaseSegment;
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: Bankparameter allgemein (Version 3)
@@ -15,13 +17,21 @@ use Fhp\Segment\BaseSegment;
 class HIBPAv3 extends BaseSegment
 {
     public int $bpdVersion;
-    public \Fhp\Segment\Common\Kik $kreditinstitutskennung;
+
+    public \BytesCommerce\Segment\Common\Kik $kreditinstitutskennung;
+
     /** Max length: 60 */
     public string $kreditinstitutsbezeichnung;
+
     public int $anzahlGeschaeftsvorfallarten;
+
     public UnterstuetzteSprachenV2 $unterstuetzteSprachen;
+
     public UnterstuetzteHbciVersionenV2 $unterstuetzteHbciVersionen;
+
     public ?int $maximaleNachrichtengroesse = null;
+
     public ?int $minimalerTimeoutWert = null;
+
     public ?int $maximalerTimeoutWert = null;
 }

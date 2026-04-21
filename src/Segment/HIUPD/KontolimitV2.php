@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\HIUPD;
 
-namespace Fhp\Segment\HIUPD;
-
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Kontolimit (Version 2)
@@ -15,8 +17,10 @@ class KontolimitV2 extends BaseDeg
 {
     /** Allowed values: E, T, W, M, Z */
     public string $limitart;
+
     /** Not allowed for limitart==Z. */
-    public ?\Fhp\Segment\Common\Btg $limitbetrag = null;
+    public ?\BytesCommerce\Segment\Common\Btg $limitbetrag = null;
+
     /** Only allowed for limitart==Z, must be greater than zero. */
     public ?int $limitTage = null;
 }

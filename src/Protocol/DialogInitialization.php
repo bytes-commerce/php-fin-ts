@@ -1,17 +1,21 @@
 <?php
 
-namespace Fhp\Protocol;
+declare(strict_types=1);
 
-use Fhp\BaseAction;
-use Fhp\Model\NoPsd2TanMode;
-use Fhp\Model\TanMode;
-use Fhp\Options\Credentials;
-use Fhp\Options\FinTsOptions;
-use Fhp\Segment\HISYN\HISYNv4;
-use Fhp\Segment\HKIDN\HKIDNv2;
-use Fhp\Segment\HKSYN\HKSYNv3;
-use Fhp\Segment\HKVVB\HKVVBv3;
-use Fhp\Segment\TAN\HKTANFactory;
+
+
+namespace BytesCommerce\Protocol;
+
+use BytesCommerce\BaseAction;
+use BytesCommerce\Model\NoPsd2TanMode;
+use BytesCommerce\Model\TanMode;
+use BytesCommerce\Options\Credentials;
+use BytesCommerce\Options\FinTsOptions;
+use BytesCommerce\Segment\HISYN\HISYNv4;
+use BytesCommerce\Segment\HKIDN\HKIDNv2;
+use BytesCommerce\Segment\HKSYN\HKSYNv3;
+use BytesCommerce\Segment\HKVVB\HKVVBv3;
+use BytesCommerce\Segment\TAN\HKTANFactory;
 
 /**
  * Initializes a FinTs dialog. The dialog initialization message is usually the first message that should be sent over
@@ -52,35 +56,17 @@ use Fhp\Segment\TAN\HKTANFactory;
  */
 class DialogInitialization extends BaseAction
 {
-    // These come from FinTs and are needed as inputs for the dialog initialization. They are NOT available after
-    // serialization, i.e. not in processResponse().
-    /** @var FinTsOptions */
-    private $options;
-    /** @var Credentials */
-    private $credentials;
-    /** @var TanMode|null */
-    private $tanMode;
-    /** @var string|null */
-    private $tanMedium;
+    private ?\BytesCommerce\Model\TanMode $tanMode;
 
     /**
      * The segment that HKTAN points to. This implicitly defines what kind of dialog is initialized: null means weak
      * authentication, 'HKIDN' means strong authentication and other values initialize a special PIN/TAN dialog.
-     * @var string
      */
-    private $hktanRef;
-
-    // This is the persistent state of the dialog initialization (can be both input and output).
-    /** @var string|null */
-    private $kundensystemId; // May be present initially. If not, will send HKSYN to obtain it.
-    /** @var int|null */
-    private $messageNumber; // Stored temporarily, to continue properly after TAN input.
-    /** @var string|null */
-    private $dialogId; // This is the main result.
-
+    private ?string $hktanRef; // May be present initially. If not, will send HKSYN to obtain it.
+    private ?int $messageNumber = null; // Stored temporarily, to continue properly after TAN input.
+    private ?string $dialogId = null; // This is the main result.
     // Side results.
-    /** @var UPD|null */
-    private $upd;
+    private ?\BytesCommerce\Protocol\UPD $upd = null;
 
     /**
      * @param TanMode|null $tanMode The TAN mode selected by the user.
@@ -93,16 +79,12 @@ class DialogInitialization extends BaseAction
      *     If it is one of the special PIN/TAN management segments (e.g. HKTAB), then the dialog does not have strong
      *     authentication (no TAN required) and can only be used for that one particular transaction.
      */
-    public function __construct(FinTsOptions $options, Credentials $credentials, ?TanMode $tanMode, ?string $tanMedium, ?string $kundensystemId, ?string $hktanRef = 'HKIDN')
+    public function __construct(private FinTsOptions $finTsOptions, private Credentials $credentials, ?TanMode $tanMode, private ?string $tanMedium, private ?string $kundensystemId, ?string $hktanRef = 'HKIDN')
     {
-        if ($hktanRef !== null && $tanMode === null) {
+        if ($hktanRef !== null && !$tanMode instanceof \BytesCommerce\Model\TanMode) {
             throw new \InvalidArgumentException('hktanRef is ignored unless a tanMode is given');
         }
-        $this->options = $options;
-        $this->credentials = $credentials;
         $this->tanMode = $tanMode instanceof NoPsd2TanMode ? null : $tanMode;
-        $this->tanMedium = $tanMedium;
-        $this->kundensystemId = $kundensystemId;
         $this->hktanRef = $hktanRef;
     }
 
@@ -129,9 +111,8 @@ class DialogInitialization extends BaseAction
      * @deprecated Beginning from PHP7.4 __unserialize is used for new generated strings, then this method is only used for previously generated strings - remove after May 2023
      *
      * @param string $serialized
-     * @return void
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         self::__unserialize(unserialize($serialized));
     }
@@ -160,13 +141,13 @@ class DialogInitialization extends BaseAction
      * @param BPD|null $bpd The BPD. Note that we support null here because a dialog initialization is how the BPD can
      *     be obtained in the first place.
      * @param UPD|null $upd The UPD.
-     * @return array|\Fhp\Segment\BaseSegment|\Fhp\Segment\BaseSegment[]
+     * @return array|\BytesCommerce\Segment\BaseSegment|\BytesCommerce\Segment\BaseSegment[]
      */
-    public function getNextRequest(?BPD $bpd, ?UPD $upd)
+    public function getNextRequest(?BPD $bpd, ?UPD $upd): array
     {
         $request = [
-            HKIDNv2::create($this->options->bankCode, $this->credentials, $this->kundensystemId ?? '0'),
-            HKVVBv3::create($this->options, $bpd, $upd),
+            HKIDNv2::create($this->finTsOptions->bankCode, $this->credentials, $this->kundensystemId ?? '0'),
+            HKVVBv3::create($this->finTsOptions, $bpd, $upd),
         ];
         if ($this->tanMode !== null) {
             $request[] = HKTANFactory::createProzessvariante2Step1(
@@ -177,25 +158,27 @@ class DialogInitialization extends BaseAction
             // NOTE: HKSYN must be *after* HKTAN.
             $request[] = HKSYNv3::createEmpty(); // See section C.8.1.1
         }
+
         return $request;
     }
 
-    public function processResponse(Message $response)
+    public function processResponse(Message $message): void
     {
-        parent::processResponse($response);
-        $this->dialogId = $response->header->dialogId;
+        parent::processResponse($message);
+        $this->dialogId = $message->header->dialogId;
 
         if ($this->kundensystemId === null) {
             /** @var HISYNv4 $hisyn */
-            $hisyn = $response->requireSegment(HISYNv4::class);
+            $hisyn = $message->requireSegment(HISYNv4::class);
             if ($hisyn->kundensystemId === null) {
                 throw new UnexpectedResponseException('No Kundensystem-ID received');
             }
+
             $this->kundensystemId = $hisyn->kundensystemId;
         }
 
-        if (UPD::containedInResponse($response)) {
-            $this->upd = UPD::extractFromResponse($response);
+        if (UPD::containedInResponse($message)) {
+            $this->upd = UPD::extractFromResponse($message);
         }
     }
 

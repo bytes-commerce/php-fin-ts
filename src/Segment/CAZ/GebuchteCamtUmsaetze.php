@@ -1,9 +1,11 @@
 <?php
 
-namespace Fhp\Segment\CAZ;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseDeg;
-use Fhp\Syntax\Bin;
+namespace BytesCommerce\Segment\CAZ;
+
+use BytesCommerce\Segment\BaseDeg;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Needed for
@@ -27,6 +29,7 @@ class GebuchteCamtUmsaetze extends BaseDeg
         foreach ($this->gebuchteCamtUmsaetze as $bin) {
             $xml[] = $bin->getData();
         }
+
         return $xml;
     }
 }

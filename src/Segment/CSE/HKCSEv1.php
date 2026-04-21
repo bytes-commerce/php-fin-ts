@@ -1,9 +1,11 @@
 <?php
 
-namespace Fhp\Segment\CSE;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
-use Fhp\Syntax\Bin;
+namespace BytesCommerce\Segment\CSE;
+
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Segment: SEPA Einzelüberweisung (Version 1)
@@ -14,9 +16,11 @@ use Fhp\Syntax\Bin;
 class HKCSEv1 extends BaseSegment
 {
     /** IBAN/BIC must match <DbtrAcct> and <DbtrAgt> in the XML Below. */
-    public \Fhp\Segment\Common\Kti $kontoverbindungInternational;
+    public \BytesCommerce\Segment\Common\Kti $kontoverbindungInternational;
+
     /** Max length: 256 */
     public string $sepaDescriptor;
+
     /**
      * The PAIN message in XML format.
      * HISPAS informs which XML schemas are allowed.

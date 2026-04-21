@@ -1,13 +1,17 @@
 <?php
 
-namespace Fhp;
+declare(strict_types=1);
 
-use Fhp\Protocol\BPD;
-use Fhp\Protocol\Message;
-use Fhp\Protocol\UnexpectedResponseException;
-use Fhp\Protocol\UPD;
-use Fhp\Segment\HIRMS\Rueckmeldungscode;
-use Fhp\Segment\Paginateable;
+
+
+namespace BytesCommerce;
+
+use BytesCommerce\Protocol\BPD;
+use BytesCommerce\Protocol\Message;
+use BytesCommerce\Protocol\UnexpectedResponseException;
+use BytesCommerce\Protocol\UPD;
+use BytesCommerce\Segment\HIRMS\Rueckmeldungscode;
+use BytesCommerce\Segment\Paginateable;
 
 /**
  * Represents actions that need to support pagination, this means that the bank can split the result into several
@@ -50,17 +54,14 @@ abstract class PaginateableAction extends BaseAction
     /**
      * @deprecated Beginning from PHP7.4 __unserialize is used for new generated strings, then this method is only used for previously generated strings - remove after May 2023
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         self::__unserialize(unserialize($serialized));
     }
 
     public function __unserialize(array $serialized): void
     {
-        list(
-            $parentSerialized,
-            $this->paginationToken,
-            $this->requestSegments) = $serialized;
+        [$parentSerialized, $this->paginationToken, $this->requestSegments] = $serialized;
 
         is_array($parentSerialized) ?
             parent::__unserialize($parentSerialized) :
@@ -76,17 +77,18 @@ abstract class PaginateableAction extends BaseAction
         return !$this->isDone() && $this->paginationToken !== null;
     }
 
-    public function processResponse(Message $response)
+    public function processResponse(Message $message): void
     {
-        if (($pagination = $response->findRueckmeldung(Rueckmeldungscode::AUFSETZPUNKT)) !== null) {
+        if (($pagination = $message->findRueckmeldung(Rueckmeldungscode::AUFSETZPUNKT)) instanceof \BytesCommerce\Segment\HIRMS\Rueckmeldung) {
             if (count($pagination->rueckmeldungsparameter) !== 1) {
-                throw new UnexpectedResponseException("Unexpected pagination request: $pagination");
+                throw new UnexpectedResponseException('Unexpected pagination request: ' . $pagination);
             }
+
             // There is at least one more page
             $this->paginationToken = $pagination->rueckmeldungsparameter[0];
         } else {
             // No pagination or last page
-            parent::processResponse($response);
+            parent::processResponse($message);
         }
     }
 
@@ -95,13 +97,15 @@ abstract class PaginateableAction extends BaseAction
         if ($this->requestSegments === null) {
             $this->requestSegments = parent::getNextRequest($bpd, $upd);
         } elseif ($this->paginationToken !== null) {
-            foreach ($this->requestSegments as $segment) {
-                if ($segment instanceof Paginateable) {
-                    $segment->setPaginationToken($this->paginationToken);
+            foreach ($this->requestSegments as $requestSegment) {
+                if ($requestSegment instanceof Paginateable) {
+                    $requestSegment->setPaginationToken($this->paginationToken);
                 }
             }
+
             $this->paginationToken = null;
         }
+
         return $this->requestSegments;
     }
 }

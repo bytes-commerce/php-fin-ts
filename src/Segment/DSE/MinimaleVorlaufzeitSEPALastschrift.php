@@ -1,6 +1,10 @@
 <?php
 
-namespace Fhp\Segment\DSE;
+declare(strict_types=1);
+
+
+
+namespace BytesCommerce\Segment\DSE;
 
 class MinimaleVorlaufzeitSEPALastschrift
 {
@@ -59,28 +63,29 @@ class MinimaleVorlaufzeitSEPALastschrift
     public static function create(int $minimaleSEPAVorlaufzeit, string $cutOffZeit, ?int $unterstuetzteSEPALastschriftartenCodiert = null,
         ?int $sequenceTypeCodiert = null): MinimaleVorlaufzeitSEPALastschrift
     {
-        $result = new MinimaleVorlaufzeitSEPALastschrift();
-        $result->unterstuetzteSEPALastschriftartenCodiert = $unterstuetzteSEPALastschriftartenCodiert;
-        $result->sequenceTypeCodiert = $sequenceTypeCodiert;
-        $result->minimaleSEPAVorlaufzeit = $minimaleSEPAVorlaufzeit;
-        $result->cutOffZeit = $cutOffZeit;
+        $minimaleVorlaufzeitSEPALastschrift = new MinimaleVorlaufzeitSEPALastschrift();
+        $minimaleVorlaufzeitSEPALastschrift->unterstuetzteSEPALastschriftartenCodiert = $unterstuetzteSEPALastschriftartenCodiert;
+        $minimaleVorlaufzeitSEPALastschrift->sequenceTypeCodiert = $sequenceTypeCodiert;
+        $minimaleVorlaufzeitSEPALastschrift->minimaleSEPAVorlaufzeit = $minimaleSEPAVorlaufzeit;
+        $minimaleVorlaufzeitSEPALastschrift->cutOffZeit = $cutOffZeit;
 
-        return $result;
+        return $minimaleVorlaufzeitSEPALastschrift;
     }
 
     /** @return MinimaleVorlaufzeitSEPALastschrift[][]|array */
     public static function parseCoded(string $coded): array
     {
         $result = [];
-        foreach (array_chunk(explode(';', $coded), 4) as list($unterstuetzteSEPALastschriftartenCodiert, $sequenceTypeCodiert, $minimaleSEPAVorlaufzeit, $cutOffZeit)) {
+        foreach (array_chunk(explode(';', $coded), 4) as [$unterstuetzteSEPALastschriftartenCodiert, $sequenceTypeCodiert, $minimaleSEPAVorlaufzeit, $cutOffZeit]) {
             $coreTypes = self::UNTERSTUETZTE_SEPA_LASTSCHRIFTARTEN_CODIERT[$unterstuetzteSEPALastschriftartenCodiert] ?? [];
             $seqTypes = self::SEQUENCE_TYPE_CODIERT[$sequenceTypeCodiert] ?? [];
             foreach ($coreTypes as $coreType) {
                 foreach ($seqTypes as $seqType) {
-                    $result[$coreType][$seqType] = MinimaleVorlaufzeitSEPALastschrift::create($minimaleSEPAVorlaufzeit, $cutOffZeit, $unterstuetzteSEPALastschriftartenCodiert, $sequenceTypeCodiert);
+                    $result[$coreType][$seqType] = MinimaleVorlaufzeitSEPALastschrift::create((int) $minimaleSEPAVorlaufzeit, $cutOffZeit, (int) $unterstuetzteSEPALastschriftartenCodiert, (int) $sequenceTypeCodiert);
                 }
             }
         }
+
         return $result;
     }
 
@@ -88,12 +93,13 @@ class MinimaleVorlaufzeitSEPALastschrift
     public static function parseCodedB2B(string $coded): array
     {
         $result = [];
-        foreach (array_chunk(explode(';', $coded), 3) as list($sequenceTypeCodiert, $minimaleSEPAVorlaufzeit, $cutOffZeit)) {
+        foreach (array_chunk(explode(';', $coded), 3) as [$sequenceTypeCodiert, $minimaleSEPAVorlaufzeit, $cutOffZeit]) {
             $seqTypes = self::SEQUENCE_TYPE_CODIERT[$sequenceTypeCodiert] ?? [];
             foreach ($seqTypes as $seqType) {
-                $result['B2B'][$seqType] = MinimaleVorlaufzeitSEPALastschrift::create($minimaleSEPAVorlaufzeit, $cutOffZeit, null, $sequenceTypeCodiert);
+                $result['B2B'][$seqType] = MinimaleVorlaufzeitSEPALastschrift::create((int) $minimaleSEPAVorlaufzeit, $cutOffZeit, null, (int) $sequenceTypeCodiert);
             }
         }
+
         return $result;
     }
 }

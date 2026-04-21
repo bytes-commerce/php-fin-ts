@@ -1,9 +1,13 @@
 <?php
 
-namespace Fhp\Segment\HNVSD;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
-use Fhp\Syntax\Bin;
+
+
+namespace BytesCommerce\Segment\HNVSD;
+
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Segment: Verschlüsselte Daten (Version 1)
@@ -32,13 +36,15 @@ class HNVSDv1 extends BaseSegment
      */
     public static function create(array $segments): HNVSDv1
     {
-        $result = HNVSDv1::createEmpty();
-        $result->segmentkopf->segmentnummer = static::SEGMENT_NUMBER;
+        $hnvsDv1 = HNVSDv1::createEmpty();
+        $hnvsDv1->segmentkopf->segmentnummer = static::SEGMENT_NUMBER;
+
         $data = '';
         foreach ($segments as $segment) {
             $data .= $segment->serialize();
         }
-        $result->datenVerschluesselt = new Bin($data);
-        return $result;
+
+        $hnvsDv1->datenVerschluesselt = new Bin($data);
+        return $hnvsDv1;
     }
 }

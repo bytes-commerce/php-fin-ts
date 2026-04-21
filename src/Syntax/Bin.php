@@ -1,14 +1,13 @@
 <?php
 
-namespace Fhp\Syntax;
+declare(strict_types=1);
 
-class Bin
+namespace BytesCommerce\Syntax;
+
+class Bin implements \Stringable
 {
-    protected string $string;
-
-    public function __construct(string $string)
+    public function __construct(protected string $string)
     {
-        $this->string = $string;
     }
 
     /**

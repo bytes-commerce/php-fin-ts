@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\HNHBS;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
+namespace BytesCommerce\Segment\HNHBS;
+
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: Nachrichtenabschluss (Version 1)

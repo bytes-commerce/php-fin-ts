@@ -1,10 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\HNVSK;
+namespace BytesCommerce\Segment\HNVSK;
 
-use Fhp\Model\TanMode;
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Model\TanMode;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Sicherheitsprofil (Version 1)
@@ -18,10 +22,12 @@ use Fhp\Segment\BaseDeg;
 class SicherheitsprofilV1 extends BaseDeg
 {
     public const VERSION_EIN_SCHRITT_VERFAHREN = 1;
+
     public const VERSION_ZWEI_SCHRITT_VERFAHREN = 2;
 
     /** Allowed values: "PIN", "RAH" */
     public string $sicherheitsverfahren;
+
     /** Allowed values: 1, 2 (for "PIN"), 7, 9, 10 (for "RAH") */
     public int $versionDesSicherheitsverfahrens;
 
@@ -30,10 +36,10 @@ class SicherheitsprofilV1 extends BaseDeg
      */
     public static function createPIN(?TanMode $tanMode): SicherheitsprofilV1
     {
-        $result = new SicherheitsprofilV1();
-        $result->sicherheitsverfahren = 'PIN';
-        $result->versionDesSicherheitsverfahrens =
-            $tanMode === null ? static::VERSION_EIN_SCHRITT_VERFAHREN : static::VERSION_ZWEI_SCHRITT_VERFAHREN;
-        return $result;
+        $sicherheitsprofilV1 = new SicherheitsprofilV1();
+        $sicherheitsprofilV1->sicherheitsverfahren = 'PIN';
+        $sicherheitsprofilV1->versionDesSicherheitsverfahrens =
+            $tanMode instanceof \BytesCommerce\Model\TanMode ? static::VERSION_ZWEI_SCHRITT_VERFAHREN : static::VERSION_EIN_SCHRITT_VERFAHREN;
+        return $sicherheitsprofilV1;
     }
 }

@@ -1,10 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\CAZ;
+namespace BytesCommerce\Segment\CAZ;
 
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\Paginateable;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\Paginateable;
 
 /**
  * Segment: Kontoumsätze/Zeitraum (camt)
@@ -14,34 +18,40 @@ use Fhp\Segment\Paginateable;
  */
 class HKCAZv1 extends BaseSegment implements Paginateable
 {
-    public \Fhp\Segment\Common\Kti $kontoverbindungInternational;
+    public \BytesCommerce\Segment\Common\Kti $kontoverbindungInternational;
+
     public UnterstuetzteCamtMessages $unterstuetzteCamtMessages;
+
     /** Only allowed if {@link ParameterKontoumsaetzeCamt::$alleKontenErlaubt} says so. */
     public bool $alleKonten;
+
     /** JJJJMMTT gemäß ISO 8601 */
     public ?string $vonDatum = null;
+
     /** JJJJMMTT gemäß ISO 8601 */
     public ?string $bisDatum = null;
+
     /** Only allowed if {@link ParameterKontoumsaetzeCamt::$eingabeAnzahlEintraegeErlaubt} says so. */
     public ?int $maximaleAnzahlEintraege = null;
+
     /** Max length: 35 */
     public ?string $aufsetzpunkt = null;
 
-    public static function create(\Fhp\Segment\Common\Kti $kti, UnterstuetzteCamtMessages $unterstuetzteCamtMessages,
+    public static function create(\BytesCommerce\Segment\Common\Kti $kti, UnterstuetzteCamtMessages $unterstuetzteCamtMessages,
         bool $alleKonten, ?\DateTime $vonDatum, ?\DateTime $bisDatum, ?string $aufsetzpunkt = null): HKCAZv1
     {
-        $result = HKCAZv1::createEmpty();
-        $result->kontoverbindungInternational = $kti;
-        $result->unterstuetzteCamtMessages = $unterstuetzteCamtMessages;
-        $result->alleKonten = $alleKonten;
-        $result->vonDatum = $vonDatum?->format('Ymd');
-        $result->bisDatum = $bisDatum?->format('Ymd');
-        $result->aufsetzpunkt = $aufsetzpunkt;
+        $hkcaZv1 = HKCAZv1::createEmpty();
+        $hkcaZv1->kontoverbindungInternational = $kti;
+        $hkcaZv1->unterstuetzteCamtMessages = $unterstuetzteCamtMessages;
+        $hkcaZv1->alleKonten = $alleKonten;
+        $hkcaZv1->vonDatum = $vonDatum?->format('Ymd');
+        $hkcaZv1->bisDatum = $bisDatum?->format('Ymd');
+        $hkcaZv1->aufsetzpunkt = $aufsetzpunkt;
 
-        return $result;
+        return $hkcaZv1;
     }
 
-    public function setPaginationToken(string $paginationToken)
+    public function setPaginationToken(string $paginationToken): void
     {
         $this->aufsetzpunkt = $paginationToken;
     }

@@ -1,6 +1,10 @@
 <?php
 
-namespace Fhp\MT940;
+declare(strict_types=1);
+
+
+
+namespace BytesCommerce\MT940;
 
 /**
  * Data format: MT 940 (Version SRG 2001)
@@ -11,6 +15,7 @@ namespace Fhp\MT940;
 class MT940
 {
     public const CD_CREDIT = 'credit';
+
     public const CD_DEBIT = 'debit';
 
     /**
@@ -31,7 +36,7 @@ class MT940
             $day = explode($divider . ':', $day);
 
             for ($i = 0, $cnt = count($day); $i < $cnt; ++$i) {
-                if (preg_match("/\+\@[0-9]+\@$/", trim($day[$i]))) {
+                if (preg_match("/\\+\\@\\d+\\@\$/", trim($day[$i]))) {
                     $booked = false;
                 }
 
@@ -84,7 +89,7 @@ class MT940
                         throw new MT940Exception('cd mark not found in: ' . $transaction);
                     }
 
-                    $trx[count($trx) - 1]['is_storno'] = ($trxMatch[2] === 'RC' or $trxMatch[2] === 'RD');
+                    $trx[count($trx) - 1]['is_storno'] = ($trxMatch[2] === 'RC' || $trxMatch[2] === 'RD');
 
                     $amount = $trxMatch[4];
                     $amount = str_replace(',', '.', $amount);
@@ -123,6 +128,7 @@ class MT940
                                 ++$year;
                             }
                         }
+
                         $bookingDate = $this->getDate($year . $bookingDatePart);
                     } else {
                         // if booking date not set in :61, then we have to take it from :60F
@@ -146,9 +152,9 @@ class MT940
 
                         $amount = str_replace(',', '.', substr($day[$i], 10, -1));
                         $cdMark = substr($day[$i], 0, 1);
-                        if ($cdMark == 'C') {
+                        if ($cdMark === 'C') {
                             $result[$soaDate]['end_balance']['credit_debit'] = static::CD_CREDIT;
-                        } elseif ($cdMark == 'D') {
+                        } elseif ($cdMark === 'D') {
                             $result[$soaDate]['end_balance']['credit_debit'] = static::CD_DEBIT;
                             $amount *= -1;
                         }
@@ -162,7 +168,7 @@ class MT940
         return $result;
     }
 
-    protected function parseDescription($descr, $transaction): array
+    protected function parseDescription($descr, array $transaction): array
     {
         // Geschäftsvorfall-Code
         $gvc = substr($descr, 0, 3);
@@ -182,18 +188,20 @@ class MT940
         $descriptionLines = [];
         $description1 = ''; // Legacy, could be removed.
         $description2 = ''; // Legacy, could be removed.
-        foreach ($matches as $m) {
-            $index = (int) $m[1];
+        foreach ($matches as $match) {
+            $index = (int) $match[1];
 
             if ((20 <= $index && $index <= 29) || (60 <= $index && $index <= 63)) {
-                if (20 <= $index && $index <= 29) {
-                    $description1 .= $m[2];
+                if ($index <= 29) {
+                    $description1 .= $match[2];
                 } else {
-                    $description2 .= $m[2];
+                    $description2 .= $match[2];
                 }
-                $descriptionLines[] = $m[2];
+
+                $descriptionLines[] = $match[2];
             }
-            $prepared[$index] = $m[2];
+
+            $prepared[$index] = $match[2];
         }
 
         $description = $this->extractStructuredDataFromRemittanceLines($descriptionLines, $gvc, $prepared, $transaction);
@@ -225,17 +233,19 @@ class MT940
             $description['SVWZ'] = implode('', $descriptionLines);
         } else {
             $lastType = null;
-            foreach ($descriptionLines as $line) {
-                if (strlen($line) >= 5 && $line[4] === '+') {
+            foreach ($descriptionLines as $descriptionLine) {
+                if (strlen($descriptionLine) >= 5 && $descriptionLine[4] === '+') {
                     if ($lastType != null) {
                         $description[$lastType] = trim($description[$lastType]);
                     }
-                    $lastType = substr($line, 0, 4);
-                    $description[$lastType] = substr($line, 5);
+
+                    $lastType = substr($descriptionLine, 0, 4);
+                    $description[$lastType] = substr($descriptionLine, 5);
                 } else {
-                    $description[$lastType] .= $line;
+                    $description[$lastType] .= $descriptionLine;
                 }
-                if (strlen($line) < 27) {
+
+                if (strlen($descriptionLine) < 27) {
                     // Usually, lines are 27 characters long. In case characters are missing, then it's either the end
                     // of the current type or spaces have been trimmed from the end. We want to collapse multiple spaces
                     // into one and we don't want to leave trailing spaces behind. So add a single space here to make up
@@ -243,6 +253,7 @@ class MT940
                     $description[$lastType] .= ' ';
                 }
             }
+
             $description[$lastType] = trim($description[$lastType]);
         }
 

@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\SPA;
 
-namespace Fhp\Segment\SPA;
-
-use Fhp\Segment\UnterstuetzteSEPADatenformate;
+use BytesCommerce\Segment\UnterstuetzteSEPADatenformate;
 
 /**
  * Data Element Group: Parameter SEPA-Kontoverbindung anfordern

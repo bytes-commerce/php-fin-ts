@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp\Syntax;
+declare(strict_types=1);
+
+namespace BytesCommerce\Syntax;
 
 /**
  * Thrown if the server responds with a syntactically invalid message, or at least one that this library fails to parse.

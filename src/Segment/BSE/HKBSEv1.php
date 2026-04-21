@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\BSE;
+declare(strict_types=1);
 
-use Fhp\Segment\DSE\HKDSEv1;
+namespace BytesCommerce\Segment\BSE;
+
+use BytesCommerce\Segment\DSE\HKDSEv1;
 
 /**
  * Einreichung terminierter SEPA-Einzellastschriften (Segmentversion 1)

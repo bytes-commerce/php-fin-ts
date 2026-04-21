@@ -1,8 +1,12 @@
 <?php
 
-namespace Fhp\Segment\Common;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseDeg;
+
+
+namespace BytesCommerce\Segment\Common;
+
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Mehrfach verwendetes Element: Saldo (Version 2)
@@ -17,7 +21,8 @@ use Fhp\Segment\BaseDeg;
  */
 class Sdo extends BaseDeg
 {
-    public const CREDIT = 'C';  // "Haben"
+    public const CREDIT = 'C';
+      // "Haben"
     public const DEBIT = 'D'; // "Soll"
 
     /**
@@ -26,9 +31,12 @@ class Sdo extends BaseDeg
      *  "D" = Debit (the signum of $wert is negative)
      */
     public string $sollHabenKennzeichen;
+
     public Btg $betrag;
+
     /** JJJJMMTT gemäß ISO 8601 */
     public string $datum;
+
     /** hhmmss gemäß ISO 8601, local time (no time zone support). */
     public ?string $uhrzeit = null;
 
@@ -42,7 +50,7 @@ class Sdo extends BaseDeg
             return -1 * $this->betrag->wert;
         }
 
-        throw new \InvalidArgumentException("Invalid sollHabenKennzeichen: $this->sollHabenKennzeichen");
+        throw new \InvalidArgumentException('Invalid sollHabenKennzeichen: ' . $this->sollHabenKennzeichen);
     }
 
     public function getCurrency(): string
@@ -57,14 +65,15 @@ class Sdo extends BaseDeg
 
     public static function create(float $amount, string $currency, \DateTime $timestamp): Sdo
     {
-        $result = new Sdo();
-        $result->sollHabenKennzeichen = $amount < 0 ? self::DEBIT : self::CREDIT;
-        $result->betrag = Btg::create($amount, $currency);
-        $result->datum = $timestamp->format('Ymd');
-        $result->uhrzeit = $timestamp->format('His');
-        if ($result->uhrzeit == '000000') {
-            $result->uhrzeit = null;
+        $sdo = new Sdo();
+        $sdo->sollHabenKennzeichen = $amount < 0 ? self::DEBIT : self::CREDIT;
+        $sdo->betrag = Btg::create($amount, $currency);
+        $sdo->datum = $timestamp->format('Ymd');
+        $sdo->uhrzeit = $timestamp->format('His');
+        if ($sdo->uhrzeit == '000000') {
+            $sdo->uhrzeit = null;
         }
-        return $result;
+
+        return $sdo;
     }
 }

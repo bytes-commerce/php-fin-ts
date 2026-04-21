@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\HKSYN;
 
-namespace Fhp\Segment\HKSYN;
-
-use Fhp\Segment\BaseSegment;
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: Synchronisierung (Version 3)

@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\HIUPD;
+declare(strict_types=1);
 
-use Fhp\Model\SEPAAccount;
+namespace BytesCommerce\Segment\HIUPD;
+
+use BytesCommerce\Model\SEPAAccount;
 
 /**
  * Segment: Kontoinformation
@@ -12,10 +14,10 @@ use Fhp\Model\SEPAAccount;
 interface HIUPD
 {
     /**
-     * @param SEPAAccount $account An account.
+     * @param SEPAAccount $sepaAccount An account.
      * @return bool True if this HIUPD segment pertains to the given account.
      */
-    public function matchesAccount(SEPAAccount $account): bool;
+    public function matchesAccount(SEPAAccount $sepaAccount): bool;
 
     /**
      * @return ErlaubteGeschaeftsvorfaelle[]

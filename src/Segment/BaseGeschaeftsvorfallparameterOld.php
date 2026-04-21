@@ -1,7 +1,9 @@
 <?php
-/** @noinspection PhpUnused */
 
-namespace Fhp\Segment;
+declare(strict_types=1);
+
+/** @noinspection PhpUnused */
+namespace BytesCommerce\Segment;
 
 /**
  * This is an older version of {@link BaseGeschaeftsvorfallparameter} (see there for documentation) used in FinTS 2.2
@@ -17,6 +19,7 @@ abstract class BaseGeschaeftsvorfallparameterOld extends BaseSegment
      * Maximum number of request segments of this kind that can be included in a single request message
      */
     public int $maximaleAnzahlAuftraege;
+
     /**
      * Minimum number of signatures required for this kind of business transaction. Note that zero signatures is
      * equivalent to an anonymous connection and one signature (the most common case) can be satisfied with PIN/TAN.

@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp\Protocol;
+declare(strict_types=1);
+
+namespace BytesCommerce\Protocol;
 
 /**
  * Thrown if the server responds with a syntactically valid message that does not match the protocol expectations

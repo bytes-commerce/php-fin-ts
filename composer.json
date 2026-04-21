@@ -1,17 +1,17 @@
 {
-  "name": "nemiah/php-fints",
-  "description": "PHP Library for the protocols fints and hbci",
-  "homepage": "https://github.com/nemiah/phpFinTS",
+  "name": "bytes-commerce/finance-ts-api",
+  "description": "PHP Library for FinTS 3.0 (formerly phpFinTS)",
+  "homepage": "https://github.com/bytes-commerce/finance-ts-api",
   "version": "4.0.0",
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "Fhp\\": "src/"
+      "BytesCommerce\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Fhp\\Tests\\": "Tests/"
+      "BytesCommerce\\Tests\\": "tests/"
     }
   },
   "require": {

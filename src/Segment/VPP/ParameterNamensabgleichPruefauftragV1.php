@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\VPP;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseDeg;
+namespace BytesCommerce\Segment\VPP;
+
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * DEG: Parameter Namensabgleich Prüfauftrag

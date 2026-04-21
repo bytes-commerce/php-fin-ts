@@ -1,7 +1,9 @@
 <?php
-/** @noinspection PhpUnused */
 
-namespace Fhp\Segment\KAZ;
+declare(strict_types=1);
+
+/** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\KAZ;
 
 /**
  * Segment: Kontoumsätze rückmelden/Zeitraum (Version 5)

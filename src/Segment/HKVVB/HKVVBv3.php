@@ -1,12 +1,16 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\HKVVB;
+namespace BytesCommerce\Segment\HKVVB;
 
-use Fhp\Options\FinTsOptions;
-use Fhp\Protocol\BPD;
-use Fhp\Protocol\UPD;
-use Fhp\Segment\BaseSegment;
+use BytesCommerce\Options\FinTsOptions;
+use BytesCommerce\Protocol\BPD;
+use BytesCommerce\Protocol\UPD;
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: Verarbeitungsvorbereitung (Version 3)
@@ -16,7 +20,8 @@ use Fhp\Segment\BaseSegment;
  */
 class HKVVBv3 extends BaseSegment
 {
-    public int $bpdVersion = 0; // 0 means no BPD stored at client-side yet.
+    public int $bpdVersion = 0;
+     // 0 means no BPD stored at client-side yet.
     public int $updVersion = 0; // 0 means no UPD stored at client-side yet.
     /**
      * 0: Standard
@@ -27,16 +32,17 @@ class HKVVBv3 extends BaseSegment
     public int $dialogsprache = 0; // The bank's default is fine.
     /** Max length: 25 */
     public string $produktbezeichnung;
+
     /** Max length: 5 */
     public string $produktversion;
 
-    public static function create(FinTsOptions $options, ?BPD $bpd, ?UPD $upd): HKVVBv3
+    public static function create(FinTsOptions $finTsOptions, ?BPD $bpd, ?UPD $upd): HKVVBv3
     {
-        $result = HKVVBv3::createEmpty();
-        $result->bpdVersion = $bpd === null ? 0 : $bpd->getVersion();
-        $result->updVersion = $upd === null ? 0 : $upd->getVersion();
-        $result->produktbezeichnung = $options->productName;
-        $result->produktversion = $options->productVersion;
-        return $result;
+        $hkvvBv3 = HKVVBv3::createEmpty();
+        $hkvvBv3->bpdVersion = $bpd instanceof \BytesCommerce\Protocol\BPD ? $bpd->getVersion() : 0;
+        $hkvvBv3->updVersion = $upd instanceof \BytesCommerce\Protocol\UPD ? $upd->getVersion() : 0;
+        $hkvvBv3->produktbezeichnung = $finTsOptions->productName;
+        $hkvvBv3->produktversion = $finTsOptions->productVersion;
+        return $hkvvBv3;
     }
 }

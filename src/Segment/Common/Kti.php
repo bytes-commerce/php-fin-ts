@@ -1,10 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\Common;
+namespace BytesCommerce\Segment\Common;
 
-use Fhp\Model\SEPAAccount;
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Model\SEPAAccount;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Kontoverbindung international (Version 1)
@@ -16,6 +20,7 @@ class Kti extends BaseDeg implements AccountInfo
 {
     /** Max length: 34 */
     public ?string $iban = null;
+
     /** Max length: 11, required if IBAN is present. */
     public ?string $bic = null;
 
@@ -23,38 +28,38 @@ class Kti extends BaseDeg implements AccountInfo
     // optional.
     /** Also known as Depotnummer. */
     public ?string $kontonummer = null;
+
     public ?string $unterkontomerkmal = null;
+
     public ?Kik $kreditinstitutskennung = null;
 
-    public function validate()
+    public function validate(): void
     {
         parent::validate();
         if ($this->iban !== null) {
             if ($this->bic == null) {
                 throw new \InvalidArgumentException('Kti cannot have IBAN without BIC');
             }
-        } else {
-            if ($this->kontonummer === null || $this->kreditinstitutskennung === null) {
-                throw new \InvalidArgumentException('Kti must have IBAN+BIC or Kontonummer+Kik or both');
-            }
+        } elseif ($this->kontonummer === null || !$this->kreditinstitutskennung instanceof \BytesCommerce\Segment\Common\Kik) {
+            throw new \InvalidArgumentException('Kti must have IBAN+BIC or Kontonummer+Kik or both');
         }
     }
 
     public static function create(?string $iban, ?string $bic): Kti
     {
-        $result = new Kti();
-        $result->iban = $iban;
-        $result->bic = $bic;
-        return $result;
+        $kti = new Kti();
+        $kti->iban = $iban;
+        $kti->bic = $bic;
+        return $kti;
     }
 
-    public static function fromAccount(SEPAAccount $account): Kti
+    public static function fromAccount(SEPAAccount $sepaAccount): Kti
     {
-        $result = static::create($account->getIban(), $account->getBic());
-        $result->kontonummer = $account->getAccountNumber();
-        $result->unterkontomerkmal = $account->getSubAccount();
-        $result->kreditinstitutskennung = Kik::create($account->getBlz());
-        return $result;
+        $kti = static::create($sepaAccount->getIban(), $sepaAccount->getBic());
+        $kti->kontonummer = $sepaAccount->getAccountNumber();
+        $kti->unterkontomerkmal = $sepaAccount->getSubAccount();
+        $kti->kreditinstitutskennung = Kik::create($sepaAccount->getBlz());
+        return $kti;
     }
 
     public function getAccountNumber(): string

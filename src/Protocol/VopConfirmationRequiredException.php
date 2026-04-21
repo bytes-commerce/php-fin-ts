@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Protocol;
 
-namespace Fhp\Protocol;
-
-use Fhp\Model\VopConfirmationRequest;
+use BytesCommerce\Model\VopConfirmationRequest;
 
 /**
  * Thrown when an action result is read, but the action is still pending the user's confirmation of the Verification of
@@ -11,12 +13,9 @@ use Fhp\Model\VopConfirmationRequest;
  */
 class VopConfirmationRequiredException extends \RuntimeException
 {
-    private VopConfirmationRequest $vopConfirmationRequest;
-
-    public function __construct(VopConfirmationRequest $vopConfirmationRequest)
+    public function __construct(private VopConfirmationRequest $vopConfirmationRequest)
     {
         parent::__construct('This action needs VOP confirmation before it will be executed.');
-        $this->vopConfirmationRequest = $vopConfirmationRequest;
     }
 
     public function getVopConfirmationRequest(): VopConfirmationRequest

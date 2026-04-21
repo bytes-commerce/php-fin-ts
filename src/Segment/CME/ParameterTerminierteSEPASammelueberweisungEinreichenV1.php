@@ -1,15 +1,21 @@
 <?php
 
-namespace Fhp\Segment\CME;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseDeg;
+namespace BytesCommerce\Segment\CME;
+
+use BytesCommerce\Segment\BaseDeg;
 
 class ParameterTerminierteSEPASammelueberweisungEinreichenV1 extends BaseDeg
 {
     public int $minimaleVorlaufzeit;
+
     public int $maximaleVorlaufzeit;
+
     public int $maximaleAnzahlCreditTransferTransactionInformation;
+
     public bool $summenfeldBenoetigt;
+
     public bool $einzelbuchungErlaubt;
 
     public function getMinimaleVorlaufzeit(): int

@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\TAN;
 
-namespace Fhp\Segment\TAN;
-
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Gültigkeitsdatum und –uhrzeit für Challenge (Version 1)
@@ -15,6 +17,7 @@ class GueltigkeitsdatumUndUhrzeitFuerChallenge extends BaseDeg
 {
     /** JJJJMMTT gemäß ISO 8601 */
     public string $datum;
+
     /** hhmmss gemäß ISO 8601, local time (no time zone support). */
     public string $uhrzeit;
 }

@@ -1,16 +1,21 @@
 <?php
 
-namespace Fhp\Segment;
+declare(strict_types=1);
 
-use Fhp\Syntax\Bin;
+
+
+namespace BytesCommerce\Segment;
+
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Common functionality for segment/Deg descriptors.
  */
 abstract class BaseDescriptor
 {
-    /** Example: "Fhp\Segment\TAN\HITANSv6" (Segment) or "Fhp\Common\Kik" (Deg) */
+    /** Example: "BytesCommerce\Segment\TAN\HITANSv6" (Segment) or "BytesCommerce\Common\Kik" (Deg) */
     public string $class;
+
     /** Example: 1 */
     public int $version = 1;
 
@@ -29,29 +34,31 @@ abstract class BaseDescriptor
      */
     public int $maxIndex;
 
-    protected function __construct(\ReflectionClass $clazz)
+    protected function __construct(\ReflectionClass $reflectionClass)
     {
         // Use reflection to map PHP class fields to elements in the segment/Deg.
         $nextIndex = 0;
-        foreach (static::enumerateProperties($clazz) as $property) {
+        foreach (self::enumerateProperties($reflectionClass) as $property) {
             if ($nextIndex === null) {
-                throw new \InvalidArgumentException("Disallowed property $property after an @Unlimited field");
+                throw new \InvalidArgumentException(sprintf('Disallowed property %s after an @Unlimited field', $property));
             }
+
             $docComment = $property->getDocComment() ?: '';
-            if (static::getBoolAnnotation('Ignore', $docComment)) {
+            if ($this->getBoolAnnotation('Ignore', $docComment)) {
                 continue; // Skip @Ignore-d propeties.
             }
 
             $index = $nextIndex;
             $descriptor = new ElementDescriptor();
             $descriptor->field = $property->getName();
-            $maxCount = static::getIntAnnotation('Max', $docComment);
-            $unlimitedCount = static::getBoolAnnotation('Unlimited', $docComment);
-            if ($type = static::getVarAnnotation($docComment)) {
+            $maxCount = $this->getIntAnnotation('Max', $docComment);
+            $unlimitedCount = $this->getBoolAnnotation('Unlimited', $docComment);
+            if ($type = $this->getVarAnnotation($docComment)) {
                 if (str_ends_with($type, '|null')) { // Nullable field
                     $descriptor->optional = true;
                     $type = substr($type, 0, -5);
                 }
+
                 if (str_ends_with($type, '[]')) { // Array/repeated field
                     $type = substr($type, 0, -2);
                     if ($unlimitedCount) {
@@ -68,23 +75,24 @@ abstract class BaseDescriptor
                         $nextIndex += $maxCount;
                     } else {
                         throw new \InvalidArgumentException(
-                            "Repeated property $property needs @Max(.) or (rarely) @Unlimited annotation"
+                            sprintf('Repeated property %s needs @Max(.) or (rarely) @Unlimited annotation', $property)
                         );
                     }
                 } elseif ($maxCount !== null) {
-                    throw new \InvalidArgumentException("@Max() annotation not recognized on single $property");
+                    throw new \InvalidArgumentException('@Max() annotation not recognized on single ' . $property);
                 } elseif ($unlimitedCount) {
-                    throw new \InvalidArgumentException("@Unlimited annotation not recognized on single $property");
+                    throw new \InvalidArgumentException('@Unlimited annotation not recognized on single ' . $property);
                 } else {
                     ++$nextIndex; // Singular field, so the index advances by 1.
                 }
-                $descriptor->type = static::resolveType($type, $property->getDeclaringClass());
+
+                $descriptor->type = $this->resolveType($type, $property->getDeclaringClass());
             } elseif ($type = $property->getType()) {
                 $descriptor->optional = $type->allowsNull();
                 if ($type instanceof \ReflectionUnionType) {
-                    throw new \InvalidArgumentException("Union type not supported for $property");
+                    throw new \InvalidArgumentException('Union type not supported for ' . $property);
                 } elseif ($type->getName() === 'array') {
-                    throw new \InvalidArgumentException("Array type must use @type annotation on $property");
+                    throw new \InvalidArgumentException('Array type must use @type annotation on ' . $property);
                 } elseif ($type->isBuiltin()) {
                     $descriptor->type = $type->getName();
                 } else {
@@ -92,18 +100,22 @@ abstract class BaseDescriptor
                         $descriptor->type = new \ReflectionClass($type->getName());
                     } catch (\ReflectionException $e) {
                         throw new \InvalidArgumentException(
-                            "Cannot resolve type {$type->getName()} for $property", 0, $e);
+                            sprintf('Cannot resolve type %s for %s', $type->getName(), $property), 0, $e);
                     }
                 }
+
                 ++$nextIndex; // Singular field, so the index advances by 1.
             } else {
-                throw new \InvalidArgumentException("Need type on property $property");
+                throw new \InvalidArgumentException('Need type on property ' . $property);
             }
+
             $this->elements[$index] = $descriptor;
         }
-        if (count($this->elements) === 0) {
-            throw new \InvalidArgumentException("No fields found in $clazz->name");
+
+        if ($this->elements === []) {
+            throw new \InvalidArgumentException('No fields found in ' . $reflectionClass->name);
         }
+
         ksort($this->elements); // Make sure elements are parsed in wire-format order.
         $this->maxIndex = $nextIndex === null ? PHP_INT_MAX : $nextIndex - 1;
     }
@@ -116,26 +128,28 @@ abstract class BaseDescriptor
     public function validateObject($obj): void
     {
         if (!is_a($obj, $this->class)) {
-            throw new \InvalidArgumentException("Expected $this->class, got " . gettype($obj));
+            throw new \InvalidArgumentException(sprintf('Expected %s, got ', $this->class) . gettype($obj));
         }
-        foreach ($this->elements as $elementDescriptor) {
-            $elementDescriptor->validateField($obj);
+
+        foreach ($this->elements as $element) {
+            $element->validateField($obj);
         }
     }
 
     /**
-     * @param \ReflectionClass $clazz The class name.
+     * @param \ReflectionClass $reflectionClass The class name.
      * @return \Generator|\ReflectionProperty[] All non-static public properties of the given class and its parents, but
      *     with the parents' properties *first*.
      */
-    private static function enumerateProperties(\ReflectionClass $clazz): array|\Generator
+    private static function enumerateProperties(\ReflectionClass $reflectionClass): array|\Generator
     {
-        if ($clazz->getParentClass() !== false) {
-            yield from static::enumerateProperties($clazz->getParentClass());
+        if ($reflectionClass->getParentClass() !== false) {
+            yield from self::enumerateProperties($reflectionClass->getParentClass());
         }
-        foreach ($clazz->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
-            if (!$property->isStatic() && $property->getDeclaringClass()->name === $clazz->name) {
-                yield $property;
+
+        foreach ($reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflectionProperty) {
+            if (!$reflectionProperty->isStatic() && $reflectionProperty->getDeclaringClass()->name === $reflectionClass->name) {
+                yield $reflectionProperty;
             }
         }
     }
@@ -147,12 +161,13 @@ abstract class BaseDescriptor
      * @param string $docComment The documentation string of a PHP field.
      * @return string|null The content of the annotation, or null if absent.
      */
-    private static function getAnnotation(string $name, string $docComment): ?string
+    private function getAnnotation(string $name, string $docComment): ?string
     {
-        $ret = preg_match("/@$name\\((.*?)\\)/", $docComment, $match);
+        $ret = preg_match(sprintf('/@%s\((.*?)\)/', $name), $docComment, $match);
         if ($ret === false) {
-            throw new \RuntimeException("preg_match failed on $name");
+            throw new \RuntimeException('preg_match failed on ' . $name);
         }
+
         return $ret === 1 ? $match[1] : null;
     }
 
@@ -162,15 +177,17 @@ abstract class BaseDescriptor
      * @param string $docComment The documentation string of a PHP field.
      * @return int|null The value of the annotation as an integer, or null if absent.
      */
-    private static function getIntAnnotation(string $name, string $docComment): ?int
+    private function getIntAnnotation(string $name, string $docComment): ?int
     {
-        $val = static::getAnnotation($name, $docComment);
+        $val = $this->getAnnotation($name, $docComment);
         if ($val === null) {
             return null;
         }
+
         if (!is_numeric($val)) {
-            throw new \InvalidArgumentException("Annotation $name has non-integer value $val");
+            throw new \InvalidArgumentException(sprintf('Annotation %s has non-integer value %s', $name, $val));
         }
+
         return intval($val);
     }
 
@@ -179,10 +196,10 @@ abstract class BaseDescriptor
      * @param string $docComment The documentation string of a PHP field.
      * @return bool Whether the annotation with the given name is present.
      */
-    private static function getBoolAnnotation(string $name, string $docComment): bool
+    private function getBoolAnnotation(string $name, string $docComment): bool
     {
-        return str_contains($docComment, "@$name ")
-            || str_contains($docComment, "@$name())");
+        return str_contains($docComment, sprintf('@%s ', $name))
+            || str_contains($docComment, sprintf('@%s())', $name));
     }
 
     /**
@@ -190,38 +207,41 @@ abstract class BaseDescriptor
      * @param string $docComment The documentation string of a PHP field.
      * @return string|null The value of the {@}var annotation, or null if absent.
      */
-    private static function getVarAnnotation(string $docComment): ?string
+    private function getVarAnnotation(string $docComment): ?string
     {
         $ret = preg_match('/@var ([^\\s]+)/', $docComment, $match);
         if ($ret === false) {
             throw new \RuntimeException('preg_match failed for @var');
         }
+
         return $ret === 1 ? $match[1] : null;
     }
 
     /**
      * NOTE: This does *not* resolve `use` statements in the source file.
      * @param string $typeName A type name (PHP class name, fully qualified or not) or a scalar type name.
-     * @param \ReflectionClass $contextClass The class where this type name was encountered, used for resolution of
+     * @param \ReflectionClass $reflectionClass The class where this type name was encountered, used for resolution of
      *     classes in the same package.
      * @return string|\ReflectionClass The class that the type name refers to, or the scalar type name as a string.
      */
-    private static function resolveType(string $typeName, \ReflectionClass $contextClass): \ReflectionClass|string
+    private function resolveType(string $typeName, \ReflectionClass $reflectionClass): \ReflectionClass|string
     {
         if (ElementDescriptor::isScalarType($typeName)) {
             return $typeName;
         }
+
         if ($typeName === 'Bin') {
             $typeName = Bin::class;
         } elseif (!str_contains($typeName, '\\')) {
-            // Let's assume it's a relative type name, e.g. `X` mentioned in a file that starts with `namespace Fhp\Y`
-            // would become `\Fhp\X\Y`.
-            $typeName = $contextClass->getNamespaceName() . '\\' . $typeName;
+            // Let's assume it's a relative type name, e.g. `X` mentioned in a file that starts with `namespace BytesCommerce\Y`
+            // would become `\BytesCommerce\X\Y`.
+            $typeName = $reflectionClass->getNamespaceName() . '\\' . $typeName;
         }
+
         try {
             return new \ReflectionClass($typeName);
-        } catch (\ReflectionException $e) {
-            throw new \RuntimeException("$typeName not found in context of " . $contextClass->getName(), 0, $e);
+        } catch (\ReflectionException $reflectionException) {
+            throw new \RuntimeException($typeName . ' not found in context of ' . $reflectionClass->getName(), 0, $reflectionException);
         }
     }
 }

@@ -1,10 +1,14 @@
 <?php
 
-namespace Fhp\Protocol;
+declare(strict_types=1);
 
-use Fhp\Model\SEPAAccount;
-use Fhp\Segment\HIUPA\HIUPAv4;
-use Fhp\Segment\HIUPD\HIUPD;
+
+
+namespace BytesCommerce\Protocol;
+
+use BytesCommerce\Model\SEPAAccount;
+use BytesCommerce\Segment\HIUPA\HIUPAv4;
+use BytesCommerce\Segment\HIUPD\HIUPD;
 
 /**
  * Contains the "Userparameterdaten" (UPD), i.e. configuration information that was retrieved from the bank server
@@ -15,6 +19,7 @@ class UPD
 {
     /** @var HIUPAv4 The HIBPA segment received from the server, which contains most of the UPD data. */
     public $hiupa;
+
     /** @var HIUPD[] All HIUPD segments from the server, which contain *per-account* information. */
     public $hiupd;
 
@@ -24,57 +29,59 @@ class UPD
     }
 
     /**
-     * @param Message $response A dialog initialization response from the server.
+     * @param Message $message A dialog initialization response from the server.
      * @return bool True if the UPD data is contained in the response and {@link extractFromResponse()} would
      *     succeed.
      */
-    public static function containedInResponse(Message $response): bool
+    public static function containedInResponse(Message $message): bool
     {
-        return $response->hasSegment(HIUPAv4::class);
+        return $message->hasSegment(HIUPAv4::class);
     }
 
     /**
-     * @param Message $response The dialog initialization response from the server, which should contain the UPD
+     * @param Message $message The dialog initialization response from the server, which should contain the UPD
      *     data.
      * @return UPD A new UPD instance with the extracted configuration data.
      */
-    public static function extractFromResponse(Message $response): UPD
+    public static function extractFromResponse(Message $message): UPD
     {
         $upd = new UPD();
-        $upd->hiupa = $response->requireSegment(HIUPAv4::class);
-        $upd->hiupd = $response->findSegments(HIUPD::class);
+        $upd->hiupa = $message->requireSegment(HIUPAv4::class);
+        $upd->hiupd = $message->findSegments(HIUPD::class);
         return $upd;
     }
 
     /**
-     * @param SEPAAccount $account An account.
+     * @param SEPAAccount $sepaAccount An account.
      * @return HIUPD|null The HIUPD segment for this account, or null if none exists for this account.
      */
-    public function findHiupd(SEPAAccount $account): ?HIUPD
+    public function findHiupd(SEPAAccount $sepaAccount): ?HIUPD
     {
         foreach ($this->hiupd as $hiupd) {
-            if ($hiupd->matchesAccount($account)) {
+            if ($hiupd->matchesAccount($sepaAccount)) {
                 return $hiupd;
             }
         }
+
         return null;
     }
 
     /**
-     * @param SEPAAccount $account The account to test the support for
+     * @param SEPAAccount $sepaAccount The account to test the support for
      * @param string $requestName The request that shall be sent to the bank.
      * @return bool True if the given request can be used by the current user for the given account.
      */
-    public function isRequestSupportedForAccount(SEPAAccount $account, string $requestName): bool
+    public function isRequestSupportedForAccount(SEPAAccount $sepaAccount, string $requestName): bool
     {
-        $hiupd = $this->findHiupd($account);
-        if ($hiupd !== null) {
-            foreach ($hiupd->getErlaubteGeschaeftsvorfaelle() as $erlaubterGeschaeftsvorfall) {
-                if ($erlaubterGeschaeftsvorfall->getGeschaeftsvorfall() == $requestName) {
+        $hiupd = $this->findHiupd($sepaAccount);
+        if ($hiupd instanceof \BytesCommerce\Segment\HIUPD\HIUPD) {
+            foreach ($hiupd->getErlaubteGeschaeftsvorfaelle() as $erlaubteGeschaeftsvorfaelle) {
+                if ($erlaubteGeschaeftsvorfaelle->getGeschaeftsvorfall() == $requestName) {
                     return true;
                 }
             }
         }
+
         return false;
     }
 }

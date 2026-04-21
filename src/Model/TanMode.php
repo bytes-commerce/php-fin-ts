@@ -1,10 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Model;
 
-namespace Fhp\Model;
-
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\TAN\HKTAN;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\TAN\HKTAN;
 
 /**
  * For two-step authentication, users need to enter a TAN, which can be obtained in various ways (SMS, TAN generator
@@ -22,6 +24,7 @@ interface TanMode
      * Only digits are allowed, i.e. [0-9]+
      */
     public const FORMAT_NUMERICAL = 1;
+
     /**
      * Digits and characters are allowed, i.e. any ISO 8859 characters (incl. [äöüß]) but not \r or \n.
      */

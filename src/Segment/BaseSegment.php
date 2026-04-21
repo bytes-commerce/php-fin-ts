@@ -1,9 +1,13 @@
 <?php
 
-namespace Fhp\Segment;
+declare(strict_types=1);
 
-use Fhp\Syntax\Parser;
-use Fhp\Syntax\Serializer;
+
+
+namespace BytesCommerce\Segment;
+
+use BytesCommerce\Syntax\Parser;
+use BytesCommerce\Syntax\Serializer;
 
 /**
  * Base class for segments. Sub-classes names need to follow the format "<Kennung>v<Version>" where <Kennung> is the
@@ -14,7 +18,8 @@ use Fhp\Syntax\Serializer;
 abstract class BaseSegment implements SegmentInterface, \Serializable
 {
     /** Reference to the descriptor for this type of segment. */
-    private ?SegmentDescriptor $descriptor = null;
+    private ?SegmentDescriptor $segmentDescriptor = null;
+
     public Segmentkopf $segmentkopf;
 
     /**
@@ -22,10 +27,11 @@ abstract class BaseSegment implements SegmentInterface, \Serializable
      */
     public function getDescriptor(): SegmentDescriptor
     {
-        if ($this->descriptor === null) {
-            $this->descriptor = SegmentDescriptor::get(static::class);
+        if ($this->segmentDescriptor === null) {
+            $this->segmentDescriptor = SegmentDescriptor::get(static::class);
         }
-        return $this->descriptor;
+
+        return $this->segmentDescriptor;
     }
 
     public function getName(): string
@@ -56,7 +62,7 @@ abstract class BaseSegment implements SegmentInterface, \Serializable
     /**
      * @throws \InvalidArgumentException If any element in this segment is invalid.
      */
-    public function validate()
+    public function validate(): void
     {
         $this->getDescriptor()->validateObject($this);
     }
@@ -77,9 +83,8 @@ abstract class BaseSegment implements SegmentInterface, \Serializable
      * @deprecated Beginning from PHP7.4 __unserialize is used for new generated strings, then this method is only used for previously generated strings - remove after May 2023
      *
      * @param string $serialized
-     * @return void
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         self::__unserialize([$serialized]);
     }
@@ -124,6 +129,7 @@ abstract class BaseSegment implements SegmentInterface, \Serializable
             // Called as BaseSegment::parse(), so we need to determine the right segment type/class.
             return Parser::detectAndParseSegment($rawSegment);
         }
+
         // The parse() function was called on the segment subclass itself.
         return Parser::parseSegment($rawSegment, static::class);
     }
@@ -136,11 +142,12 @@ abstract class BaseSegment implements SegmentInterface, \Serializable
         if (static::class === BaseSegment::class) {
             throw new \InvalidArgumentException('Must not call BaseSegment::createEmpty() on the super class');
         }
-        $result = new static();
-        $descriptor = $result->getDescriptor();
-        $result->segmentkopf = new Segmentkopf();
-        $result->segmentkopf->segmentkennung = $descriptor->kennung;
-        $result->segmentkopf->segmentversion = $descriptor->version;
-        return $result;
+
+        $static = new static();
+        $segmentDescriptor = $static->getDescriptor();
+        $static->segmentkopf = new Segmentkopf();
+        $static->segmentkopf->segmentkennung = $segmentDescriptor->kennung;
+        $static->segmentkopf->segmentversion = $segmentDescriptor->version;
+        return $static;
     }
 }

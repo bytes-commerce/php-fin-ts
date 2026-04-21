@@ -1,7 +1,9 @@
 <?php
-/** @noinspection PhpUnused */
 
-namespace Fhp\Segment;
+declare(strict_types=1);
+
+/** @noinspection PhpUnused */
+namespace BytesCommerce\Segment;
 
 interface UnterstuetzteSEPADatenformate
 {

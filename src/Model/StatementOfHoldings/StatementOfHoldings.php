@@ -1,6 +1,10 @@
 <?php
 
-namespace Fhp\Model\StatementOfHoldings;
+declare(strict_types=1);
+
+
+
+namespace BytesCommerce\Model\StatementOfHoldings;
 
 class StatementOfHoldings
 {
@@ -19,7 +23,7 @@ class StatementOfHoldings
         return $this->holdings;
     }
 
-    public function addHolding(Holding $holding)
+    public function addHolding(Holding $holding): void
     {
         $this->holdings[] = $holding;
     }

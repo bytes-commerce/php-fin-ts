@@ -1,9 +1,13 @@
 <?php
 
-namespace Fhp\MT535;
+declare(strict_types=1);
 
-use Fhp\Model\StatementOfHoldings\Holding;
-use Fhp\Model\StatementOfHoldings\StatementOfHoldings;
+
+
+namespace BytesCommerce\MT535;
+
+use BytesCommerce\Model\StatementOfHoldings\Holding;
+use BytesCommerce\Model\StatementOfHoldings\StatementOfHoldings;
 
 /**
  * Data format: MT 535 (Version SRG 1998)

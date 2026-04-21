@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\CAZ;
+declare(strict_types=1);
 
-use Fhp\Segment\KAZ\ParameterKontoumsaetzeV2;
+namespace BytesCommerce\Segment\CAZ;
+
+use BytesCommerce\Segment\KAZ\ParameterKontoumsaetzeV2;
 
 /**
  * Segment: Parameter Kontoumsätze/Zeitraum camt

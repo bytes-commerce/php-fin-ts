@@ -1,17 +1,26 @@
 <?php
 
-namespace Fhp\Model\StatementOfAccount;
+declare(strict_types=1);
+
+
+
+namespace BytesCommerce\Model\StatementOfAccount;
 
 class Statement
 {
     public const CD_CREDIT = 'credit';
+
     public const CD_DEBIT = 'debit';
 
     /** @var Transaction[] */
     protected array $transactions = [];
+
     protected float $startBalance = 0.0;
+
     protected ?float $endBalance = null;
+
     protected ?string $creditDebit = null;
+
     protected ?\DateTime $date = null;
 
     /**
@@ -24,7 +33,7 @@ class Statement
         return $this->transactions;
     }
 
-    public function addTransaction(Transaction $transaction)
+    public function addTransaction(Transaction $transaction): void
     {
         $this->transactions[] = $transaction;
     }
@@ -42,9 +51,9 @@ class Statement
      *
      * @return $this
      */
-    public function setStartBalance(float $startBalance)
+    public function setStartBalance(float $startBalance): static
     {
-        $this->startBalance = (float) $startBalance;
+        $this->startBalance = $startBalance;
 
         return $this;
     }
@@ -63,9 +72,9 @@ class Statement
      *
      * @return $this
      */
-    public function setEndBalance(float $endBalance)
+    public function setEndBalance(float $endBalance): static
     {
-        $this->endBalance = (float) $endBalance;
+        $this->endBalance = $endBalance;
 
         return $this;
     }
@@ -83,7 +92,7 @@ class Statement
      *
      * @return $this
      */
-    public function setCreditDebit(?string $creditDebit)
+    public function setCreditDebit(?string $creditDebit): static
     {
         $this->creditDebit = $creditDebit;
 
@@ -103,7 +112,7 @@ class Statement
      *
      * @return $this
      */
-    public function setDate(\DateTime $date)
+    public function setDate(\DateTime $date): static
     {
         $this->date = $date;
 

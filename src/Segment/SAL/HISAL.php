@@ -1,12 +1,14 @@
 <?php
 
-namespace Fhp\Segment\SAL;
+declare(strict_types=1);
 
-use Fhp\Segment\Common\AccountInfo;
-use Fhp\Segment\Common\Btg;
-use Fhp\Segment\Common\Sdo;
-use Fhp\Segment\Common\Tsp;
-use Fhp\Segment\SegmentInterface;
+namespace BytesCommerce\Segment\SAL;
+
+use BytesCommerce\Segment\Common\AccountInfo;
+use BytesCommerce\Segment\Common\Btg;
+use BytesCommerce\Segment\Common\Sdo;
+use BytesCommerce\Segment\Common\Tsp;
+use BytesCommerce\Segment\SegmentInterface;
 
 /**
  * Segment: Saldenabfrage Rückmeldung

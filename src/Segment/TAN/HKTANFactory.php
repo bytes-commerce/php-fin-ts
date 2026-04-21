@@ -1,9 +1,13 @@
 <?php
 
-namespace Fhp\Segment\TAN;
+declare(strict_types=1);
 
-use Fhp\Model\TanMode;
-use Fhp\Segment\BaseSegment;
+
+
+namespace BytesCommerce\Segment\TAN;
+
+use BytesCommerce\Model\TanMode;
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Creates HKTAN segments matching the segment version used by the server.
@@ -38,8 +42,10 @@ class HKTANFactory
             if ($tanMedium === null) {
                 throw new \InvalidArgumentException('Missing tanMedium');
             }
+
             $result->setBezeichnungDesTanMediums($tanMedium);
         }
+
         return $result;
     }
 
@@ -80,10 +86,12 @@ class HKTANFactory
         if (!$tanMode->isDecoupled()) {
             throw new \InvalidArgumentException('Cannot use step S with non-decoupled TAN mode');
         }
+
         $result = $tanMode->createHKTAN();
         if ($result->getVersion() < 7) {
             throw new \InvalidArgumentException('Step S is only supported with HKTAN version 7+');
         }
+
         $result->setTanProzess(HKTAN::TAN_PROZESS_S);
         $result->setAuftragsreferenz($auftragsreferenz);
         $result->setWeitereTanFolgt(false); // No Mehrfach-TAN support, so we'll never send true here.

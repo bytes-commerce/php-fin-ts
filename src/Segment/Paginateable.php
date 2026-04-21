@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp\Segment;
+declare(strict_types=1);
+
+namespace BytesCommerce\Segment;
 
 /**
  * Marks a request segment as supporting pagination, this means that the bank can split the result into several

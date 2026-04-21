@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\HNSHA;
 
-namespace Fhp\Segment\HNSHA;
-
-use Fhp\Segment\BaseSegment;
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: Signaturabschluss (Version 2)
@@ -15,19 +17,21 @@ class HNSHAv2 extends BaseSegment
 {
     /** Max length: 14; A nonce, that matches the one in HNSHK */
     public string $sicherheitskontrollreferenz;
+
     /** Max length: 512; not allowed for PIN/TAN */
     public ?string $validierungsresultat = null;
+
     public ?BenutzerdefinierteSignaturV1 $benutzerdefinierteSignatur = null;
 
     /**
      * @param string $sicherheitskontrollreferenz The same number that was passed to HNSHK.
-     * @param BenutzerdefinierteSignaturV1 $benutzerdefinierteSignatur Contains PIN, and optionally the TAN
+     * @param BenutzerdefinierteSignaturV1 $benutzerdefinierteSignaturV1 Contains PIN, and optionally the TAN
      */
-    public static function create(string $sicherheitskontrollreferenz, BenutzerdefinierteSignaturV1 $benutzerdefinierteSignatur): HNSHAv2
+    public static function create(string $sicherheitskontrollreferenz, BenutzerdefinierteSignaturV1 $benutzerdefinierteSignaturV1): HNSHAv2
     {
-        $result = HNSHAv2::createEmpty();
-        $result->sicherheitskontrollreferenz = $sicherheitskontrollreferenz;
-        $result->benutzerdefinierteSignatur = $benutzerdefinierteSignatur;
-        return $result;
+        $hnshAv2 = HNSHAv2::createEmpty();
+        $hnshAv2->sicherheitskontrollreferenz = $sicherheitskontrollreferenz;
+        $hnshAv2->benutzerdefinierteSignatur = $benutzerdefinierteSignaturV1;
+        return $hnshAv2;
     }
 }

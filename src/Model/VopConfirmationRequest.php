@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp\Model;
+declare(strict_types=1);
+
+namespace BytesCommerce\Model;
 
 /**
  * Provides information (about the payee) that the client application should present to the user and then ask for their

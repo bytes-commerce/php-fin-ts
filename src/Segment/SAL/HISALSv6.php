@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\SAL;
 
-namespace Fhp\Segment\SAL;
-
-use Fhp\Segment\BaseGeschaeftsvorfallparameter;
+use BytesCommerce\Segment\BaseGeschaeftsvorfallparameter;
 
 /**
  * Segment: Saldenabfrage Parameter (Version 6)

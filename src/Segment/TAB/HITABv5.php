@@ -1,9 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\TAB;
+namespace BytesCommerce\Segment\TAB;
 
-use Fhp\Segment\BaseSegment;
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: TAN-Generator/Liste anzeigen Bestand Rückmeldung (Version 5)
@@ -19,6 +23,7 @@ class HITABv5 extends BaseSegment implements HITAB
      * 2: Kunde kann ein Mobiltelefon und einen TAN-Generator parallel nutzen
      */
     public int $tanEinsatzoption;
+
     /** @var TanMediumListeV5[]|null @Max(99) */
     public ?array $tanMediumListe = null;
 

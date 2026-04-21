@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp\Segment\SPA;
+declare(strict_types=1);
+
+namespace BytesCommerce\Segment\SPA;
 
 /**
  * Segment: SEPA-Kontoverbindung anfordern, Parameter (Version 3)

@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\KAZ;
 
-namespace Fhp\Segment\KAZ;
-
-use Fhp\Segment\BaseGeschaeftsvorfallparameterOld;
+use BytesCommerce\Segment\BaseGeschaeftsvorfallparameterOld;
 
 /**
  * Segment: Kontoumsätze/Zeitraum Parameter (Version 4)

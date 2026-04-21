@@ -1,8 +1,12 @@
 <?php
 
-namespace Fhp\MT940\Dialect;
+declare(strict_types=1);
 
-use Fhp\MT940\MT940;
+
+
+namespace BytesCommerce\MT940\Dialect;
+
+use BytesCommerce\MT940\MT940;
 
 class PostbankMT940 extends MT940
 {

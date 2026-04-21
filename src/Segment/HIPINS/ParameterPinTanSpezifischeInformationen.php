@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\HIPINS;
 
-namespace Fhp\Segment\HIPINS;
-
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Parameter PIN/TAN-spezifische Informationen
@@ -14,10 +16,15 @@ use Fhp\Segment\BaseDeg;
 class ParameterPinTanSpezifischeInformationen extends BaseDeg
 {
     public ?int $minimalePinLaenge = null;
+
     public ?int $maximalePinLaenge = null;
+
     public ?int $maximaleTanLaenge = null;
+
     public ?string $textZurBelegungDerBenutzerkennung = null;
+
     public ?string $textZurBelegungDerKundenId = null;
+
     /** @var GeschaeftsvorfallspezifischePinTanInformationen[] @Max(999) */
     public array $geschaeftsvorfallspezifischePinTanInformationen;
 

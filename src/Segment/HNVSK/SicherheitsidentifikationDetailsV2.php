@@ -1,9 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\HNVSK;
+namespace BytesCommerce\Segment\HNVSK;
 
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Sicherheitsidentifikation, Details (Version 2)
@@ -20,6 +24,7 @@ class SicherheitsidentifikationDetailsV2 extends BaseDeg
     public int $bezeichnerFuerSicherheitspartei = 1; // Unless we receive another value that overwrites this one, we're sending.
     /** Only allowed and mandatory for Chip-card, so this library does not support it. */
     public ?string $cid = null;
+
     /** Must be set to the {@link FinTs::$kundensystemId}, or '0' during synchronization. */
     public ?string $identifizierungDerPartei = null;
 
@@ -29,8 +34,8 @@ class SicherheitsidentifikationDetailsV2 extends BaseDeg
      */
     public static function createForSender(string $kundensystemId): SicherheitsidentifikationDetailsV2
     {
-        $result = new SicherheitsidentifikationDetailsV2();
-        $result->identifizierungDerPartei = $kundensystemId;
-        return $result;
+        $sicherheitsidentifikationDetailsV2 = new SicherheitsidentifikationDetailsV2();
+        $sicherheitsidentifikationDetailsV2->identifizierungDerPartei = $kundensystemId;
+        return $sicherheitsidentifikationDetailsV2;
     }
 }

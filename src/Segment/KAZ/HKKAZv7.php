@@ -1,10 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\KAZ;
+namespace BytesCommerce\Segment\KAZ;
 
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\Paginateable;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\Paginateable;
 
 /**
  * Segment: Kontoumsätze anfordern/Zeitraum (Version 7)
@@ -14,14 +18,19 @@ use Fhp\Segment\Paginateable;
  */
 class HKKAZv7 extends BaseSegment implements Paginateable
 {
-    public \Fhp\Segment\Common\Kti $kontoverbindungInternational;
+    public \BytesCommerce\Segment\Common\Kti $kontoverbindungInternational;
+
     public bool $alleKonten;
+
     public ?string $vonDatum = null;
+
     public ?string $bisDatum = null;
+
     public ?int $maximaleAnzahlEintraege = null;
+
     public ?string $aufsetzpunkt = null;
 
-    public function getKontoverbindungInternational(): \Fhp\Segment\Common\Kti
+    public function getKontoverbindungInternational(): \BytesCommerce\Segment\Common\Kti
     {
         return $this->kontoverbindungInternational;
     }
@@ -51,18 +60,18 @@ class HKKAZv7 extends BaseSegment implements Paginateable
         return $this->aufsetzpunkt;
     }
 
-    public static function create(\Fhp\Segment\Common\Kti $kti, bool $alleKonten, ?\DateTime $vonDatum, ?\DateTime $bisDatum, ?string $aufsetzpunkt = null): HKKAZv7
+    public static function create(\BytesCommerce\Segment\Common\Kti $kti, bool $alleKonten, ?\DateTime $vonDatum, ?\DateTime $bisDatum, ?string $aufsetzpunkt = null): HKKAZv7
     {
-        $result = HKKAZv7::createEmpty();
-        $result->kontoverbindungInternational = $kti;
-        $result->alleKonten = $alleKonten;
-        $result->vonDatum = $vonDatum?->format('Ymd');
-        $result->bisDatum = $bisDatum?->format('Ymd');
-        $result->aufsetzpunkt = $aufsetzpunkt;
-        return $result;
+        $hkkaZv7 = HKKAZv7::createEmpty();
+        $hkkaZv7->kontoverbindungInternational = $kti;
+        $hkkaZv7->alleKonten = $alleKonten;
+        $hkkaZv7->vonDatum = $vonDatum?->format('Ymd');
+        $hkkaZv7->bisDatum = $bisDatum?->format('Ymd');
+        $hkkaZv7->aufsetzpunkt = $aufsetzpunkt;
+        return $hkkaZv7;
     }
 
-    public function setPaginationToken(string $paginationToken)
+    public function setPaginationToken(string $paginationToken): void
     {
         $this->aufsetzpunkt = $paginationToken;
     }

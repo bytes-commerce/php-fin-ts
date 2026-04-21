@@ -1,24 +1,28 @@
 <?php
 
-namespace Fhp\Model\FlickerTan;
+declare(strict_types=1);
+
+
+
+namespace BytesCommerce\Model\FlickerTan;
 
 /**
  * inspired by @see https://github.com/willuhn/hbci4java/blob/master/src/org/kapott/hbci/manager/FlickerCode.java
  * documentation @see tan_hhd_uc_v14.pdf e.g. https://github.com/willuhn/hbci4java/blob/master/doc/tan_hhd_uc_v14.pdf
  */
-class SvgRenderer
+class SvgRenderer implements \Stringable
 {
-    private $svg;
+    private string $svg;
 
     /**
      * @var string[] the code in half-bit representation (string has length 4)
      */
-    private $bitPattern;
+    private array $bitPattern;
 
     /**
      * @var int blink frequency in Hz [1/s] should be between 2 and 20 Hz by documentation, but many TAN Generators are able to fetch 40 Hz as well
      */
-    private $frequency;
+    private int $frequency;
 
     /**
      * @param string[] $bitPattern a bit pattern in the format from {@see TanRequestChallengeFlicker::getFlickerPattern()}
@@ -71,6 +75,7 @@ class SvgRenderer
                 'height' => 75,
             ], [$this->getAnimation($i)]);
         }
+
         $docAttr = [
             'xmlns' => 'http://www.w3.org/2000/svg',
             'width' => $width,
@@ -100,15 +105,14 @@ class SvgRenderer
             $attr['dur'] = $timePerHalfByte . 's';
         } else {
             // arrange keyframes and colors
-            $colors = array_map(static function (string $pattern) use ($channelNumber) {
-                return $pattern[$channelNumber - 1] === '1' ? 'white' : 'black';
-            }, $this->bitPattern);
+            $colors = array_map(static fn(string $pattern) => $pattern[$channelNumber - 1] === '1' ? 'white' : 'black', $this->bitPattern);
             $keyFrames = range(0, 1, 1.0 / count($this->bitPattern));
 
             $attr['values'] = implode(';', $colors);
             $attr['keyFrames'] = implode(';', $keyFrames);
             $attr['dur'] = ($timePerHalfByte * count($this->bitPattern)) . 's';
         }
+
         return $this->buildNode('animate', $attr);
     }
 
@@ -122,20 +126,16 @@ class SvgRenderer
     {
         $attr = [];
         foreach ($attributes as $name => $value) {
-            switch ($name) {
-                case 'fill':
-                    $attr[] = "style='fill: $value'";
-                    break;
-                case 'points':
-                    $attr[] = "points='" . implode(' ', $value) . "'";
-                    break;
-                default:
-                    $attr[] = "$name='$value'";
-            }
+            $attr[] = match ($name) {
+                'fill' => sprintf("style='fill: %s'", $value),
+                'points' => "points='" . implode(' ', $value) . "'",
+                default => sprintf("%s='%s'", $name, $value),
+            };
         }
+
         $attrStr = implode(' ', $attr);
         $childStr = implode(PHP_EOL, $childs);
-        return "<$tag $attrStr>$childStr</$tag>";
+        return sprintf('<%s %s>%s</%s>', $tag, $attrStr, $childStr, $tag);
     }
 
     public function getImage(): string
@@ -143,7 +143,7 @@ class SvgRenderer
         return $this->svg;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->svg;
     }
@@ -157,10 +157,11 @@ class SvgRenderer
         if ($frequency < 2 || $frequency > 40) {
             throw new \InvalidArgumentException('Frequency is not between 2 and 40 Hz');
         }
+
         foreach ($bitPattern as $idx => $pattern) {
             // detect if a string is not length 4 with only 0 and 1 chars
             if (!preg_match('/^[01]{4}$/', $pattern)) {
-                throw new \InvalidArgumentException("Bit Pattern at index $idx is faulty, only 0 and 1 are allowed with length 4");
+                throw new \InvalidArgumentException(sprintf('Bit Pattern at index %s is faulty, only 0 and 1 are allowed with length 4', $idx));
             }
         }
     }

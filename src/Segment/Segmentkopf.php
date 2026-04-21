@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp\Segment;
+declare(strict_types=1);
+
+namespace BytesCommerce\Segment;
 
 class Segmentkopf extends BaseDeg
 {

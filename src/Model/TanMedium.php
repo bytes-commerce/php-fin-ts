@@ -1,7 +1,9 @@
 <?php
-/** @noinspection PhpUnused */
 
-namespace Fhp\Model;
+declare(strict_types=1);
+
+/** @noinspection PhpUnused */
+namespace BytesCommerce\Model;
 
 /**
  * For two-step authentication, users need to enter a TAN, which can be obtained in various ways. After choosing one of

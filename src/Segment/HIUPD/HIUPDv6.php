@@ -1,10 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\HIUPD;
 
-namespace Fhp\Segment\HIUPD;
-
-use Fhp\Model\SEPAAccount;
-use Fhp\Segment\BaseSegment;
+use BytesCommerce\Model\SEPAAccount;
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: Kontoinformation (Version 6)
@@ -19,10 +21,13 @@ use Fhp\Segment\BaseSegment;
 class HIUPDv6 extends BaseSegment implements HIUPD
 {
     // Note: Specification wants version 2, but only specifies version 3.
-    public ?\Fhp\Segment\Common\KtvV3 $kontoverbindung = null;
+    public ?\BytesCommerce\Segment\Common\KtvV3 $kontoverbindung = null;
+
     /** Max length: 34 */
     public ?string $iban = null;
+
     public string $kundenId;
+
     /**
      * 1 – 9: Kontokorrent-/Girokonto
      * 10 – 19: Sparkonto
@@ -36,13 +41,20 @@ class HIUPDv6 extends BaseSegment implements HIUPD
      * 90 – 99: Sonstige (nicht zuordenbar)
      */
     public ?int $kontoart = null;
+
     public ?string $kontowaehrung = null;
+
     public string $name1;
+
     public ?string $name2 = null;
+
     public ?string $kontoproduktbezeichnung = null;
+
     public ?KontolimitV2 $kontolimit = null;
+
     /** @var ErlaubteGeschaeftsvorfaelleV2[]|null @Max(999) */
     public ?array $erlaubteGeschaeftsvorfaelle = null;
+
     /**
      * JSON-encoded extra information.
      * @link https://www.hbci-zka.de/dokumente/spezifikation_deutsch/fintsv3/FinTS_3.0_Formals_2017-10-06_final_version.pdf
@@ -51,13 +63,14 @@ class HIUPDv6 extends BaseSegment implements HIUPD
      */
     public ?string $erweiterungKontobezogen = null;
 
-    public function matchesAccount(SEPAAccount $account): bool
+    public function matchesAccount(SEPAAccount $sepaAccount): bool
     {
         if (!is_null($this->iban)) {
-            return $this->iban == $account->getIban();
+            return $this->iban == $sepaAccount->getIban();
         }
+
         // Sparkasse (Koblenz) does not provide an IBAN in this segment, fall back to kontonummer:
-        return !is_null($this->kontoverbindung->kontonummer) && $this->kontoverbindung->kontonummer == $account->getAccountNumber();
+        return !is_null($this->kontoverbindung->kontonummer) && $this->kontoverbindung->kontonummer == $sepaAccount->getAccountNumber();
     }
 
     public function getErlaubteGeschaeftsvorfaelle(): array

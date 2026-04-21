@@ -1,28 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
+
+
 // NOTE: In FinTsTestCase, this namespace name is hard-coded in order to be able to mock the rand() function below.
 
-namespace Fhp\Protocol;
+namespace BytesCommerce\Protocol;
 
-use Fhp\Model\NoPsd2TanMode;
-use Fhp\Model\TanMode;
-use Fhp\Options\Credentials;
-use Fhp\Options\FinTsOptions;
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\HIRMS\Rueckmeldung;
-use Fhp\Segment\HIRMS\RueckmeldungContainer;
-use Fhp\Segment\HNHBK\HNHBKv3;
-use Fhp\Segment\HNHBS\HNHBSv1;
-use Fhp\Segment\HNSHA\BenutzerdefinierteSignaturV1;
-use Fhp\Segment\HNSHA\HNSHAv2;
-use Fhp\Segment\HNSHK\HNSHKv4;
-use Fhp\Segment\HNVSD\HNVSDv1;
-use Fhp\Segment\HNVSK\HNVSKv3;
-use Fhp\Syntax\Parser;
-use Fhp\Syntax\Serializer;
+use BytesCommerce\Model\NoPsd2TanMode;
+use BytesCommerce\Model\TanMode;
+use BytesCommerce\Options\Credentials;
+use BytesCommerce\Options\FinTsOptions;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\HIRMS\Rueckmeldung;
+use BytesCommerce\Segment\HIRMS\RueckmeldungContainer;
+use BytesCommerce\Segment\HNHBK\HNHBKv3;
+use BytesCommerce\Segment\HNHBS\HNHBSv1;
+use BytesCommerce\Segment\HNSHA\BenutzerdefinierteSignaturV1;
+use BytesCommerce\Segment\HNSHA\HNSHAv2;
+use BytesCommerce\Segment\HNSHK\HNSHKv4;
+use BytesCommerce\Segment\HNVSD\HNVSDv1;
+use BytesCommerce\Segment\HNVSK\HNVSKv3;
+use BytesCommerce\Syntax\Parser;
+use BytesCommerce\Syntax\Serializer;
 
 /**
- * NOTE: There is also the (newer) Fhp\Message\Message class.
+ * NOTE: There is also the (newer) BytesCommerce\Protocol\Message class.
  *
  * This class builds a message that has the structure of an encrypted message as defined in the original HBCI
  * specification (first link below). However, it implements only the structure and no actual encryption or cryptographic
@@ -75,13 +79,14 @@ class Message
 
     /** @var HNSHKv4|null */
     public $signatureHeader;
+
     /** @var HNSHAv2|null */
     public $signatureFooter;
 
     /**
      * @return \Generator|BaseSegment[] All plain and wrapper segments in this message.
      */
-    public function getAllSegments()
+    public function getAllSegments(): \Generator
     {
         yield from $this->plainSegments;
         yield from $this->wrapperSegments;
@@ -90,13 +95,13 @@ class Message
     /**
      * @throws \InvalidArgumentException If any segment in this message is invalid.
      */
-    public function validate()
+    public function validate(): void
     {
-        foreach ($this->getAllSegments() as $segment) {
+        foreach ($this->getAllSegments() as $allSegment) {
             try {
-                $segment->validate();
+                $allSegment->validate();
             } catch (\InvalidArgumentException $e) {
-                throw new \InvalidArgumentException("Invalid segment {$segment->segmentkopf->segmentkennung}", 0, $e);
+                throw new \InvalidArgumentException('Invalid segment ' . $allSegment->segmentkopf->segmentkennung, 0, $e);
             }
         }
     }
@@ -109,10 +114,9 @@ class Message
      */
     public function findSegments(string $segmentType): array
     {
-        return array_values(array_filter($this->plainSegments, function ($segment) use ($segmentType) {
+        return array_values(array_filter($this->plainSegments, 
             /* @var BaseSegment $segment */
-            return $segment instanceof $segmentType;
-        }));
+            fn(\BytesCommerce\Segment\BaseSegment $segment) => $segment instanceof $segmentType));
     }
 
     /**
@@ -123,9 +127,10 @@ class Message
     {
         $matchedSegments = $this->findSegments($segmentType);
         if (count($matchedSegments) > 1) {
-            throw new UnexpectedResponseException("Multiple segments matched $segmentType");
+            throw new UnexpectedResponseException('Multiple segments matched ' . $segmentType);
         }
-        return count($matchedSegments) === 0 ? null : $matchedSegments[0];
+
+        return $matchedSegments === [] ? null : $matchedSegments[0];
     }
 
     /**
@@ -134,7 +139,7 @@ class Message
      */
     public function hasSegment(string $segmentType): bool
     {
-        return $this->findSegment($segmentType) !== null;
+        return $this->findSegment($segmentType) instanceof \BytesCommerce\Segment\BaseSegment;
     }
 
     /**
@@ -145,9 +150,10 @@ class Message
     public function requireSegment(string $segmentType): BaseSegment
     {
         $matchedSegment = $this->findSegment($segmentType);
-        if ($matchedSegment === null) {
-            throw new UnexpectedResponseException("Segment not found: $segmentType");
+        if (!$matchedSegment instanceof \BytesCommerce\Segment\BaseSegment) {
+            throw new UnexpectedResponseException('Segment not found: ' . $segmentType);
         }
+
         return $matchedSegment;
     }
 
@@ -157,11 +163,12 @@ class Message
      */
     public function findSegmentByNumber(int $segmentNumber): ?BaseSegment
     {
-        foreach ($this->getAllSegments() as $segment) {
-            if ($segment->getSegmentNumber() === $segmentNumber) {
-                return $segment;
+        foreach ($this->getAllSegments() as $allSegment) {
+            if ($allSegment->getSegmentNumber() === $segmentNumber) {
+                return $allSegment;
             }
         }
+
         return null;
     }
 
@@ -172,20 +179,21 @@ class Message
      */
     public function filterByReferenceSegments(array $referenceNumbers): Message
     {
-        $result = new Message();
-        if (count($referenceNumbers) === 0) {
-            return $result;
+        $message = new Message();
+        if ($referenceNumbers === []) {
+            return $message;
         }
-        $result->plainSegments = array_filter($this->plainSegments, function ($segment) use ($referenceNumbers) {
+
+        $message->plainSegments = array_filter($this->plainSegments, function (\BytesCommerce\Segment\BaseSegment $baseSegment) use ($referenceNumbers): bool {
             /** @var BaseSegment $segment */
-            $referenceNumber = $segment->segmentkopf->bezugselement;
+            $referenceNumber = $baseSegment->segmentkopf->bezugselement;
             return $referenceNumber !== null && in_array($referenceNumber, $referenceNumbers);
         });
-        $result->header = $this->header;
-        $result->footer = $this->footer;
-        $result->signatureHeader = $this->signatureHeader;
-        $result->signatureFooter = $this->signatureFooter;
-        return $result;
+        $message->header = $this->header;
+        $message->footer = $this->footer;
+        $message->signatureHeader = $this->signatureHeader;
+        $message->signatureFooter = $this->signatureFooter;
+        return $message;
     }
 
     /**
@@ -195,18 +203,19 @@ class Message
      */
     public function findRueckmeldung(int $code, ?int $requestSegmentNumber = null): ?Rueckmeldung
     {
-        foreach ($this->plainSegments as $segment) {
+        foreach ($this->plainSegments as $plainSegment) {
             if (
-                $segment instanceof RueckmeldungContainer && (
-                    $requestSegmentNumber === null || $segment->segmentkopf->bezugselement === $requestSegmentNumber
+                $plainSegment instanceof RueckmeldungContainer && (
+                    $requestSegmentNumber === null || $plainSegment->segmentkopf->bezugselement === $requestSegmentNumber
                 )
             ) {
-                $rueckmeldung = $segment->findRueckmeldung($code);
-                if ($rueckmeldung !== null) {
+                $rueckmeldung = $plainSegment->findRueckmeldung($code);
+                if ($rueckmeldung instanceof \BytesCommerce\Segment\HIRMS\Rueckmeldung) {
                     return $rueckmeldung;
                 }
             }
         }
+
         return null;
     }
 
@@ -214,11 +223,12 @@ class Message
     public function findRueckmeldungen(int $code): array
     {
         $rueckmeldungen = [];
-        foreach ($this->plainSegments as $segment) {
-            if ($segment instanceof RueckmeldungContainer) {
-                $rueckmeldungen = array_merge($rueckmeldungen, $segment->findRueckmeldungen($code));
+        foreach ($this->plainSegments as $plainSegment) {
+            if ($plainSegment instanceof RueckmeldungContainer) {
+                $rueckmeldungen = array_merge($rueckmeldungen, $plainSegment->findRueckmeldungen($code));
             }
         }
+
         return $rueckmeldungen;
     }
 
@@ -229,13 +239,14 @@ class Message
     public function findRueckmeldungscodesForReferenceSegment(int $requestSegmentNumber): array
     {
         $codes = [];
-        foreach ($this->plainSegments as $segment) {
-            if ($segment instanceof RueckmeldungContainer && $segment->segmentkopf->bezugselement === $requestSegmentNumber) {
-                foreach ($segment->getAllRueckmeldungen() as $rueckmeldung) {
+        foreach ($this->plainSegments as $plainSegment) {
+            if ($plainSegment instanceof RueckmeldungContainer && $plainSegment->segmentkopf->bezugselement === $requestSegmentNumber) {
+                foreach ($plainSegment->getAllRueckmeldungen() as $rueckmeldung) {
                     $codes[] = $rueckmeldung->rueckmeldungscode;
                 }
             }
         }
+
         return $codes;
     }
 
@@ -251,32 +262,32 @@ class Message
      * Wraps the given segments in an "encryption" envelope (see class documentation). Inverse of {@link parse()}.
      * @param BaseSegment[]|MessageBuilder $plainSegments The plain segments to be wrapped. Segment numbers do not need
      *     to be set yet (or they will be overwritten).
-     * @param FinTsOptions $options See {@link FinTsOptions}.
+     * @param FinTsOptions $finTsOptions See {@link FinTsOptions}.
      * @param string $kundensystemId See {@link $kundensystemId}.
      * @param Credentials $credentials The credentials used to authenticate the message.
      * @param TanMode|null $tanMode Optionally specifies which two-step TAN mode to use, defaults to 999 (single step).
      * @param string|null The TAN to be sent to the server (in HNSHA). If this is present, $tanMode must be present.
      * @return Message The built message, ready to be sent to the server through {@link FinTs::sendMessage()}.
      */
-    public static function createWrappedMessage($plainSegments, FinTsOptions $options, string $kundensystemId, Credentials $credentials, ?TanMode $tanMode, $tan): Message
+    public static function createWrappedMessage($plainSegments, FinTsOptions $finTsOptions, string $kundensystemId, Credentials $credentials, ?TanMode $tanMode, ?string $tan): Message
     {
         $message = new Message();
         $message->plainSegments = $plainSegments instanceof MessageBuilder ? $plainSegments->segments : $plainSegments;
 
         $tanMode = $tanMode instanceof NoPsd2TanMode ? null : $tanMode;
-        $randomReference = strval(rand(1000000, 9999999)); // Call unqualified rand() for unit test mocking to work.
-        $signature = BenutzerdefinierteSignaturV1::create($credentials->getPin(), $tan);
+        $randomReference = strval(random_int(1000000, 9999999)); // Call unqualified rand() for unit test mocking to work.
+        $benutzerdefinierteSignaturV1 = BenutzerdefinierteSignaturV1::create($credentials->getPin(), $tan);
         $numPlainSegments = count($message->plainSegments); // This is N, see $encryptedSegments.
 
         $message->wrapperSegments = [ // See $encryptedSegments documentation for the structure.
             $message->header = HNHBKv3::createEmpty()->setSegmentNumber(1),
-            HNVSKv3::create($options, $credentials, $kundensystemId, $tanMode), // Segment number 998
+            HNVSKv3::create($finTsOptions, $credentials, $kundensystemId, $tanMode), // Segment number 998
             HNVSDv1::create(array_merge( // Segment number 999
                 [$message->signatureHeader = HNSHKv4::create(
-                    $randomReference, $options, $credentials, $tanMode, $kundensystemId
+                    $randomReference, $finTsOptions, $credentials, $tanMode, $kundensystemId
                 )->setSegmentNumber(2)],
                 static::setSegmentNumbers($message->plainSegments, 3),
-                [$message->signatureFooter = HNSHAv2::create($randomReference, $signature)
+                [$message->signatureFooter = HNSHAv2::create($randomReference, $benutzerdefinierteSignaturV1)
                     ->setSegmentNumber($numPlainSegments + 3), ]
             )),
             $message->footer = HNHBSv1::createEmpty()->setSegmentNumber($numPlainSegments + 4),
@@ -314,56 +325,61 @@ class Message
      */
     public static function parse(string $rawMessage): Message
     {
-        $result = new Message();
+        $message = new Message();
         $segments = Parser::parseSegments($rawMessage);
 
         // Message header and footer must always be there, or something went badly wrong.
-        $result->header = $segments[0];
-        $result->footer = $segments[count($segments) - 1];
-        if (!$result->header instanceof HNHBKv3) {
-            $actual = $result->header->getName();
-            throw new \InvalidArgumentException("Expected first segment to be HNHBK, but got $actual: $rawMessage");
+        $message->header = $segments[0];
+        $message->footer = $segments[count($segments) - 1];
+        if (!$message->header instanceof HNHBKv3) {
+            $actual = $message->header->getName();
+            throw new \InvalidArgumentException(sprintf('Expected first segment to be HNHBK, but got %s: %s', $actual, $rawMessage));
         }
-        if (!$result->footer instanceof HNHBSv1) {
-            $actual = $result->footer->getName();
-            throw new \InvalidArgumentException("Expected last segment to be HNHBS, but got $actual: $rawMessage");
+
+        if (!$message->footer instanceof HNHBSv1) {
+            $actual = $message->footer->getName();
+            throw new \InvalidArgumentException(sprintf('Expected last segment to be HNHBS, but got %s: %s', $actual, $rawMessage));
         }
 
         // Check if there's an encryption header and "encrypted" data.
         // Section B.8 specifies that there are exactly 4 segments: HNHBK, HNVSK, HNVSD, HNHBS.
         if (count($segments) === 4 && $segments[1] instanceof HNVSKv3) {
             if (!$segments[2] instanceof HNVSDv1) {
-                throw new \InvalidArgumentException("Expected third segment to be HNVSD: $rawMessage");
+                throw new \InvalidArgumentException('Expected third segment to be HNVSD: ' . $rawMessage);
             }
-            $result->wrapperSegments = $segments;
-            $result->plainSegments = Parser::parseSegments($segments[2]->datenVerschluesselt->getData());
+
+            $message->wrapperSegments = $segments;
+            $message->plainSegments = Parser::parseSegments($segments[2]->datenVerschluesselt->getData());
 
             // Signature header and footer must always be there when the "encrypted" structure was used.
             // Postbank is not following the Spec and does not send the Header and Footer
 
-            $signatureFooterAsExpected = end($result->plainSegments) instanceof HNSHAv2;
-            $signatureHeaderAsExpected = reset($result->plainSegments) instanceof HNSHKv4;
+            $signatureFooterAsExpected = end($message->plainSegments) instanceof HNSHAv2;
+            $signatureHeaderAsExpected = reset($message->plainSegments) instanceof HNSHKv4;
 
             if ($signatureHeaderAsExpected xor $signatureFooterAsExpected) {
-                throw new \InvalidArgumentException("Expected first segment to be HNSHK and last segement to be HNSHA or both to be absent: $rawMessage");
+                throw new \InvalidArgumentException('Expected first segment to be HNSHK and last segement to be HNSHA or both to be absent: ' . $rawMessage);
             }
 
             if ($signatureHeaderAsExpected) {
-                $result->signatureHeader = array_shift($result->plainSegments);
+                $message->signatureHeader = array_shift($message->plainSegments);
             }
+
             if ($signatureFooterAsExpected) {
-                $result->signatureFooter = array_pop($result->plainSegments);
+                $message->signatureFooter = array_pop($message->plainSegments);
             }
         } else {
             // Ensure that there's no encryption header anywhere, and we haven't just misunderstood the format.
             foreach ($segments as $segment) {
                 if ($segment->getName() === 'HNVSK' || $segment->getName() === 'HNVSD') {
-                    throw new \InvalidArgumentException("Unexpected encrypted format: $rawMessage");
+                    throw new \InvalidArgumentException('Unexpected encrypted format: ' . $rawMessage);
                 }
             }
-            $result->plainSegments = $segments; // The message wasn't "encrypted".
+
+            $message->plainSegments = $segments; // The message wasn't "encrypted".
         }
-        return $result;
+
+        return $message;
     }
 
     /**
@@ -378,8 +394,10 @@ class Message
             if ($segment->segmentkopf->segmentnummer >= HNVSKv3::SEGMENT_NUMBER) {
                 throw new \InvalidArgumentException('Too many segments');
             }
+
             ++$segmentNumber;
         }
+
         return $segments;
     }
 }

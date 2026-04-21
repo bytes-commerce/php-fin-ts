@@ -1,10 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\Common;
+namespace BytesCommerce\Segment\Common;
 
-use Fhp\Model\SEPAAccount;
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Model\SEPAAccount;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Kontoverbindung (Version 3)
@@ -19,22 +23,24 @@ use Fhp\Segment\BaseDeg;
  */
 class KtvV3 extends BaseDeg implements AccountInfo
 {
-    public ?string $kontonummer = null;  // Officially it's mandatory, but in practice it can be missing.
+    public ?string $kontonummer = null;
+      // Officially it's mandatory, but in practice it can be missing.
     public ?string $unterkontomerkmal = null;
+
     public ?Kik $kik = null;  // Officially it's mandatory, but in practice it can be missing.
 
     public static function create(string $kontonummer, ?string $unterkontomerkmal, Kik $kik): KtvV3
     {
-        $result = new KtvV3();
-        $result->kontonummer = $kontonummer;
-        $result->unterkontomerkmal = $unterkontomerkmal;
-        $result->kik = $kik;
-        return $result;
+        $ktvV3 = new KtvV3();
+        $ktvV3->kontonummer = $kontonummer;
+        $ktvV3->unterkontomerkmal = $unterkontomerkmal;
+        $ktvV3->kik = $kik;
+        return $ktvV3;
     }
 
-    public static function fromAccount(SEPAAccount $account): KtvV3
+    public static function fromAccount(SEPAAccount $sepaAccount): KtvV3
     {
-        return static::create($account->getAccountNumber(), $account->getSubAccount(), Kik::create($account->getBlz()));
+        return static::create($sepaAccount->getAccountNumber(), $sepaAccount->getSubAccount(), Kik::create($sepaAccount->getBlz()));
     }
 
     public function getAccountNumber(): string

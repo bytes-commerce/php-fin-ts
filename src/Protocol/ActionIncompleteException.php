@@ -1,7 +1,9 @@
 <?php
-/** @noinspection PhpUnused */
 
-namespace Fhp\Protocol;
+declare(strict_types=1);
+
+/** @noinspection PhpUnused */
+namespace BytesCommerce\Protocol;
 
 /**
  * Thrown when an action result is read, but it is not available yet because the action was not executed.

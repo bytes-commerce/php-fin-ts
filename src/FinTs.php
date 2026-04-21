@@ -1,38 +1,42 @@
 <?php
 
-namespace Fhp;
+declare(strict_types=1);
 
-use Fhp\Model\NoPsd2TanMode;
-use Fhp\Model\TanMedium;
-use Fhp\Model\TanMode;
-use Fhp\Model\VopConfirmationRequest;
-use Fhp\Model\VopConfirmationRequestImpl;
-use Fhp\Model\VopPollingInfo;
-use Fhp\Model\VopVerificationResult;
-use Fhp\Options\Credentials;
-use Fhp\Options\FinTsOptions;
-use Fhp\Options\SanitizingLogger;
-use Fhp\Protocol\BPD;
-use Fhp\Protocol\DialogInitialization;
-use Fhp\Protocol\GetTanMedia;
-use Fhp\Protocol\Message;
-use Fhp\Protocol\MessageBuilder;
-use Fhp\Protocol\ServerException;
-use Fhp\Protocol\UnexpectedResponseException;
-use Fhp\Protocol\UPD;
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\HIBPA\HIBPAv3;
-use Fhp\Segment\HIRMS\Rueckmeldungscode;
-use Fhp\Segment\HKEND\HKENDv1;
-use Fhp\Segment\HKIDN\HKIDNv2;
-use Fhp\Segment\HKVVB\HKVVBv3;
-use Fhp\Segment\TAN\HITAN;
-use Fhp\Segment\TAN\HKTAN;
-use Fhp\Segment\TAN\HKTANFactory;
-use Fhp\Segment\TAN\HKTANv6;
-use Fhp\Segment\VPP\HKVPPv1;
-use Fhp\Segment\VPP\VopHelper;
-use Fhp\Syntax\InvalidResponseException;
+
+
+namespace BytesCommerce;
+
+use BytesCommerce\Model\NoPsd2TanMode;
+use BytesCommerce\Model\TanMedium;
+use BytesCommerce\Model\TanMode;
+use BytesCommerce\Model\VopConfirmationRequest;
+use BytesCommerce\Model\VopConfirmationRequestImpl;
+use BytesCommerce\Model\VopPollingInfo;
+use BytesCommerce\Model\VopVerificationResult;
+use BytesCommerce\Options\Credentials;
+use BytesCommerce\Options\FinTsOptions;
+use BytesCommerce\Options\SanitizingLogger;
+use BytesCommerce\Protocol\BPD;
+use BytesCommerce\Protocol\DialogInitialization;
+use BytesCommerce\Protocol\GetTanMedia;
+use BytesCommerce\Protocol\Message;
+use BytesCommerce\Protocol\MessageBuilder;
+use BytesCommerce\Protocol\ServerException;
+use BytesCommerce\Protocol\UnexpectedResponseException;
+use BytesCommerce\Protocol\UPD;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\HIBPA\HIBPAv3;
+use BytesCommerce\Segment\HIRMS\Rueckmeldungscode;
+use BytesCommerce\Segment\HKEND\HKENDv1;
+use BytesCommerce\Segment\HKIDN\HKIDNv2;
+use BytesCommerce\Segment\HKVVB\HKVVBv3;
+use BytesCommerce\Segment\TAN\HITAN;
+use BytesCommerce\Segment\TAN\HKTAN;
+use BytesCommerce\Segment\TAN\HKTANFactory;
+use BytesCommerce\Segment\TAN\HKTANv6;
+use BytesCommerce\Segment\VPP\HKVPPv1;
+use BytesCommerce\Segment\VPP\VopHelper;
+use BytesCommerce\Syntax\InvalidResponseException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -291,7 +295,7 @@ class FinTs
     }
 
     /**
-     * Executes an action. Be sure to {@link login()} first. See the `\Fhp\Action` package for actions that can be
+     * Executes an action. Be sure to {@link login()} first. See the `\BytesCommerce\Action` package for actions that can be
      * executed with this function. Note that, after this function returns, the action can be in the following states:
      * 1. If {@link BaseAction::needsTan()} returns true, the action isn't completed yet because needs a TAN or other
      *    kind of two-factor authentication (2FA). In this case, use {@link BaseAction::getTanRequest()} to get more

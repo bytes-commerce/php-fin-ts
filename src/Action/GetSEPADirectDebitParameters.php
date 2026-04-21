@@ -1,12 +1,16 @@
 <?php
 
-namespace Fhp\Action;
+declare(strict_types=1);
 
-use Fhp\BaseAction;
-use Fhp\Protocol\BPD;
-use Fhp\Protocol\UPD;
-use Fhp\Segment\DSE\HIDXES;
-use Fhp\Segment\DSE\MinimaleVorlaufzeitSEPALastschrift;
+
+
+namespace BytesCommerce\Action;
+
+use BytesCommerce\BaseAction;
+use BytesCommerce\Protocol\BPD;
+use BytesCommerce\Protocol\UPD;
+use BytesCommerce\Segment\DSE\HIDXES;
+use BytesCommerce\Segment\DSE\MinimaleVorlaufzeitSEPALastschrift;
 
 /**
  * Retrieves information about SEPA Direct Debit Requests
@@ -14,32 +18,33 @@ use Fhp\Segment\DSE\MinimaleVorlaufzeitSEPALastschrift;
 class GetSEPADirectDebitParameters extends BaseAction
 {
     public const SEQUENCE_TYPES = ['FRST', 'OOFF', 'FNAL', 'RCUR'];
+
     public const DIRECT_DEBIT_TYPES = ['CORE', 'COR1', 'B2B'];
 
     // Request (if you add a field here, update __serialize() and __unserialize() as well).
-    /** @var string */
-    private $directDebitType;
-    /** @var string */
-    private $seqType;
-    /** @var bool */
-    private $singleDirectDebit;
+    private ?string $directDebitType = null;
 
-    /** @var HIDXES */
-    private $hidxes;
+    private ?string $seqType = null;
 
-    public static function create(string $seqType, bool $singleDirectDebit, string $directDebitType = 'CORE')
+    private ?bool $singleDirectDebit = null;
+
+    private ?\BytesCommerce\Segment\BaseSegment $baseSegment = null;
+
+    public static function create(string $seqType, bool $singleDirectDebit, string $directDebitType = 'CORE'): \BytesCommerce\Action\GetSEPADirectDebitParameters
     {
-        if (!in_array($directDebitType, self::DIRECT_DEBIT_TYPES)) {
+        if (!in_array($directDebitType, self::DIRECT_DEBIT_TYPES, true)) {
             throw new \InvalidArgumentException('Unknown CORE type, possible values are ' . implode(', ', self::DIRECT_DEBIT_TYPES));
         }
-        if (!in_array($seqType, self::SEQUENCE_TYPES)) {
+
+        if (!in_array($seqType, self::SEQUENCE_TYPES, true)) {
             throw new \InvalidArgumentException('Unknown SEPA sequence type, possible values are ' . implode(', ', self::SEQUENCE_TYPES));
         }
-        $result = new GetSEPADirectDebitParameters();
-        $result->directDebitType = $directDebitType;
-        $result->seqType = $seqType;
-        $result->singleDirectDebit = $singleDirectDebit;
-        return $result;
+
+        $getSEPADirectDebitParameters = new GetSEPADirectDebitParameters();
+        $getSEPADirectDebitParameters->directDebitType = $directDebitType;
+        $getSEPADirectDebitParameters->seqType = $seqType;
+        $getSEPADirectDebitParameters->singleDirectDebit = $singleDirectDebit;
+        return $getSEPADirectDebitParameters;
     }
 
     /**
@@ -62,9 +67,8 @@ class GetSEPADirectDebitParameters extends BaseAction
      * @deprecated Beginning from PHP7.4 __unserialize is used for new generated strings, then this method is only used for previously generated strings - remove after May 2023
      *
      * @param string $serialized
-     * @return void
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         self::__unserialize(unserialize($serialized));
     }
@@ -83,20 +87,16 @@ class GetSEPADirectDebitParameters extends BaseAction
 
     public static function getHixxesSegmentName(string $directDebitType, bool $singleDirectDebit): string
     {
-        switch ($directDebitType) {
-            case 'CORE':
-            case 'COR1':
-                return $singleDirectDebit ? 'HIDSES' : 'HIDMES';
-            case 'B2B':
-                return $singleDirectDebit ? 'HIBSES' : 'HIBMES';
-            default:
-                throw new \InvalidArgumentException('Unknown DirectDebitTypes type, possible values are ' . implode(', ', self::DIRECT_DEBIT_TYPES));
-        }
+        return match ($directDebitType) {
+            'CORE', 'COR1' => $singleDirectDebit ? 'HIDSES' : 'HIDMES',
+            'B2B' => $singleDirectDebit ? 'HIBSES' : 'HIBMES',
+            default => throw new \InvalidArgumentException('Unknown DirectDebitTypes type, possible values are ' . implode(', ', self::DIRECT_DEBIT_TYPES)),
+        };
     }
 
-    protected function createRequest(BPD $bpd, ?UPD $upd)
+    protected function createRequest(BPD $bpd, ?UPD $upd): array
     {
-        $this->hidxes = $bpd->requireLatestSupportedParameters(static::getHixxesSegmentName($this->directDebitType, $this->singleDirectDebit));
+        $this->baseSegment = $bpd->requireLatestSupportedParameters(static::getHixxesSegmentName($this->directDebitType, $this->singleDirectDebit));
         $this->isDone = true;
         return []; // No request to the bank required
     }
@@ -106,10 +106,11 @@ class GetSEPADirectDebitParameters extends BaseAction
      */
     public function getMinimalLeadTime(): ?MinimaleVorlaufzeitSEPALastschrift
     {
-        $parsed = $this->hidxes->getParameter()->getMinimalLeadTime($this->seqType);
+        $parsed = $this->baseSegment->getParameter()->getMinimalLeadTime($this->seqType);
         if ($parsed instanceof MinimaleVorlaufzeitSEPALastschrift) {
             return $parsed;
         }
+
         return $parsed[$this->directDebitType] ?? null;
     }
 }

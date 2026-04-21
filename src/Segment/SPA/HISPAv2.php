@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp\Segment\SPA;
+declare(strict_types=1);
+
+namespace BytesCommerce\Segment\SPA;
 
 /**
  * Segment: SEPA-Kontoverbindung rückmelden (Version 2)

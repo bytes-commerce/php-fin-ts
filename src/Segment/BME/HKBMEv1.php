@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\BME;
+declare(strict_types=1);
 
-use Fhp\Segment\DME\HKDMEv1;
+namespace BytesCommerce\Segment\BME;
+
+use BytesCommerce\Segment\DME\HKDMEv1;
 
 /**
  * Einreichung terminierter SEPA-Sammellastschrift (Segmentversion 1)

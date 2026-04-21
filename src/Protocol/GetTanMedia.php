@@ -1,13 +1,17 @@
 <?php
 
-namespace Fhp\Protocol;
+declare(strict_types=1);
 
-use Fhp\BaseAction;
-use Fhp\Segment\TAB\HITAB;
-use Fhp\Segment\TAB\HKTABv4;
-use Fhp\Segment\TAB\HKTABv5;
-use Fhp\Segment\TAB\TanMediumListe;
-use Fhp\UnsupportedException;
+
+
+namespace BytesCommerce\Protocol;
+
+use BytesCommerce\BaseAction;
+use BytesCommerce\Segment\TAB\HITAB;
+use BytesCommerce\Segment\TAB\HKTABv4;
+use BytesCommerce\Segment\TAB\HKTABv5;
+use BytesCommerce\Segment\TAB\TanMediumListe;
+use BytesCommerce\UnsupportedException;
 
 /**
  * Fetches the TAN media (e.g. different mobile phones or iTAN lists) that are available to the user (HTKAB).
@@ -17,26 +21,23 @@ class GetTanMedia extends BaseAction
     /** @var TanMediumListe[]|null */
     private $tanMedia;
 
-    protected function createRequest(BPD $bpd, ?UPD $upd)
+    protected function createRequest(BPD $bpd, ?UPD $upd): \BytesCommerce\Segment\TAB\HKTABv4|\BytesCommerce\Segment\TAB\HKTABv5
     {
         // Prepare the HKTAB request.
-        $hitabs = $bpd->requireLatestSupportedParameters('HITABS');
-        switch ($hitabs->getVersion()) {
-            case 4:
-                return HKTABv4::createEmpty();
-            case 5:
-                return HKTABv5::createEmpty();
-            default:
-                throw new UnsupportedException('Unsupported HKTAB version: ' . $hitabs->getVersion());
-        }
+        $baseSegment = $bpd->requireLatestSupportedParameters('HITABS');
+        return match ($baseSegment->getVersion()) {
+            4 => HKTABv4::createEmpty(),
+            5 => HKTABv5::createEmpty(),
+            default => throw new UnsupportedException('Unsupported HKTAB version: ' . $baseSegment->getVersion()),
+        };
     }
 
-    public function processResponse(Message $response)
+    public function processResponse(Message $message): void
     {
-        parent::processResponse($response);
-        /** @var HITAB $hitab */
-        $hitab = $response->requireSegment(HITAB::class);
-        $this->tanMedia = $hitab->getTanMediumListe() === null ? [] : $hitab->getTanMediumListe();
+        parent::processResponse($message);
+        /** @var HITAB $baseSegment */
+        $baseSegment = $message->requireSegment(HITAB::class);
+        $this->tanMedia = $baseSegment->getTanMediumListe() ?? [];
     }
 
     /**

@@ -1,8 +1,12 @@
 <?php
 
-namespace Fhp\Protocol;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
+
+
+namespace BytesCommerce\Protocol;
+
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Collects segments and assigns them segment numbers in order to form a {@link Message}.
@@ -25,7 +29,7 @@ class MessageBuilder
      * @param BaseSegment|BaseSegment[] $segments The segment(s) to be added.
      * @return $this The same instance for chaining.
      */
-    public function add($segments)
+    public function add($segments): static
     {
         if (is_array($segments)) {
             foreach ($segments as $segment) {
@@ -34,16 +38,18 @@ class MessageBuilder
         } else {
             $this->addInternal($segments);
         }
+
         return $this;
     }
 
-    private function addInternal(BaseSegment $segment)
+    private function addInternal(BaseSegment $baseSegment): void
     {
-        if ($segment->segmentkopf === null) {
+        if (!$baseSegment->segmentkopf instanceof \BytesCommerce\Segment\Segmentkopf) {
             throw new \InvalidArgumentException(
                 'Segment lacks Segmentkopf, maybe you called ctor instead of createEmpty()');
         }
-        $this->segments[] = $segment;
+
+        $this->segments[] = $baseSegment;
     }
 
     // Note: There is no single build() function, use Message::createWrappedMessage() instead.

@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Model;
+declare(strict_types=1);
 
-use Fhp\Protocol\UnexpectedResponseException;
+namespace BytesCommerce\Model;
+
+use BytesCommerce\Protocol\UnexpectedResponseException;
 
 /**
  * Possible outcomes of the Verification of Payee check that the bank did on a transfer we want to execute.
@@ -14,12 +16,16 @@ class VopVerificationResult
 {
     /** The verification completed and successfully matched the payee information. */
     public const CompletedFullMatch = 'CompletedFullMatch';
+
     /** The verification completed and only partially matched the payee information. */
     public const CompletedCloseMatch = 'CompletedCloseMatch';
+
     /** The verification completed but could not match the payee information. */
     public const CompletedNoMatch = 'CompletedNoMatch';
+
     /** The verification completed but not all included transfers were successfully matched. */
     public const CompletedPartialMatch = 'CompletedPartialMatch';
+
     /**
      * The verification was attempted but could not be completed. More information MAY be available from
      * {@link VopConfirmationRequest::getVerificationNotApplicableReason()}.
@@ -45,7 +51,7 @@ class VopVerificationResult
             'RVNM' => self::CompletedNoMatch,
             'RVCM' => self::CompletedPartialMatch,
             'RVNA' => self::NotApplicable,
-            default => throw new UnexpectedResponseException("Unexpected VOP result code: $codeFromBank"),
+            default => throw new UnexpectedResponseException('Unexpected VOP result code: ' . $codeFromBank),
         };
     }
 }

@@ -1,20 +1,24 @@
 <?php
 
-namespace Fhp\Action;
+declare(strict_types=1);
 
-use Fhp\Model\SEPAAccount;
-use Fhp\PaginateableAction;
-use Fhp\Protocol\BPD;
-use Fhp\Protocol\Message;
-use Fhp\Protocol\UPD;
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\Common\Ktz;
-use Fhp\Segment\HIRMS\Rueckmeldungscode;
-use Fhp\Segment\SPA\HISPA;
-use Fhp\Segment\SPA\HKSPAv1;
-use Fhp\Segment\SPA\HKSPAv2;
-use Fhp\Segment\SPA\HKSPAv3;
-use Fhp\UnsupportedException;
+
+
+namespace BytesCommerce\Action;
+
+use BytesCommerce\Model\SEPAAccount;
+use BytesCommerce\PaginateableAction;
+use BytesCommerce\Protocol\BPD;
+use BytesCommerce\Protocol\Message;
+use BytesCommerce\Protocol\UPD;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\Common\Ktz;
+use BytesCommerce\Segment\HIRMS\Rueckmeldungscode;
+use BytesCommerce\Segment\SPA\HISPA;
+use BytesCommerce\Segment\SPA\HKSPAv1;
+use BytesCommerce\Segment\SPA\HKSPAv2;
+use BytesCommerce\Segment\SPA\HKSPAv3;
+use BytesCommerce\UnsupportedException;
 
 /**
  * Runs an HKSPA request to retrieve account details about the accounts that the user can access through FinTs.
@@ -28,7 +32,7 @@ class GetSEPAAccounts extends PaginateableAction
 
     // Response
     /** @var SEPAAccount[] */
-    private $accounts;
+    private ?array $accounts = null;
 
     /**
      * @return GetSEPAAccounts A new action instance.
@@ -47,44 +51,39 @@ class GetSEPAAccounts extends PaginateableAction
         return $this->accounts;
     }
 
-    protected function createRequest(BPD $bpd, ?UPD $upd)
+    protected function createRequest(BPD $bpd, ?UPD $upd): \BytesCommerce\Segment\SPA\HKSPAv1|\BytesCommerce\Segment\SPA\HKSPAv2
     {
-        /** @var BaseSegment $hispas */
-        $hispas = $bpd->requireLatestSupportedParameters('HISPAS');
-        switch ($hispas->getVersion()) {
-            case 1:
-                return HKSPAv1::createEmpty();
-            case 2:
-                return HKSPAv2::createEmpty();
-            case 3:
-                return HKSPAv3::createEmpty();
-            default:
-                throw new UnsupportedException('Unsupported HKSPA version: ' . $hispas->getVersion());
-        }
+        $baseSegment = $bpd->requireLatestSupportedParameters('HISPAS');
+        return match ($baseSegment->getVersion()) {
+            1 => HKSPAv1::createEmpty(),
+            2 => HKSPAv2::createEmpty(),
+            3 => HKSPAv3::createEmpty(),
+            default => throw new UnsupportedException('Unsupported HKSPA version: ' . $baseSegment->getVersion()),
+        };
     }
 
-    public function processResponse(Message $response)
+    public function processResponse(Message $message): void
     {
-        parent::processResponse($response);
+        parent::processResponse($message);
 
         // Banks send just 3010 and no HISPA in case there are no accounts (or at least none that the bank is able to
         // report through HISPA).
-        if ($response->findRueckmeldung(Rueckmeldungscode::NICHT_VERFUEGBAR) !== null) {
+        if ($message->findRueckmeldung(Rueckmeldungscode::NICHT_VERFUEGBAR) instanceof \BytesCommerce\Segment\HIRMS\Rueckmeldung) {
             $this->accounts = [];
             return;
         }
 
-        /** @var HISPA $hispa */
-        $hispa = $response->requireSegment(HISPA::class);
-        $this->accounts = array_map(function ($ktz) {
+        /** @var HISPA $baseSegment */
+        $baseSegment = $message->requireSegment(HISPA::class);
+        $this->accounts = array_map(function (\BytesCommerce\Segment\Common\Ktz $ktz): \BytesCommerce\Model\SEPAAccount {
             /** @var Ktz $ktz */
-            $account = new SEPAAccount();
-            $account->setIban($ktz->iban);
-            $account->setBic($ktz->bic);
-            $account->setAccountNumber($ktz->kontonummer);
-            $account->setSubAccount($ktz->unterkontomerkmal);
-            $account->setBlz($ktz->kreditinstitutskennung->kreditinstitutscode);
-            return $account;
-        }, $hispa->getSepaKontoverbindung());
+            $sepaAccount = new SEPAAccount();
+            $sepaAccount->setIban($ktz->iban);
+            $sepaAccount->setBic($ktz->bic);
+            $sepaAccount->setAccountNumber($ktz->kontonummer);
+            $sepaAccount->setSubAccount($ktz->unterkontomerkmal);
+            $sepaAccount->setBlz($ktz->kreditinstitutskennung->kreditinstitutscode);
+            return $sepaAccount;
+        }, $baseSegment->getSepaKontoverbindung());
     }
 }

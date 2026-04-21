@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\Common;
 
-namespace Fhp\Segment\Common;
-
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Kontoverbindung ZV international (Version 1)
@@ -15,13 +17,18 @@ class Ktz extends BaseDeg implements AccountInfo
 {
     /** Whether it's a SEPA account that has IBAN/BIC, or not (e.g. a stock depot) */
     public bool $kontoverwendungSepa;
+
     /** Max length: 34 */
     public ?string $iban = null;
+
     /** Max length: 11, required if IBAN is present. */
     public ?string $bic = null;
+
     /** Also known as Depotnummer. */
     public string $kontonummer;
+
     public ?string $unterkontomerkmal = null;
+
     public Kik $kreditinstitutskennung;
 
     public function getAccountNumber(): string

@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\WPD;
 
-namespace Fhp\Segment\WPD;
-
-use Fhp\Segment\BaseGeschaeftsvorfallparameterOld;
+use BytesCommerce\Segment\BaseGeschaeftsvorfallparameterOld;
 
 /**
  * Segment: Parameter Depotaufstellung

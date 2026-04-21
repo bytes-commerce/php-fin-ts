@@ -1,8 +1,12 @@
 <?php
 
-namespace Fhp\CAMT;
+declare(strict_types=1);
 
-use Fhp\MT940\MT940;
+
+
+namespace BytesCommerce\CAMT;
+
+use BytesCommerce\MT940\MT940;
 
 /**
  * Parser for CAMT XML format (ISO 20022)

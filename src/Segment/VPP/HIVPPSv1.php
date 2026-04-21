@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\VPP;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseGeschaeftsvorfallparameter;
+namespace BytesCommerce\Segment\VPP;
+
+use BytesCommerce\Segment\BaseGeschaeftsvorfallparameter;
 
 /**
  * Segment: Namensabgleich Prüfauftrag Parameter

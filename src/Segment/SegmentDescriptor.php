@@ -1,6 +1,10 @@
 <?php
 
-namespace Fhp\Segment;
+declare(strict_types=1);
+
+
+
+namespace BytesCommerce\Segment;
 
 /**
  * Contains meta information about a segment, i.e. anything that can be statically known about a sub-class of
@@ -17,10 +21,11 @@ class SegmentDescriptor extends BaseDescriptor
      */
     public static function get(string $class): SegmentDescriptor
     {
-        if (!array_key_exists($class, static::$descriptors)) {
-            static::$descriptors[$class] = new SegmentDescriptor($class);
+        if (!array_key_exists($class, self::$descriptors)) {
+            self::$descriptors[$class] = new SegmentDescriptor($class);
         }
-        return static::$descriptors[$class];
+
+        return self::$descriptors[$class];
     }
 
     /** Example: "HITANS" */
@@ -34,20 +39,22 @@ class SegmentDescriptor extends BaseDescriptor
     {
         $this->class = $class;
         try {
-            $clazz = new \ReflectionClass($class);
-            if (!$clazz->isSubclassOf(BaseSegment::class)) {
-                throw new \InvalidArgumentException("Must inherit from BaseSegment: $class");
+            $reflectionClass = new \ReflectionClass($class);
+            if (!$reflectionClass->isSubclassOf(BaseSegment::class)) {
+                throw new \InvalidArgumentException('Must inherit from BaseSegment: ' . $class);
             }
-            parent::__construct($clazz);
+
+            parent::__construct($reflectionClass);
 
             // Parse the class name into segment type (Kennung) and version.
-            if (preg_match('/^([A-Z]+)v([0-9]+)$/', $clazz->getShortName(), $match) !== 1) {
-                throw new \InvalidArgumentException("Invalid segment class name: $class");
+            if (preg_match('/^([A-Z]+)v(\d+)$/', $reflectionClass->getShortName(), $match) !== 1) {
+                throw new \InvalidArgumentException('Invalid segment class name: ' . $class);
             }
+
             $this->kennung = strval($match[1]);
             $this->version = intval($match[2]);
-        } catch (\ReflectionException $e) {
-            throw new \RuntimeException($e);
+        } catch (\ReflectionException $reflectionException) {
+            throw new \RuntimeException($reflectionException, $reflectionException->getCode(), $reflectionException);
         }
     }
 
@@ -57,8 +64,9 @@ class SegmentDescriptor extends BaseDescriptor
         if (!$obj instanceof BaseSegment) {
             throw new \InvalidArgumentException('Expected sub-class of BaseSegment, got ' . gettype($obj));
         }
+
         if ($obj->getName() !== $this->kennung) {
-            throw new \InvalidArgumentException("Expected $this->kennung, got " . $obj->getName());
+            throw new \InvalidArgumentException(sprintf('Expected %s, got ', $this->kennung) . $obj->getName());
         }
     }
 }

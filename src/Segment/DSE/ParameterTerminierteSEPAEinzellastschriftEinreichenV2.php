@@ -1,9 +1,11 @@
 <?php
 
-namespace Fhp\Segment\DSE;
+declare(strict_types=1);
 
-use Fhp\Segment\UnterstuetzteSEPADatenformate;
-use Fhp\Segment\UnterstuetzteSEPADatenformateTrait;
+namespace BytesCommerce\Segment\DSE;
+
+use BytesCommerce\Segment\UnterstuetzteSEPADatenformate;
+use BytesCommerce\Segment\UnterstuetzteSEPADatenformateTrait;
 
 class ParameterTerminierteSEPAEinzellastschriftEinreichenV2 extends ParameterTerminierteSEPALastschriftEinreichenV2 implements UnterstuetzteSEPADatenformate
 {

@@ -1,9 +1,13 @@
 <?php
 
-namespace Fhp\Segment\VPP;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
-use Fhp\Syntax\Bin;
+
+
+namespace BytesCommerce\Segment\VPP;
+
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Segment: Namensabgleich Prüfauftrag

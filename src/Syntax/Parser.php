@@ -1,12 +1,16 @@
 <?php
 
-namespace Fhp\Syntax;
+declare(strict_types=1);
 
-use Fhp\Segment\AnonymousSegment;
-use Fhp\Segment\BaseDeg;
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\ElementDescriptor;
-use Fhp\Segment\Segmentkopf;
+
+
+namespace BytesCommerce\Syntax;
+
+use BytesCommerce\Segment\AnonymousSegment;
+use BytesCommerce\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\ElementDescriptor;
+use BytesCommerce\Segment\Segmentkopf;
 
 /**
  * Parses the FinTS wire format (aka. syntax) into Messages, Segments, Data Element Groups (DEG) and Data Elements (DE).
@@ -17,7 +21,7 @@ use Fhp\Segment\Segmentkopf;
 abstract class Parser
 {
     /** @var string Name of the PHP namespace under which all the segments are stored. */
-    public const SEGMENT_NAMESPACE = 'Fhp\Segment';
+    public const SEGMENT_NAMESPACE = 'BytesCommerce\Segment';
 
     /**
      * The FinTs wire format specifies escaping with a question mark `?` for the syntax characters `+:'?@`. This
@@ -35,9 +39,10 @@ abstract class Parser
      */
     public static function splitEscapedString(string $delimiter, string $str, bool $trailingDelimiter = false): array
     {
-        if (strlen($str) === 0) {
+        if ($str === '') {
             return [];
         }
+
         // Since most of the $delimiters used in FinTs are also special characters in regexes, we need to escape.
         $delimiter = preg_quote($delimiter, '/');
         $nextBegin = 0;
@@ -45,10 +50,11 @@ abstract class Parser
         $result = [];
         while (true) {
             // Walk to the next syntax character of interest and handle it respectively.
-            $ret = preg_match("/\\?|@([0-9]+)@|$delimiter/", $str, $match, PREG_OFFSET_CAPTURE, $offset);
+            $ret = preg_match(sprintf('/\?|@(\d+)@|%s/', $delimiter), $str, $match, PREG_OFFSET_CAPTURE, $offset);
             if ($ret === false) {
-                throw new \RuntimeException("preg_match failed on $str");
+                throw new \RuntimeException('preg_match failed on ' . $str);
             }
+
             if ($ret === 0) { // There is no more syntax character behind $offset.
                 if ($trailingDelimiter) {
                     // The last character should have been a delimiter, so there should be no content remaining.
@@ -60,8 +66,10 @@ abstract class Parser
                     // Anything behind the last delimiter forms the last substring.
                     $result[] = substr($str, $nextBegin);
                 }
+
                 break;
             }
+
             $matchedStr = $match[0][0]; // $match[0] refers to the entire matched string. [0] has the content
             $matchedOffset = intval($match[0][1]); // and [1] has the offset within $str.
             if ($matchedStr === '?') {
@@ -74,15 +82,16 @@ abstract class Parser
                 // It's a block binary data, which we should skip entirely.
                 $binaryLength = $match[1][0]; // $match[1] refers to the first (and only) capture group in the regex.
                 if (!is_numeric($binaryLength)) {
-                    throw new \AssertionError("Invalid binary length $binaryLength");
+                    throw new \AssertionError('Invalid binary length ' . $binaryLength);
                 }
+
                 // Note: The FinTS specification says that the length of the binary block is given in bytes (not
                 // characters) and PHP's string functions like substr() or preg_match() also operate on byte offsets, so
                 // this is fine.
                 $offset = $matchedOffset + strlen($matchedStr) + intval($binaryLength);
                 if ($offset > strlen($str)) {
                     throw new \InvalidArgumentException(
-                        "Incomplete binary block at offset $matchedOffset, declared length $binaryLength, but "
+                        sprintf('Incomplete binary block at offset %d, declared length %s, but ', $matchedOffset, $binaryLength)
                         . 'only has ' . (strlen($str) - $matchedOffset - strlen($matchedStr)) . ' bytes left');
                 }
             } else {
@@ -92,6 +101,7 @@ abstract class Parser
                 $offset = $nextBegin;
             }
         }
+
         return $result;
     }
 
@@ -120,30 +130,35 @@ abstract class Parser
         if ($rawValue === '') {
             return null;
         }
+
         if ($type === 'int' || $type === 'integer') {
             if (!is_numeric($rawValue)) {
-                throw new \InvalidArgumentException("Invalid int: $rawValue");
+                throw new \InvalidArgumentException('Invalid int: ' . $rawValue);
             }
+
             return intval($rawValue);
         } elseif ($type === 'float') {
             $rawValue = str_replace(',', '.', $rawValue, $numCommas);
             if (!is_numeric($rawValue) || $numCommas !== 1) {
-                throw new \InvalidArgumentException("Invalid float: $rawValue");
+                throw new \InvalidArgumentException('Invalid float: ' . $rawValue);
             }
+
             return floatval($rawValue);
         } elseif ($type === 'bool' || $type === 'boolean') {
             if ($rawValue === 'J') {
                 return true;
             }
+
             if ($rawValue === 'N') {
                 return false;
             }
-            throw new \InvalidArgumentException("Invalid bool: $rawValue");
+
+            throw new \InvalidArgumentException('Invalid bool: ' . $rawValue);
         } elseif ($type === 'string') {
             // Convert ISO-8859-1 (FinTS wire format encoding) to UTF-8 (PHP's encoding)
             return mb_convert_encoding(static::unescape($rawValue), 'UTF-8', 'ISO-8859-1');
         } else {
-            throw new \RuntimeException("Unsupported type $type");
+            throw new \RuntimeException('Unsupported type ' . $type);
         }
     }
 
@@ -162,22 +177,23 @@ abstract class Parser
             substr($rawValue, 0, 1) !== Delimiter::BINARY
             || $delimiterPos === false
         ) {
-            throw new \InvalidArgumentException("Expected binary block header, got $rawValue");
+            throw new \InvalidArgumentException('Expected binary block header, got ' . $rawValue);
         }
 
         $lengthStr = substr($rawValue, 1, $delimiterPos - 1);
         if (!is_numeric($lengthStr)) {
-            throw new \InvalidArgumentException("Invalid binary block length: $lengthStr");
+            throw new \InvalidArgumentException('Invalid binary block length: ' . $lengthStr);
         }
 
         $length = intval($lengthStr);
-        $result = new Bin(substr($rawValue, $delimiterPos + 1));
+        $bin = new Bin(substr($rawValue, $delimiterPos + 1));
 
-        $actualLength = strlen($result->getData());
+        $actualLength = strlen($bin->getData());
         if ($actualLength !== $length) {
-            throw new \InvalidArgumentException("Expected binary block of length $length, got $actualLength");
+            throw new \InvalidArgumentException(sprintf('Expected binary block of length %d, got %d', $length, $actualLength));
         }
-        return $result;
+
+        return $bin;
     }
 
     /**
@@ -190,11 +206,12 @@ abstract class Parser
     public static function parseDeg(string $rawElements, $type, bool $allowEmpty = false): ?BaseDeg
     {
         $rawElements = static::splitEscapedString(Delimiter::GROUP, $rawElements);
-        list($result, $offset) = static::parseDegElements($rawElements, $type, $allowEmpty);
+        [$result, $offset] = self::parseDegElements($rawElements, $type, $allowEmpty);
         if ($offset < count($rawElements)) {
             throw new \InvalidArgumentException(
-                "Expected only $offset elements, but got " . count($rawElements) . ': ' . print_r($rawElements, true));
+                sprintf('Expected only %s elements, but got ', $offset) . count($rawElements) . ': ' . print_r($rawElements, true));
         }
+
         return $result;
     }
 
@@ -215,12 +232,12 @@ abstract class Parser
     {
         /** @var BaseDeg $result */
         $result = is_string($type) ? new $type() : $type;
-        $descriptor = $result->getDescriptor();
+        $degDescriptor = $result->getDescriptor();
         $expectedIndex = 0;
         $allEmpty = true;
         $missingFieldError = null; // When $allowEmpty, we need to tolerate errors at first, but maybe throw them later.
         // The iteration order guarantees that $index is strictly monotonically increasing, but there can be gaps.
-        foreach ($descriptor->elements as $index => $elementDescriptor) {
+        foreach ($degDescriptor->elements as $index => $elementDescriptor) {
             $offset += ($index - $expectedIndex); // Adjust for skipped indices.
             $numRepetitions = $elementDescriptor->repeated === 0 ? 1 : $elementDescriptor->repeated;
             $expectedIndex += $numRepetitions; // Advance to next expected elementDescriptor index.
@@ -233,9 +250,9 @@ abstract class Parser
                 if ($elementDescriptor->optional) {
                     ++$offset;
                     continue;
-                } elseif ($missingFieldError === null) {
+                } elseif (!$missingFieldError instanceof \InvalidArgumentException) {
                     $missingFieldError = new \InvalidArgumentException(
-                        "Missing field $descriptor->class.$elementDescriptor->field");
+                        sprintf('Missing field %s.%s', $degDescriptor->class, $elementDescriptor->field));
                     if (!$allowEmpty) {
                         throw $missingFieldError;
                     }
@@ -248,25 +265,30 @@ abstract class Parser
                     if ($offset >= count($rawElements)) {
                         break; // End of input reached
                     }
+
                     if ($isSingleField) {
                         if ($rawElements[$offset] === '' && $repetition >= 1) { // Skip empty repeated entries.
                             ++$offset;
                             continue;
                         }
+
                         if (is_string($elementDescriptor->type)) {
                             $value = static::parseDataElement($rawElements[$offset], $elementDescriptor->type);
                         } else {
                             $value = static::parseBinaryBlock($rawElements[$offset]);
                         }
+
                         ++$offset;
                     } else { // Nested DEG, will consume a certain number of elements and adjust the $offset accordingly.
-                        list($value, $offset) = static::parseDegElements(
+                        [$value, $offset] = self::parseDegElements(
                             $rawElements, $elementDescriptor->type->name,
                             $allowEmpty || $elementDescriptor->optional, $offset);
                     }
+
                     if ($value !== null) {
                         $allEmpty = false;
                     }
+
                     if ($elementDescriptor->repeated === 0) {
                         $result->{$elementDescriptor->field} = $value;
                     } elseif ($value !== null) {
@@ -274,15 +296,18 @@ abstract class Parser
                     }
                 }
             } catch (\InvalidArgumentException $e) {
-                throw new \InvalidArgumentException("Failed to parse $descriptor->class::$elementDescriptor->field: $e");
+                throw new \InvalidArgumentException(sprintf('Failed to parse %s::%s: %s', $degDescriptor->class, $elementDescriptor->field, $e), $e->getCode(), $e);
             }
         }
+
         if ($allEmpty && $allowEmpty) {
             return [null, $offset];
         }
-        if ($missingFieldError !== null) {
+
+        if ($missingFieldError instanceof \InvalidArgumentException) {
             throw $missingFieldError;
         }
+
         return [$result, $offset];
     }
 
@@ -302,25 +327,31 @@ abstract class Parser
         if ($descriptor->optional) {
             return null; // No need to fill optional fields.
         }
+
         if ($descriptor->repeated !== 0) {
             return false; // Cannot fill a repeated field that requires at least one entry.
         }
+
         if (!($descriptor->type instanceof \ReflectionClass && $descriptor->type->isSubclassOf(BaseDeg::class))) {
             return false; // Cannot create empty value for non-DEG field.
         }
+
         try {
             /** @var BaseDeg $result */
             $result = $descriptor->type->newInstance();
-        } catch (\ReflectionException $e) {
-            throw new \RuntimeException("Failed to create $descriptor->type", 0, $e);
+        } catch (\ReflectionException $reflectionException) {
+            throw new \RuntimeException('Failed to create ' . $descriptor->type, 0, $reflectionException);
         }
+
         foreach ($result->getDescriptor()->elements as $elementDescriptor) {
-            $emptyValue = static::tryConstructEmptyValue($elementDescriptor);
+            $emptyValue = self::tryConstructEmptyValue($elementDescriptor);
             if ($emptyValue === false) {
                 return false;
             }
+
             $result->{$elementDescriptor->field} = $emptyValue;
         }
+
         return $result;
     }
 
@@ -335,18 +366,20 @@ abstract class Parser
     {
         /** @var BaseSegment $result */
         $result = is_string($type) ? new $type() : $type;
-        $rawElements = static::splitIntoSegmentElements($rawSegment);
-        $descriptor = $result->getDescriptor();
-        if (array_key_last($rawElements) > $descriptor->maxIndex) {
-            throw new \InvalidArgumentException("Too many elements for $descriptor->class: $rawSegment");
+        $rawElements = self::splitIntoSegmentElements($rawSegment);
+        $segmentDescriptor = $result->getDescriptor();
+        if (array_key_last($rawElements) > $segmentDescriptor->maxIndex) {
+            throw new \InvalidArgumentException(sprintf('Too many elements for %s: %s', $segmentDescriptor->class, $rawSegment));
         }
+
         // The iteration order guarantees that $index is strictly monotonically increasing, but there can be gaps.
-        foreach ($descriptor->elements as $index => $elementDescriptor) {
+        foreach ($segmentDescriptor->elements as $index => $elementDescriptor) {
             if (!array_key_exists($index, $rawElements) || $rawElements[$index] === '') {
-                $emptyValue = static::tryConstructEmptyValue($elementDescriptor);
+                $emptyValue = self::tryConstructEmptyValue($elementDescriptor);
                 if ($emptyValue === false) {
-                    throw new \InvalidArgumentException("Missing field $descriptor->class.$elementDescriptor->field");
+                    throw new \InvalidArgumentException(sprintf('Missing field %s.%s', $segmentDescriptor->class, $elementDescriptor->field));
                 }
+
                 $result->{$elementDescriptor->field} = $emptyValue;
                 continue;
             }
@@ -354,48 +387,53 @@ abstract class Parser
             // Note: The handling of empty values may be incorrect here, parseSegmentElement() can return null.
             if ($elementDescriptor->repeated === 0) {
                 $result->{$elementDescriptor->field} =
-                    static::parseSegmentElement($rawElements[$index], $elementDescriptor);
+                    self::parseSegmentElement($rawElements[$index], $elementDescriptor);
             } else {
                 for ($repetition = 0; $repetition < $elementDescriptor->repeated; ++$repetition) {
                     if ($index + $repetition >= count($rawElements)) {
                         break; // End of input reached.
                     }
+
                     if ($rawElements[$index + $repetition] !== '') { // Skip empty entries.
                         $result->{$elementDescriptor->field}[$repetition] =
-                            static::parseSegmentElement($rawElements[$index + $repetition], $elementDescriptor);
+                            self::parseSegmentElement($rawElements[$index + $repetition], $elementDescriptor);
                     }
                 }
             }
         }
-        if ($result->segmentkopf->segmentkennung !== $descriptor->kennung) {
+
+        if ($result->segmentkopf->segmentkennung !== $segmentDescriptor->kennung) {
             throw new \InvalidArgumentException(
-                "Invalid segment type $result->segmentkopf->segmentkennung for $descriptor->class");
+                sprintf('Invalid segment type %s->segmentkennung for %s', $result->segmentkopf, $segmentDescriptor->class));
         }
-        if ($result->segmentkopf->segmentversion !== $descriptor->version) {
+
+        if ($result->segmentkopf->segmentversion !== $segmentDescriptor->version) {
             throw new \InvalidArgumentException(
-                "Invalid version $result->segmentkopf->segmentversion for $descriptor->class");
+                sprintf('Invalid version %s->segmentversion for %s', $result->segmentkopf, $segmentDescriptor->class));
         }
+
         return $result;
     }
 
     /**
      * @param string $rawSegment The serialized wire format for a single segment (segment delimiter must be present at
      *     the end).
-     * @return AnonymousSegment The segment parsed as an anonymous segment.
      */
-    public static function parseAnonymousSegment(string $rawSegment): AnonymousSegment
+    public static function parseAnonymousSegment(string $rawSegment): ?AnonymousSegment
     {
-        $rawElements = static::splitIntoSegmentElements($rawSegment);
+        $rawElements = self::splitIntoSegmentElements($rawSegment);
         return new AnonymousSegment(
             Segmentkopf::parse(array_shift($rawElements)),
-            array_map(function ($rawElement) {
-                if (strlen($rawElement) === 0) {
+            array_map(function (string $rawElement): null|string|array {
+                if ($rawElement === '') {
                     return null;
                 }
+
                 $subElements = static::splitEscapedString(Delimiter::GROUP, $rawElement);
                 if (count($subElements) <= 1) {
                     return $rawElement;
-                } // Asume it's not repeated.
+                }
+                 // Asume it's not repeated.
                 return $subElements;
             }, $rawElements));
     }
@@ -407,33 +445,35 @@ abstract class Parser
     private static function splitIntoSegmentElements(string $rawSegment): array
     {
         if (substr($rawSegment, -1) !== Delimiter::SEGMENT) {
-            throw new \InvalidArgumentException("Raw segment does not end with delimiter: $rawSegment");
+            throw new \InvalidArgumentException('Raw segment does not end with delimiter: ' . $rawSegment);
         }
+
         $rawSegment = substr($rawSegment, 0, -1); // Strip segment delimiter at the end.
         $rawElements = static::splitEscapedString(Delimiter::ELEMENT, $rawSegment);
-        if (count($rawElements) === 0) {
-            throw new \InvalidArgumentException("Invalid segment: $rawSegment");
+        if ($rawElements === []) {
+            throw new \InvalidArgumentException('Invalid segment: ' . $rawSegment);
         }
+
         return $rawElements;
     }
 
     /**
      * @param string $rawElement The raw content (unparsed wire format) of an element, which can either be a single
      *     Data Element (DE) or a group (DEG), as determined by the descriptor.
-     * @param ElementDescriptor $descriptor The descriptor that describes the expected format of the element.
+     * @param ElementDescriptor $elementDescriptor The descriptor that describes the expected format of the element.
      * @return BaseDeg|Bin|bool|float|int|string|null The parsed value, or null if it was empty.
      */
-    private static function parseSegmentElement(string $rawElement, ElementDescriptor $descriptor)
+    private static function parseSegmentElement(string $rawElement, ElementDescriptor $elementDescriptor)
     {
-        if (is_string($descriptor->type)) { // Scalar value / DE
-            return static::parseDataElement($rawElement, $descriptor->type);
+        if (is_string($elementDescriptor->type)) { // Scalar value / DE
+            return static::parseDataElement($rawElement, $elementDescriptor->type);
         }
 
-        if ($descriptor->type->getName() === Bin::class) {
+        if ($elementDescriptor->type->getName() === Bin::class) {
             return static::parseBinaryBlock($rawElement);
         }
 
-        return static::parseDeg($rawElement, $descriptor->type->name, $descriptor->optional);
+        return static::parseDeg($rawElement, $elementDescriptor->type->name, $elementDescriptor->optional);
     }
 
     /**
@@ -444,16 +484,18 @@ abstract class Parser
     public static function detectAndParseSegment(string $rawSegment): BaseSegment
     {
         if (substr($rawSegment, -1) !== Delimiter::SEGMENT) {
-            throw new \InvalidArgumentException("Raw segment does not end with delimiter: $rawSegment");
+            throw new \InvalidArgumentException('Raw segment does not end with delimiter: ' . $rawSegment);
         }
+
         $firstElementDelimiter = strpos($rawSegment, Delimiter::ELEMENT);
         if ($firstElementDelimiter === false) {
             // Let's assume it's an empty segment, i.e. all of it is the header.
             $firstElementDelimiter = strlen($rawSegment) - 1; // Exclude the SEGMENT delimiter at the end.
         }
+
         $segmentkopf = Segmentkopf::parse(substr($rawSegment, 0, $firstElementDelimiter));
 
-        // Try the default class name Fhp\Segment\HABCD\HABCDvN.
+        // Try the default class name BytesCommerce\Segment\HABCD\HABCDvN.
         $segmentType = static::SEGMENT_NAMESPACE . '\\' . $segmentkopf->segmentkennung . '\\'
             . $segmentkopf->segmentkennung . 'v' . $segmentkopf->segmentversion;
         if (class_exists($segmentType)) {
@@ -461,7 +503,7 @@ abstract class Parser
         }
 
         // Alternatively, allow Geschäftsvorfall segments (HKXYZ, HIXYZ and HIXYZS) to live in an abbreviated namespace,
-        // i.e. like Fhp\Segment\XYZ\HKXYZSvN
+        // i.e. like BytesCommerce\Segment\XYZ\HKXYZSvN
         $segmentType = static::SEGMENT_NAMESPACE . '\\' . substr($segmentkopf->segmentkennung, 2, 3) . '\\'
             . $segmentkopf->segmentkennung . 'v' . $segmentkopf->segmentversion;
         if (class_exists($segmentType)) {
@@ -478,9 +520,10 @@ abstract class Parser
      */
     public static function parseSegments(string $rawSegments): array
     {
-        if (strlen($rawSegments) === 0) {
+        if ($rawSegments === '') {
             return [];
         }
+
         $rawSegments = static::splitEscapedString(Delimiter::SEGMENT, $rawSegments, true);
         return array_map([static::class, 'detectAndParseSegment'], $rawSegments);
     }

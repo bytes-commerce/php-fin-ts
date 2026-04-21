@@ -1,9 +1,11 @@
 <?php
 
-namespace Fhp\Model;
+declare(strict_types=1);
 
-use Fhp\Model\FlickerTan\TanRequestChallengeFlicker;
-use Fhp\Syntax\Bin;
+namespace BytesCommerce\Model;
+
+use BytesCommerce\Model\FlickerTan\TanRequestChallengeFlicker;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Provides information that can be used to display a TAN request to the user, plus identifiers to track the TAN request

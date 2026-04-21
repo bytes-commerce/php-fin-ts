@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp\Segment\HIUPD;
+declare(strict_types=1);
+
+namespace BytesCommerce\Segment\HIUPD;
 
 /**
  * Data Element Group: Erlaubte Geschäftsvorfälle

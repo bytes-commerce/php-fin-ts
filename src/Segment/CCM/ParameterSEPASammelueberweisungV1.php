@@ -1,13 +1,17 @@
 <?php
 
-namespace Fhp\Segment\CCM;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseDeg;
+namespace BytesCommerce\Segment\CCM;
+
+use BytesCommerce\Segment\BaseDeg;
 
 class ParameterSEPASammelueberweisungV1 extends BaseDeg
 {
     public int $maximaleAnzahlCreditTransferTransactionInformation;
+
     public bool $summenfeldBenoetigt;
+
     public bool $einzelbuchungErlaubt;
 
     public function getMaximaleAnzahlCreditTransferTransactionInformation(): int

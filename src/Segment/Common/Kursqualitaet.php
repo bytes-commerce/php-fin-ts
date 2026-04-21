@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\Common;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseDeg;
+namespace BytesCommerce\Segment\Common;
+
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Mehrfach verwendetes Element: Kursqualität (Version 2)
@@ -12,7 +14,8 @@ use Fhp\Segment\BaseDeg;
  */
 class Kursqualitaet extends BaseDeg
 {
-    public const DELAYED = 1;  // delayed-Kurs
+    public const DELAYED = 1;
+      // delayed-Kurs
     public const REALTIME = 2; // Echtzeit-Kurs
 
     public int $kursqualitaet;

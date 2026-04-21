@@ -1,10 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\HNVSK;
+namespace BytesCommerce\Segment\HNVSK;
 
-use Fhp\Segment\BaseDeg;
-use Fhp\Syntax\Bin;
+use BytesCommerce\Segment\BaseDeg;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Data Element Group: Verschlüsselungsalgorithmus (Version 2)
@@ -29,8 +33,10 @@ class VerschluesselungsalgorithmusV2 extends BaseDeg
      * specification, that's the value that is used.
      */
     public int $verschluesselungsalgorithmus = 13;
+
     /** Binary, max length: 512 */
     public Bin $wertDesAlgorithmusparametersSchluessel;
+
     /**
      * 5: Symmetrischer Schlüssel (nicht zugelassen) This is the recommended dummy value for PIN/TAN.
      * 6: Symmetrischer Schlüssel, verschlüsselt mit einem öffentlichen Schlüssel bei RAH und RDH (KYP).
@@ -43,11 +49,11 @@ class VerschluesselungsalgorithmusV2 extends BaseDeg
 
     public static function create(): VerschluesselungsalgorithmusV2
     {
-        $result = new VerschluesselungsalgorithmusV2();
+        $verschluesselungsalgorithmusV2 = new VerschluesselungsalgorithmusV2();
         // Note: The correct representation of the value that the specification recommends is "\0\0\0\0\0\0\0\0". But
         // that makes unit test failures unreadable because PhpUnit then interprets the entire surrounding message as
         // binary. Since the specification does not enforce its suggestion, we just something similar instead.
-        $result->wertDesAlgorithmusparametersSchluessel = new Bin('00000000'); // Dummy for PIN/TAN
-        return $result;
+        $verschluesselungsalgorithmusV2->wertDesAlgorithmusparametersSchluessel = new Bin('00000000'); // Dummy for PIN/TAN
+        return $verschluesselungsalgorithmusV2;
     }
 }

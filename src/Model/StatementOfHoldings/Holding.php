@@ -1,6 +1,10 @@
 <?php
 
-namespace Fhp\Model\StatementOfHoldings;
+declare(strict_types=1);
+
+
+
+namespace BytesCommerce\Model\StatementOfHoldings;
 
 class Holding
 {
@@ -59,7 +63,7 @@ class Holding
      *
      * @return $this
      */
-    public function setISIN(?string $isin)
+    public function setISIN(?string $isin): static
     {
         $this->isin = $isin;
 
@@ -71,7 +75,7 @@ class Holding
      *
      * @return $this
      */
-    public function setWKN(?string $wkn)
+    public function setWKN(?string $wkn): static
     {
         $this->wkn = $wkn;
 
@@ -83,7 +87,7 @@ class Holding
      *
      * @return $this
      */
-    public function setName(?string $name)
+    public function setName(?string $name): static
     {
         $this->name = $name;
 
@@ -95,7 +99,7 @@ class Holding
      *
      * @return $this
      */
-    public function setValue(?float $value)
+    public function setValue(?float $value): static
     {
         $this->value = $value;
 
@@ -107,7 +111,7 @@ class Holding
      *
      * @return $this
      */
-    public function setPrice(?float $price)
+    public function setPrice(?float $price): static
     {
         $this->price = $price;
 
@@ -119,7 +123,7 @@ class Holding
      *
      * @return $this
      */
-    public function setAcquisitionPrice(?float $price)
+    public function setAcquisitionPrice(?float $price): static
     {
         $this->acquisitionPrice = $price;
 
@@ -131,7 +135,7 @@ class Holding
      *
      * @return $this
      */
-    public function setAmount(?float $amount)
+    public function setAmount(?float $amount): static
     {
         $this->amount = $amount;
 
@@ -143,7 +147,7 @@ class Holding
      *
      * @return $this
      */
-    public function setCurrency(?string $currency)
+    public function setCurrency(?string $currency): static
     {
         $this->currency = $currency;
 
@@ -155,7 +159,7 @@ class Holding
      *
      * @return $this
      */
-    public function setDate(\DateTime $date)
+    public function setDate(\DateTime $date): static
     {
         $this->date = $date;
 
@@ -167,7 +171,7 @@ class Holding
      *
      * @return $this
      */
-    public function setTime(\DateTime $time)
+    public function setTime(\DateTime $time): static
     {
         $this->time = $time;
 

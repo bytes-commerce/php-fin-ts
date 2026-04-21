@@ -1,16 +1,20 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Protocol;
+namespace BytesCommerce\Protocol;
 
-use Fhp\Model\TanMode;
-use Fhp\Segment\AnonymousSegment;
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\HIBPA\HIBPAv3;
-use Fhp\Segment\HIPINS\HIPINSv1;
-use Fhp\Segment\SegmentInterface;
-use Fhp\Segment\TAN\HITANS;
-use Fhp\Segment\VPP\HIVPPSv1;
+use BytesCommerce\Model\TanMode;
+use BytesCommerce\Segment\AnonymousSegment;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\HIBPA\HIBPAv3;
+use BytesCommerce\Segment\HIPINS\HIPINSv1;
+use BytesCommerce\Segment\SegmentInterface;
+use BytesCommerce\Segment\TAN\HITANS;
+use BytesCommerce\Segment\VPP\HIVPPSv1;
 
 /**
  * Segmentfolge: Bankparameterdaten (Version 3)
@@ -84,9 +88,7 @@ class BPD
      */
     public function getAllSupportedParameters(string $type): array
     {
-        return array_filter($this->parameters[$type] ?? [], function (BaseSegment $segment) {
-            return !$segment instanceof AnonymousSegment;
-        });
+        return array_filter($this->parameters[$type] ?? [], fn(BaseSegment $segment) => !$segment instanceof AnonymousSegment);
     }
 
     /**
@@ -100,11 +102,13 @@ class BPD
         if (!array_key_exists($type, $this->parameters)) {
             return null;
         }
+
         foreach ($this->parameters[$type] as $segment) {
             if (!$segment instanceof AnonymousSegment) {
                 return $segment;
             }
         }
+
         return null;
     }
 
@@ -116,10 +120,11 @@ class BPD
     public function requireLatestSupportedParameters(string $type): BaseSegment
     {
         $result = $this->getLatestSupportedParameters($type);
-        if ($result === null) {
+        if (!$result instanceof \BytesCommerce\Segment\BaseSegment) {
             throw new UnexpectedResponseException(
-                "The server does not support any $type versions implemented in this library");
+                sprintf('The server does not support any %s versions implemented in this library', $type));
         }
+
         return $result;
     }
 
@@ -135,6 +140,7 @@ class BPD
                 return true;
             }
         }
+
         return false;
     }
 
@@ -145,11 +151,12 @@ class BPD
      */
     public function tanRequiredForRequest(array $requestSegments): ?string
     {
-        foreach ($requestSegments as $segment) {
-            if ($this->tanRequired[$segment->getName()] ?? false) {
-                return $segment->getName();
+        foreach ($requestSegments as $requestSegment) {
+            if ($this->tanRequired[$requestSegment->getName()] ?? false) {
+                return $requestSegment->getName();
             }
         }
+
         return null;
     }
 
@@ -167,11 +174,12 @@ class BPD
             return null;
         }
 
-        foreach ($requestSegments as $segment) {
-            if (in_array($segment->getName(), $vopRequiredTypes)) {
-                return $segment->getName();
+        foreach ($requestSegments as $requestSegment) {
+            if (in_array($requestSegment->getName(), $vopRequiredTypes)) {
+                return $requestSegment->getName();
             }
         }
+
         return null;
     }
 
@@ -184,29 +192,29 @@ class BPD
     }
 
     /**
-     * @param Message $response The dialog initialization response from the server.
+     * @param Message $message The dialog initialization response from the server.
      * @return BPD A new BPD instance with the extracted configuration data.
      */
-    public static function extractFromResponse(Message $response): BPD
+    public static function extractFromResponse(Message $message): BPD
     {
         $bpd = new BPD();
-        $bpd->hibpa = $response->requireSegment(HIBPAv3::class);
+        $bpd->hibpa = $message->requireSegment(HIBPAv3::class);
 
         // Extract the HIxyzS segments, which contain parameters that describe how (future) requests for the particular
         // type of business transaction have to look.
-        foreach ($response->plainSegments as $segment) {
+        foreach ($message->plainSegments as $segment) {
             $segmentName = $segment->getName();
             if (strlen($segmentName) === 6 && $segmentName[5] === 'S') {
                 $bpd->parameters[$segmentName][$segment->getVersion()] = $segment;
                 krsort($bpd->parameters[$segmentName]); // Newest first.
             }
         }
-        ksort($bpd->parameters); // Sort alphabetically, for easier debugging.
 
+        ksort($bpd->parameters); // Sort alphabetically, for easier debugging.
         // Extract from HIPINS which HKxyz requests will need a TAN.
-        /** @var HIPINSv1 $hipins */
-        $hipins = $response->requireSegment(HIPINSv1::class);
-        foreach ($hipins->parameter->geschaeftsvorfallspezifischePinTanInformationen as $typeInfo) {
+        /** @var HIPINSv1 $baseSegment */
+        $baseSegment = $message->requireSegment(HIPINSv1::class);
+        foreach ($baseSegment->parameter->geschaeftsvorfallspezifischePinTanInformationen as $typeInfo) {
             $bpd->tanRequired[$typeInfo->segmentkennung] = $typeInfo->tanErforderlich;
         }
 
@@ -218,8 +226,9 @@ class BPD
                 throw new UnexpectedResponseException(
                     'The server does not support any HITANS versions implemented in this library');
             }
-            foreach ($allHitans as $hitans) {
-                $tanParams = $hitans->getParameterZweiSchrittTanEinreichung();
+
+            foreach ($allHitans as $allHitan) {
+                $tanParams = $allHitan->getParameterZweiSchrittTanEinreichung();
                 $bpd->singleStepTanModeAllowed = $tanParams->isEinschrittVerfahrenErlaubt();
                 foreach ($tanParams->getVerfahrensparameterZweiSchrittVerfahren() as $verfahren) {
                     if (!array_key_exists($verfahren->getId(), $bpd->allTanModes)) {

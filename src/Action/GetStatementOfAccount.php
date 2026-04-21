@@ -1,30 +1,34 @@
 <?php
 
-namespace Fhp\Action;
+declare(strict_types=1);
 
-use Fhp\CAMT\CAMT;
-use Fhp\Model\SEPAAccount;
-use Fhp\Model\StatementOfAccount\StatementOfAccount;
-use Fhp\MT940\Dialect\PostbankMT940;
-use Fhp\MT940\Dialect\SpardaMT940;
-use Fhp\MT940\MT940;
-use Fhp\MT940\MT940Exception;
-use Fhp\PaginateableAction;
-use Fhp\Protocol\BPD;
-use Fhp\Protocol\Message;
-use Fhp\Protocol\UnexpectedResponseException;
-use Fhp\Protocol\UPD;
-use Fhp\Segment\Common\Kti;
-use Fhp\Segment\Common\Kto;
-use Fhp\Segment\Common\KtvV3;
-use Fhp\Segment\HIRMS\Rueckmeldungscode;
-use Fhp\Segment\KAZ\HIKAZ;
-use Fhp\Segment\KAZ\HIKAZS;
-use Fhp\Segment\KAZ\HKKAZv4;
-use Fhp\Segment\KAZ\HKKAZv5;
-use Fhp\Segment\KAZ\HKKAZv6;
-use Fhp\Segment\KAZ\HKKAZv7;
-use Fhp\UnsupportedException;
+
+
+namespace BytesCommerce\Action;
+
+use BytesCommerce\CAMT\CAMT;
+use BytesCommerce\Model\SEPAAccount;
+use BytesCommerce\Model\StatementOfAccount\StatementOfAccount;
+use BytesCommerce\MT940\Dialect\PostbankMT940;
+use BytesCommerce\MT940\Dialect\SpardaMT940;
+use BytesCommerce\MT940\MT940;
+use BytesCommerce\MT940\MT940Exception;
+use BytesCommerce\PaginateableAction;
+use BytesCommerce\Protocol\BPD;
+use BytesCommerce\Protocol\Message;
+use BytesCommerce\Protocol\UnexpectedResponseException;
+use BytesCommerce\Protocol\UPD;
+use BytesCommerce\Segment\Common\Kti;
+use BytesCommerce\Segment\Common\Kto;
+use BytesCommerce\Segment\Common\KtvV3;
+use BytesCommerce\Segment\HIRMS\Rueckmeldungscode;
+use BytesCommerce\Segment\KAZ\HIKAZ;
+use BytesCommerce\Segment\KAZ\HIKAZS;
+use BytesCommerce\Segment\KAZ\HKKAZv4;
+use BytesCommerce\Segment\KAZ\HKKAZv5;
+use BytesCommerce\Segment\KAZ\HKKAZv6;
+use BytesCommerce\Segment\KAZ\HKKAZv7;
+use BytesCommerce\UnsupportedException;
 
 /**
  * Retrieves statements for one specific account or for all accounts that the user has access to. A statement is a
@@ -109,7 +113,7 @@ class GetStatementOfAccount extends PaginateableAction
      * @param string $serialized
      * @return void
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         self::__unserialize(unserialize($serialized));
     }
@@ -182,13 +186,13 @@ class GetStatementOfAccount extends PaginateableAction
         }
     }
 
-    public function processResponse(Message $response)
+    public function processResponse(Message $message): void
     {
-        parent::processResponse($response);
+        parent::processResponse($message);
 
         // If we're using XML fallback, delegate to the XML action
         if ($this->xmlAction !== null) {
-            $this->xmlAction->processResponse($response);
+            $this->xmlAction->processResponse($message);
 
             // Parse XML and convert to StatementOfAccount once all pages are received
             if (!$this->hasMorePages()) {
@@ -198,8 +202,8 @@ class GetStatementOfAccount extends PaginateableAction
         }
 
         // Banks send just 3010 and no HIKAZ in case there are no transactions.
-        $isUnavailable = $response->findRueckmeldung(Rueckmeldungscode::NICHT_VERFUEGBAR) !== null;
-        $responseHikaz = $response->findSegments(HIKAZ::class);
+        $isUnavailable = $message->findRueckmeldung(Rueckmeldungscode::NICHT_VERFUEGBAR) !== null;
+        $responseHikaz = $message->findSegments(HIKAZ::class);
         $numResponseSegments = count($responseHikaz);
         if (!$isUnavailable && $numResponseSegments < count($this->getRequestSegmentNumbers())) {
             throw new UnexpectedResponseException("Only got $numResponseSegments HIKAZ response segments!");

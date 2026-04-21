@@ -1,13 +1,17 @@
 <?php
 
-namespace Fhp\Syntax;
+declare(strict_types=1);
 
-use Fhp\Segment\AnonymousSegment;
-use Fhp\Segment\BaseDeg;
-use Fhp\Segment\BaseDescriptor;
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\DegDescriptor;
-use Fhp\Segment\SegmentDescriptor;
+
+
+namespace BytesCommerce\Syntax;
+
+use BytesCommerce\Segment\AnonymousSegment;
+use BytesCommerce\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDescriptor;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\DegDescriptor;
+use BytesCommerce\Segment\SegmentDescriptor;
 
 abstract class Serializer
 {
@@ -18,7 +22,7 @@ abstract class Serializer
      */
     public static function escape(string $str): string
     {
-        return preg_replace('/([+:\'?@])/', '?$1', $str);
+        return preg_replace("/([+:'?@])/", '?$1', $str);
     }
 
     /**
@@ -33,7 +37,7 @@ abstract class Serializer
             return '';
         }
 
-        if ($type === 'int' || $type === 'integer' || $type === 'string') {
+        if (in_array($type, ['int', 'integer', 'string'], true)) {
             // Convert UTF-8 (PHP's encoding) to ISO-8859-1 (FinTS wire format encoding)
             return static::escape(mb_convert_encoding(strval($value), 'ISO-8859-1', 'UTF-8'));
         }
@@ -48,32 +52,33 @@ abstract class Serializer
             return $value ? 'J' : 'N';
         }
 
-        throw new \RuntimeException("Unsupported type $type");
+        throw new \RuntimeException('Unsupported type ' . $type);
     }
 
     /**
-     * @param BaseDeg|null $deg The data element group to be serialized. If null, all fields are implicitly null.
-     * @param DegDescriptor $descriptor The descriptor for the DEG type.
+     * @param BaseDeg|null $baseDeg The data element group to be serialized. If null, all fields are implicitly null.
+     * @param DegDescriptor $degDescriptor The descriptor for the DEG type.
      * @return string The HBCI wire format representation of the DEG.
      */
-    public static function serializeDeg(?BaseDeg $deg, DegDescriptor $descriptor): string
+    public static function serializeDeg(?BaseDeg $baseDeg, DegDescriptor $degDescriptor): string
     {
-        $serializedElements = Serializer::serializeElements($deg, $descriptor);
-        return implode(Delimiter::GROUP, static::flattenAndTrimEnd($serializedElements));
+        $serializedElements = Serializer::serializeElements($baseDeg, $degDescriptor);
+        return implode(Delimiter::GROUP, self::flattenAndTrimEnd($serializedElements));
     }
 
     /**
-     * @param BaseSegment $segment The segment to be serialized.
+     * @param BaseSegment $baseSegment The segment to be serialized.
      * @return string The HBCI wire format representation of the segment, in ISO-8859-1 encoding, terminated by the
      *     segment delimiter.
      */
-    public static function serializeSegment(BaseSegment $segment): string
+    public static function serializeSegment(BaseSegment $baseSegment): string
     {
-        if ($segment instanceof AnonymousSegment) {
+        if ($baseSegment instanceof AnonymousSegment) {
             throw new \InvalidArgumentException('Cannot serialize anonymous segments');
         }
-        $serializedElements = static::serializeElements($segment, $segment->getDescriptor());
-        return implode(Delimiter::ELEMENT, static::flattenAndTrimEnd($serializedElements)) . Delimiter::SEGMENT;
+
+        $serializedElements = self::serializeElements($baseSegment, $baseSegment->getDescriptor());
+        return implode(Delimiter::ELEMENT, self::flattenAndTrimEnd($serializedElements)) . Delimiter::SEGMENT;
     }
 
     /**
@@ -82,47 +87,51 @@ abstract class Serializer
      */
     public static function serializeSegments(array $segments): string
     {
-        return implode(array_map([self::class, 'serializeSegment'], $segments));
+        return implode('', array_map([self::class, 'serializeSegment'], $segments));
     }
 
     /**
      * @param BaseSegment|BaseDeg|null $obj An object to be serialized. If null, all fields are implicitly null.
-     * @param BaseDescriptor $descriptor The descriptor for the object to be serialized.
+     * @param BaseDescriptor $baseDescriptor The descriptor for the object to be serialized.
      * @return array A partial serialization of that object, namely a (possibly nested) array with all of its elements
      *     serialized independently, and at the right indices. In order to put subsequent elements in the right
      *     position, the returned array may contain emtpy strings as gaps/buffers in the middle (for subsequent elements
      *     in $obj) and/or at the end (for subsequent elements added by the caller for data following $obj).
      */
-    private static function serializeElements($obj, BaseDescriptor $descriptor): array
+    private static function serializeElements($obj, BaseDescriptor $baseDescriptor): array
     {
-        $isSegment = $descriptor instanceof SegmentDescriptor;
+        $isSegment = $baseDescriptor instanceof SegmentDescriptor;
         $serializedElements = [];
-        $lastKey = array_key_last($descriptor->elements);
+        $lastKey = array_key_last($baseDescriptor->elements);
         for ($index = 0; $index <= $lastKey; ++$index) {
-            if (!array_key_exists($index, $descriptor->elements)) {
+            if (!array_key_exists($index, $baseDescriptor->elements)) {
                 $serializedElements[$index] = '';
                 continue;
             }
-            $elementDescriptor = $descriptor->elements[$index];
+
+            $elementDescriptor = $baseDescriptor->elements[$index];
             $value = $obj === null ? null : $obj->{$elementDescriptor->field};
             if (array_key_exists($index, $serializedElements)) {
-                throw new \AssertionError("Duplicate index $index");
+                throw new \AssertionError('Duplicate index ' . $index);
             }
+
             if ($elementDescriptor->repeated === 0) {
-                $serializedElements[$index] = static::serializeElement($value, $elementDescriptor->type, $isSegment);
+                $serializedElements[$index] = self::serializeElement($value, $elementDescriptor->type, $isSegment);
             } else {
                 if ($value !== null && !is_array($value)) {
                     throw new \InvalidArgumentException(
-                        "Expected array value for $descriptor->class.$elementDescriptor->field, got: $value");
+                        sprintf('Expected array value for %s.%s, got: %s', $baseDescriptor->class, $elementDescriptor->field, $value));
                 }
+
                 if ($elementDescriptor->repeated === PHP_INT_MAX) {
                     // For an uncapped repeated field (with @Unlimited), it must be the very last field and we do not
                     // need to insert padding elements, so we only output its actual contents.
                     if ($index !== $lastKey) {
                         throw new \AssertionError(
-                            "Expected unlimited field at $index to be the last one, but the last one is $lastKey"
+                            sprintf('Expected unlimited field at %d to be the last one, but the last one is %s', $index, $lastKey)
                         );
                     }
+
                     $numOutputElements = count($value);
                 } else {
                     // For a capped repeated field (with @Max), we need to output the specified number of elements, such
@@ -130,14 +139,17 @@ abstract class Serializer
                     // elements will be trimmed away again by flattenAndTrimEnd() later.
                     $numOutputElements = $elementDescriptor->repeated;
                 }
+
                 for ($repetition = 0; $repetition < $numOutputElements; ++$repetition) {
-                    $serializedElements[$index + $repetition] = static::serializeElement(
+                    $serializedElements[$index + $repetition] = self::serializeElement(
                         $value === null || $repetition >= count($value) ? null : $value[$repetition],
                         $elementDescriptor->type, $isSegment);
                 }
+
                 $index += $numOutputElements - 1; // The outer loop will increment by 1 as well.
             }
         }
+
         return $serializedElements;
     }
 
@@ -148,7 +160,7 @@ abstract class Serializer
      * @return string|array The serialized value. In case $type is a complex type and $fullySerialize is false, this
      *     returns a (possibly nested) array of strings.
      */
-    private static function serializeElement($value, $type, bool $fullySerialize)
+    private static function serializeElement($value, string|\ReflectionClass $type, bool $fullySerialize)
     {
         if (is_string($type)) { // Scalar value / DE
             return static::serializeDataElement($value, $type);
@@ -163,7 +175,7 @@ abstract class Serializer
             return static::serializeDeg($value, DegDescriptor::get($type->name));
         }
 
-        return static::serializeElements($value, DegDescriptor::get($type->name));
+        return self::serializeElements($value, DegDescriptor::get($type->name));
     }
 
     /**
@@ -181,6 +193,7 @@ abstract class Serializer
                 $nonemptyLength = count($result);
             }
         }
+
         return array_slice($result, 0, $nonemptyLength);
     }
 }

@@ -1,8 +1,12 @@
 <?php
 
-namespace Fhp\MT940\Dialect;
+declare(strict_types=1);
 
-use Fhp\MT940\MT940;
+
+
+namespace BytesCommerce\MT940\Dialect;
+
+use BytesCommerce\MT940\MT940;
 
 class SpardaMT940 extends MT940
 {
@@ -21,6 +25,7 @@ class SpardaMT940 extends MT940
                 $otherInfo[] = $line;
             }
         }
+
         if (!$structuredStartFound) {
             return ['SVWZ' => implode("\n", $otherInfo)];
         }
@@ -41,6 +46,7 @@ class SpardaMT940 extends MT940
             // Sonderfall, für Zeile 2 aus dem Beispiel
             $combined .= preg_replace('/ ([A-Z]{4}\+)$/', ' $1 ', $line);
         }
+
         $combined = implode('', $lines);
 
         // SEPA Bezeichner müssen in einer neuen Zeile Anfangen und kein Leerzeichen hinter dem + haben
@@ -49,7 +55,7 @@ class SpardaMT940 extends MT940
         $correctedLines = explode("\n", trim($fixed, "\n"));
 
         // Buchungstext z.B. SEPA-ÜBERWEISUNG
-        if (count($otherInfo) > 0) {
+        if ($otherInfo !== []) {
             $rawLines[0] = $bookingText = array_pop($otherInfo);
 
             switch ($bookingText) {
@@ -57,9 +63,11 @@ class SpardaMT940 extends MT940
                     if ($transaction['credit_debit'] === static::CD_CREDIT) {
                         $gvc = '166';
                     }
+
                     if ($transaction['credit_debit'] === static::CD_DEBIT) {
                         $gvc = '177';
                     }
+
                     break;
                 case 'SEPA-BASISLASTSCHRIFT':
                     $gvc = '105';
@@ -70,7 +78,7 @@ class SpardaMT940 extends MT940
         }
 
         // Rest vom Namen, wenn der > 27 Zeichen ist, ja ernsthaft
-        if (count($otherInfo) > 0) {
+        if ($otherInfo !== []) {
             $rawLines[33] .= array_pop($otherInfo);
         }
 

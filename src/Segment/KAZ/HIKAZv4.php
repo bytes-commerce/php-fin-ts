@@ -1,10 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\KAZ;
 
-namespace Fhp\Segment\KAZ;
-
-use Fhp\Segment\BaseSegment;
-use Fhp\Syntax\Bin;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Segment: Kontoumsätze rückmelden/Zeitraum (Version 4)
@@ -19,6 +21,7 @@ class HIKAZv4 extends BaseSegment implements HIKAZ
 {
     /** Uses SWIFT format MT940, version SRG 2001 */
     public Bin $gebuchteUmsaetze;
+
     /** Uses SWIFT format MT942, version SRG 2001 */
     public ?Bin $nichtGebuchteUmsaetze = null;
 

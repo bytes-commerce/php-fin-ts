@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp;
+declare(strict_types=1);
+
+namespace BytesCommerce;
 
 /**
  * Thrown when trying to use a feature/variant that is not implemented in this library.

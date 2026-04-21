@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\HIRMS;
+declare(strict_types=1);
 
-use Fhp\Protocol\DialogInitialization;
+namespace BytesCommerce\Segment\HIRMS;
+
+use BytesCommerce\Protocol\DialogInitialization;
 
 /**
  * Enum for the response codes that the server can send.
@@ -46,7 +48,7 @@ abstract class Rueckmeldungscode
      */
     public static function isError(int $code): bool
     {
-        return (9000 < $code && $code < 9999) || in_array($code, self::TREAT_WARNINGS_AS_ERRORS);
+        return (9000 < $code && $code < 9999) || in_array($code, self::TREAT_WARNINGS_AS_ERRORS, true);
     }
 
     /**

@@ -1,13 +1,17 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\HNSHK;
+namespace BytesCommerce\Segment\HNSHK;
 
-use Fhp\Model\TanMode;
-use Fhp\Options\Credentials;
-use Fhp\Options\FinTsOptions;
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\Common\Kik;
+use BytesCommerce\Model\TanMode;
+use BytesCommerce\Options\Credentials;
+use BytesCommerce\Options\FinTsOptions;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\Common\Kik;
 
 /**
  * Segment: Signaturkopf (Version 4)
@@ -20,16 +24,19 @@ use Fhp\Segment\Common\Kik;
  */
 class HNSHKv4 extends BaseSegment
 {
-    public \Fhp\Segment\HNVSK\SicherheitsprofilV1 $sicherheitsprofil;
+    public \BytesCommerce\Segment\HNVSK\SicherheitsprofilV1 $sicherheitsprofil;
+
     /**
      * For the PIN/TAN profile (see section B.9.4), this must be:
      *   - 998 for Ein-Schritt-Verfahren, or
      *   - the value in the 900--997 range as received in
-     *     {@link \Fhp\Segment\TAN\VerfahrensparameterZweiSchrittVerfahrenv6::$sicherheitsfunktion}
+     *     {@link \BytesCommerce\Segment\TAN\VerfahrensparameterZweiSchrittVerfahrenv6::$sicherheitsfunktion}
      */
     public int $sicherheitsfunktion;
+
     /** Max length: 14; A nonce, that matches the one in HNSHA */
     public string $sicherheitskontrollreferenz;
+
     /**
      * 1: Signaturkopf und HBCI-Nutzdaten (SHM)
      * (not allowed: 2: Von Signaturkopf bis Signaturabschluss (SHT))
@@ -43,39 +50,46 @@ class HNSHKv4 extends BaseSegment
      *    welcher nicht Erfasser ist (WIT)
      */
     public int $rolleDesSicherheitslieferanten = 1;
-    public \Fhp\Segment\HNVSK\SicherheitsidentifikationDetailsV2 $sicherheitsidentifikationDetails;
-    public int $sicherheitsreferenznummer = 1; // Not used / supported by this library, so just a dummy value.
-    public \Fhp\Segment\HNVSK\SicherheitsdatumUndUhrzeitV2 $sicherheitsdatumUndUhrzeit;
+
+    public \BytesCommerce\Segment\HNVSK\SicherheitsidentifikationDetailsV2 $sicherheitsidentifikationDetails;
+
+    public int $sicherheitsreferenznummer = 1;
+     // Not used / supported by this library, so just a dummy value.
+    public \BytesCommerce\Segment\HNVSK\SicherheitsdatumUndUhrzeitV2 $sicherheitsdatumUndUhrzeit;
+
     public HashalgorithmusV2 $hashalgorithmus;
+
     public SignaturalgorithmusV2 $signaturalgorithmus;
-    public \Fhp\Segment\HNVSK\SchluesselnameV3 $schluesselname;
+
+    public \BytesCommerce\Segment\HNVSK\SchluesselnameV3 $schluesselname;
+
     /** For the PIN/TAN profile, this must be empty (see section B.9.4). */
-    public ?\Fhp\Segment\HNVSK\ZertifikatV2 $zertifikat = null;
+    public ?\BytesCommerce\Segment\HNVSK\ZertifikatV2 $zertifikat = null;
 
     /**
      * @param string $sicherheitskontrollreferenz A nonce (random number) to reference the corresponding HNSHA segment.
-     * @param FinTsOptions $options See {@link FinTsOptions}.
+     * @param FinTsOptions $finTsOptions See {@link FinTsOptions}.
      * @param Credentials $credentials See {@link Credentials}.
      * @param TanMode|null $tanMode Optionally specifies which two-step TAN mode to use, defaults to 999 (single step).
      * @param string $kundensystemId See {@link SicherheitsidentifikationDetailsV2::$identifizierungDerPartei}.
      */
-    public static function create(string $sicherheitskontrollreferenz, FinTsOptions $options, Credentials $credentials, ?TanMode $tanMode, string $kundensystemId): HNSHKv4
+    public static function create(string $sicherheitskontrollreferenz, FinTsOptions $finTsOptions, Credentials $credentials, ?TanMode $tanMode, string $kundensystemId): HNSHKv4
     {
-        $result = HNSHKv4::createEmpty();
-        $result->sicherheitsprofil =
-            \Fhp\Segment\HNVSK\SicherheitsprofilV1::createPIN($tanMode);
-        $result->sicherheitsfunktion = $tanMode === null ? TanMode::SINGLE_STEP_ID : $tanMode->getId();
-        $result->sicherheitskontrollreferenz = $sicherheitskontrollreferenz;
-        $result->sicherheitsidentifikationDetails =
-            \Fhp\Segment\HNVSK\SicherheitsidentifikationDetailsV2::createForSender($kundensystemId);
-        $result->sicherheitsdatumUndUhrzeit =
-            \Fhp\Segment\HNVSK\SicherheitsdatumUndUhrzeitV2::now();
-        $result->hashalgorithmus = new HashalgorithmusV2();
-        $result->signaturalgorithmus = new SignaturalgorithmusV2();
-        $result->schluesselname = \Fhp\Segment\HNVSK\SchluesselnameV3::create(
-            Kik::create($options->bankCode),
+        $hnshKv4 = HNSHKv4::createEmpty();
+        $hnshKv4->sicherheitsprofil =
+            \BytesCommerce\Segment\HNVSK\SicherheitsprofilV1::createPIN($tanMode);
+        $hnshKv4->sicherheitsfunktion = $tanMode instanceof \BytesCommerce\Model\TanMode ? $tanMode->getId() : TanMode::SINGLE_STEP_ID;
+        $hnshKv4->sicherheitskontrollreferenz = $sicherheitskontrollreferenz;
+        $hnshKv4->sicherheitsidentifikationDetails =
+            \BytesCommerce\Segment\HNVSK\SicherheitsidentifikationDetailsV2::createForSender($kundensystemId);
+        $hnshKv4->sicherheitsdatumUndUhrzeit =
+            \BytesCommerce\Segment\HNVSK\SicherheitsdatumUndUhrzeitV2::now();
+        $hnshKv4->hashalgorithmus = new HashalgorithmusV2();
+        $hnshKv4->signaturalgorithmus = new SignaturalgorithmusV2();
+        $hnshKv4->schluesselname = \BytesCommerce\Segment\HNVSK\SchluesselnameV3::create(
+            Kik::create($finTsOptions->bankCode),
             $credentials->getBenutzerkennung(),
-            \Fhp\Segment\HNVSK\SchluesselnameV3::SIGNIERSCHLUESSEL);
-        return $result;
+            \BytesCommerce\Segment\HNVSK\SchluesselnameV3::SIGNIERSCHLUESSEL);
+        return $hnshKv4;
     }
 }

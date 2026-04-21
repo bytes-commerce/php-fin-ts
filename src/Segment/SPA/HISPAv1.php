@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\SPA;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
+namespace BytesCommerce\Segment\SPA;
+
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: SEPA-Kontoverbindung rückmelden (Version 1)
@@ -13,10 +15,10 @@ use Fhp\Segment\BaseSegment;
  */
 class HISPAv1 extends BaseSegment implements HISPA
 {
-    /** @var \Fhp\Segment\Common\Ktz[]|null @Max(999) */
+    /** @var \BytesCommerce\Segment\Common\Ktz[]|null @Max(999) */
     public ?array $sepaKontoverbindung = null;
 
-    /** @return \Fhp\Segment\Common\Ktz[] */
+    /** @return \BytesCommerce\Segment\Common\Ktz[] */
     public function getSepaKontoverbindung(): array
     {
         return $this->sepaKontoverbindung ?? [];

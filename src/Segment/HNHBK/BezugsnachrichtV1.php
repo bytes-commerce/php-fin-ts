@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\HNHBK;
 
-namespace Fhp\Segment\HNHBK;
-
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data ELement Group: Bezugsnachricht (Version 1)
@@ -15,6 +17,7 @@ class BezugsnachrichtV1 extends BaseDeg
 {
     /** References a previously sent {@link HNHBKv3::$dialogId} */
     public string $dialogId;
+
     /** References a previously sent {@link HNHBKv3::$nachrichtennummer} */
     public int $nachrichtennummer;
 }

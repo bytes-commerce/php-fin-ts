@@ -1,8 +1,12 @@
 <?php
 
-namespace Fhp\Model\StatementOfAccount;
+declare(strict_types=1);
 
-use Fhp\MT940\MT940;
+
+
+namespace BytesCommerce\Model\StatementOfAccount;
+
+use BytesCommerce\MT940\MT940;
 
 class StatementOfAccount
 {
@@ -27,12 +31,12 @@ class StatementOfAccount
     public function getStatementForDate($date): ?Statement
     {
         if (is_string($date)) {
-            $date = static::parseDate($date);
+            $date = self::parseDate($date);
         }
 
-        foreach ($this->statements as $stmt) {
-            if ($stmt->getDate() == $date) {
-                return $stmt;
+        foreach ($this->statements as $statement) {
+            if ($statement->getDate() == $date) {
+                return $statement;
             }
         }
 
@@ -46,15 +50,15 @@ class StatementOfAccount
      */
     public function hasStatementForDate($date): bool
     {
-        return null !== $this->getStatementForDate($date);
+        return $this->getStatementForDate($date) instanceof \BytesCommerce\Model\StatementOfAccount\Statement;
     }
 
     private static function parseDate(string $date): \DateTime
     {
         try {
             return new \DateTime($date);
-        } catch (\Exception $e) {
-            throw new \InvalidArgumentException("Invalid date: $date", 0, $e);
+        } catch (\Exception $exception) {
+            throw new \InvalidArgumentException('Invalid date: ' . $date, 0, $exception);
         }
     }
 
@@ -64,23 +68,26 @@ class StatementOfAccount
      */
     public static function fromMT940Array(array $array): StatementOfAccount
     {
-        $result = new StatementOfAccount();
+        $statementOfAccount = new StatementOfAccount();
         foreach ($array as $date => $statement) {
-            if ($result->hasStatementForDate($date)) {
-                $statementModel = $result->getStatementForDate($date);
+            if ($statementOfAccount->hasStatementForDate($date)) {
+                $statementModel = $statementOfAccount->getStatementForDate($date);
             } else {
                 $statementModel = new Statement();
-                $statementModel->setDate(static::parseDate($date));
+                $statementModel->setDate(self::parseDate($date));
                 if (isset($statement['start_balance']['amount'])) {
                     $statementModel->setStartBalance((float) $statement['start_balance']['amount']);
                 }
+
                 if (isset($statement['end_balance'])) {
                     $statementModel->setEndBalance((float) $statement['end_balance']['amount'] * ($statement['end_balance']['credit_debit'] == MT940::CD_CREDIT ? 1 : -1));
                 }
+
                 if (isset($statement['start_balance']['credit_debit'])) {
                     $statementModel->setCreditDebit($statement['start_balance']['credit_debit']);
                 }
-                $result->statements[] = $statementModel;
+
+                $statementOfAccount->statements[] = $statementModel;
             }
 
             if (isset($statement['transactions'])) {
@@ -99,8 +106,8 @@ class StatementOfAccount
                     }
 
                     $transaction = new Transaction();
-                    $transaction->setBookingDate(static::parseDate($trx['booking_date']));
-                    $transaction->setValutaDate(static::parseDate($trx['valuta_date']));
+                    $transaction->setBookingDate(self::parseDate($trx['booking_date']));
+                    $transaction->setValutaDate(self::parseDate($trx['valuta_date']));
                     $transaction->setCreditDebit($trx['credit_debit']);
                     $transaction->setIsStorno($trx['is_storno']);
                     $transaction->setAmount($trx['amount']);
@@ -119,11 +126,12 @@ class StatementOfAccount
                 }
             }
         }
-        return $result;
+
+        return $statementOfAccount;
     }
 
     /**
-     * @param array $array A parsed CAMT dataset, as returned from {@link \Fhp\CAMT\CAMT::parse()}.
+     * @param array $array A parsed CAMT dataset, as returned from {@link \BytesCommerce\CAMT\CAMT::parse()}.
      * @return StatementOfAccount A new instance that contains the given data.
      */
     public static function fromCAMTArray(array $array): StatementOfAccount

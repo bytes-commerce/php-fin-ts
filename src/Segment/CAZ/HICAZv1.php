@@ -1,10 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\CAZ;
+namespace BytesCommerce\Segment\CAZ;
 
-use Fhp\Segment\BaseSegment;
-use Fhp\Syntax\Bin;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Segment: Kontoumsätze rückmelden/Zeitraum camt
@@ -16,7 +20,7 @@ use Fhp\Syntax\Bin;
  */
 class HICAZv1 extends BaseSegment
 {
-    public \Fhp\Segment\Common\Kti $kontoverbindungInternational;
+    public \BytesCommerce\Segment\Common\Kti $kontoverbindungInternational;
 
     /** Der camt-Descriptor beschreibt Ort, Name und Version einer camt Schema-Definition als URN. */
     public string $camtDescriptor;
@@ -36,7 +40,7 @@ class HICAZv1 extends BaseSegment
      */
     public ?Bin $nichtGebuchteUmsaetze = null;
 
-    public function getKontoverbindungInternational(): \Fhp\Segment\Common\Kti
+    public function getKontoverbindungInternational(): \BytesCommerce\Segment\Common\Kti
     {
         return $this->kontoverbindungInternational;
     }

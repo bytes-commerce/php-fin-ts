@@ -1,21 +1,34 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Model\StatementOfAccount;
+namespace BytesCommerce\Model\StatementOfAccount;
 
 class Transaction
 {
     public const CD_CREDIT = 'credit';
+
     public const CD_DEBIT = 'debit';
 
     protected ?\DateTime $bookingDate = null;
+
     protected ?\DateTime $valutaDate = null;
+
     protected float $amount;
+
     protected string $creditDebit;
+
     protected bool $isStorno;
+
     protected string $bookingCode;
+
     protected string $bookingText;
+
     protected string $description1;
+
     protected string $description2;
 
     /**
@@ -25,10 +38,15 @@ class Transaction
     protected array $structuredDescription;
 
     protected string $bankCode;
+
     protected string $accountNumber;
+
     protected string $name;
+
     protected bool $booked;
+
     protected int $pn;
+
     protected int $textKeyAddition;
 
     /**
@@ -255,6 +273,7 @@ class Transaction
         if (array_key_exists('SVWZ', $this->structuredDescription)) {
             return $this->structuredDescription['SVWZ'];
         }
+
         return '';
     }
 
@@ -266,6 +285,7 @@ class Transaction
         if (array_key_exists('EREF', $this->structuredDescription)) {
             return $this->structuredDescription['EREF'];
         }
+
         return '';
     }
 

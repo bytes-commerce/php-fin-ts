@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\TAN;
 
-namespace Fhp\Segment\TAN;
-
-use Fhp\Model\TanMode;
+use BytesCommerce\Model\TanMode;
 
 interface ParameterZweiSchrittTanEinreichung
 {

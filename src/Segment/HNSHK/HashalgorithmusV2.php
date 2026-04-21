@@ -1,10 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\HNSHK;
 
-namespace Fhp\Segment\HNSHK;
-
-use Fhp\Segment\BaseDeg;
-use Fhp\Syntax\Bin;
+use BytesCommerce\Segment\BaseDeg;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Data Element Group: Hashalgorithmus (Version 2)

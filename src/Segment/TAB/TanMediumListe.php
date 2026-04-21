@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\TAB;
+declare(strict_types=1);
 
-use Fhp\Model\TanMedium;
+namespace BytesCommerce\Segment\TAB;
+
+use BytesCommerce\Model\TanMedium;
 
 /**
  * Data Element Group: TAN-Medium-Liste

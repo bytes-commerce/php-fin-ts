@@ -1,8 +1,12 @@
 <?php
 
-namespace Fhp\Segment\CAZ;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseDeg;
+
+
+namespace BytesCommerce\Segment\CAZ;
+
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Segment: Parameter Kontoumsätze/Zeitraum camt
@@ -17,8 +21,8 @@ class UnterstuetzteCamtMessages extends BaseDeg
 
     public static function create(array $camtDescriptor): UnterstuetzteCamtMessages
     {
-        $result = new UnterstuetzteCamtMessages();
-        $result->camtDescriptor = $camtDescriptor;
-        return $result;
+        $unterstuetzteCamtMessages = new UnterstuetzteCamtMessages();
+        $unterstuetzteCamtMessages->camtDescriptor = $camtDescriptor;
+        return $unterstuetzteCamtMessages;
     }
 }

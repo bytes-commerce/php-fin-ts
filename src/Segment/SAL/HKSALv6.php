@@ -1,10 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\SAL;
 
-namespace Fhp\Segment\SAL;
-
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\Paginateable;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\Paginateable;
 
 /**
  * Segment: Saldenabfrage (Version 6)
@@ -14,22 +16,25 @@ use Fhp\Segment\Paginateable;
  */
 class HKSALv6 extends BaseSegment implements Paginateable
 {
-    public \Fhp\Segment\Common\KtvV3 $kontoverbindungAuftraggeber;
+    public \BytesCommerce\Segment\Common\KtvV3 $kontoverbindungAuftraggeber;
+
     public bool $alleKonten;
+
     public ?int $maximaleAnzahlEintraege = null;
+
     /** Max length: 35 */
     public ?string $aufsetzpunkt = null;
 
-    public static function create(\Fhp\Segment\Common\KtvV3 $ktv, bool $alleKonten, ?string $aufsetzpunkt = null): HKSALv6
+    public static function create(\BytesCommerce\Segment\Common\KtvV3 $ktvV3, bool $alleKonten, ?string $aufsetzpunkt = null): HKSALv6
     {
-        $result = HKSALv6::createEmpty();
-        $result->kontoverbindungAuftraggeber = $ktv;
-        $result->alleKonten = $alleKonten;
-        $result->aufsetzpunkt = $aufsetzpunkt;
-        return $result;
+        $hksaLv6 = HKSALv6::createEmpty();
+        $hksaLv6->kontoverbindungAuftraggeber = $ktvV3;
+        $hksaLv6->alleKonten = $alleKonten;
+        $hksaLv6->aufsetzpunkt = $aufsetzpunkt;
+        return $hksaLv6;
     }
 
-    public function setPaginationToken(string $paginationToken)
+    public function setPaginationToken(string $paginationToken): void
     {
         $this->aufsetzpunkt = $paginationToken;
     }

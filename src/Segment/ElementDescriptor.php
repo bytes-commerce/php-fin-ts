@@ -1,8 +1,12 @@
 <?php
 
-namespace Fhp\Segment;
+declare(strict_types=1);
 
-use Fhp\Syntax\Bin;
+
+
+namespace BytesCommerce\Segment;
+
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Contains information about an element (aka. field) in a segment or Deg.
@@ -44,13 +48,16 @@ class ElementDescriptor
             if ($this->optional) {
                 return;
             }
-            throw new \InvalidArgumentException("Missing field $this->field");
+
+            throw new \InvalidArgumentException('Missing field ' . $this->field);
         }
+
         $value = $obj->{$this->field};
-        if ($this->repeated) {
+        if ($this->repeated !== 0) {
             if (!is_array($value)) {
-                throw new \InvalidArgumentException("Expected array value for repeated field $this->field");
+                throw new \InvalidArgumentException('Expected array value for repeated field ' . $this->field);
             }
+
             foreach ($value as $item) {
                 $this->validateValue($item);
             }
@@ -88,21 +95,22 @@ class ElementDescriptor
             $expectedType = static::TYPE_MAP[$this->type];
             $actualType = gettype($value);
             if ($actualType !== $expectedType) {
-                throw new \InvalidArgumentException("Expected $expectedType, got $actualType: $value for $this->field");
+                throw new \InvalidArgumentException(sprintf('Expected %s, got %s: %s for %s', $expectedType, $actualType, $value, $this->field));
             }
         } elseif ($this->type instanceof \ReflectionClass) {
             if (!$this->type->isInstance($value)) {
-                throw new \InvalidArgumentException("Expected {$this->type->name}, got $value for $this->field");
+                throw new \InvalidArgumentException(sprintf('Expected %s, got %s for %s', $this->type->name, $value, $this->field));
             }
+
             if ($value instanceof BaseSegment || $value instanceof BaseDeg) {
                 $value->validate();
             } elseif ($value instanceof Bin) {
                 // Nothing to validate on a binary value.
             } else {
-                throw new \AssertionError("Unexpected type {$this->type->name}"); // Violates guarantees of what we put in $this->type.
+                throw new \AssertionError('Unexpected type ' . $this->type->name); // Violates guarantees of what we put in $this->type.
             }
         } else {
-            throw new \InvalidArgumentException("Unsupported type: $this->type");
+            throw new \InvalidArgumentException('Unsupported type: ' . $this->type);
         }
     }
 }

@@ -1,10 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
-namespace Fhp\Segment\Common;
+namespace BytesCommerce\Segment\Common;
 
-use Fhp\Model\SEPAAccount;
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Model\SEPAAccount;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Kontoverbindung
@@ -15,20 +19,21 @@ use Fhp\Segment\BaseDeg;
  */
 class Kto extends BaseDeg implements AccountInfo
 {
-    public string $kontonummer; // Aka Depotnummer
+    public string $kontonummer;
+     // Aka Depotnummer
     public Kik $kik;
 
     public static function create(string $kontonummer, Kik $kik): Kto
     {
-        $result = new Kto();
-        $result->kontonummer = $kontonummer;
-        $result->kik = $kik;
-        return $result;
+        $kto = new Kto();
+        $kto->kontonummer = $kontonummer;
+        $kto->kik = $kik;
+        return $kto;
     }
 
-    public static function fromAccount(SEPAAccount $account): Kto
+    public static function fromAccount(SEPAAccount $sepaAccount): Kto
     {
-        return static::create($account->getAccountNumber(), Kik::create($account->getBlz()));
+        return static::create($sepaAccount->getAccountNumber(), Kik::create($sepaAccount->getBlz()));
     }
 
     public function getAccountNumber(): string

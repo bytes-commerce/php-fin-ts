@@ -1,31 +1,32 @@
 <?php
 
-namespace Fhp\Model\FlickerTan;
+declare(strict_types=1);
+
+
+
+namespace BytesCommerce\Model\FlickerTan;
 
 /**
  * Represents a Data Element which is part of the Flicker Tan Challenge. Shortens the whole challenge.
  * @see https://www.hbci-zka.de/dokumente/spezifikation_deutsch/hhd/Belegungsrichtlinien%20TANve1.5%20FV%20vom%202018-04-16.pdf
  */
-class DataElement
+class DataElement implements \Stringable
 {
     public const ENC_ASCII = '1';
+
     public const ENC_ASC = self::ENC_ASCII;
+
     public const ENC_BCD = '0';
 
     /**
      * @var string the encoding (either self::ENC_ASC or self::ENC_BCD)
      */
-    protected $enc;
-
-    /**
-     * @var string the raw data string
-     */
-    protected $data;
+    protected string $enc;
 
     /**
      * @var string the highest bit of the generated header
      */
-    protected $headerHighBit;
+    protected $headerHighBit = 0;
 
     /**
      * @param $challenge string raw challenge text
@@ -34,14 +35,16 @@ class DataElement
      */
     public static function parseNextBlock(string $challenge): array
     {
-        if (empty($challenge)) {
+        if ($challenge === '' || $challenge === '0') {
             return [$challenge, new self('')];
         }
+
         $length = (int) substr($challenge, 0, 2);
         $data = substr($challenge, 2, $length);
         if (strlen($data) !== $length) {
             throw new \InvalidArgumentException('Parsing went wrong');
         }
+
         $rest = substr($challenge, 2 + $length);
         return [$rest, new self($data)];
     }
@@ -50,15 +53,9 @@ class DataElement
      * The needed encoding will be automatically determined by the type of data
      * @param string $data the raw data
      */
-    protected function __construct(string $data)
+    protected function __construct(protected string $data)
     {
-        $this->data = $data;
-        $this->headerHighBit = 0;
-        if (is_numeric($this->data) || empty($this->data)) {
-            $this->enc = self::ENC_BCD;
-        } else {
-            $this->enc = self::ENC_ASC;
-        }
+        $this->enc = is_numeric($this->data) || empty($this->data) ? self::ENC_BCD : self::ENC_ASC;
     }
 
     /**
@@ -69,6 +66,7 @@ class DataElement
         if ($this->enc === self::ENC_BCD) {
             return ceil(strlen($this->data) / 2);
         }
+
         return strlen($this->data);
     }
 
@@ -94,13 +92,16 @@ class DataElement
             if (strlen($hexData) % 2 === 1) {
                 $hexData .= 'F';
             }
+
             return $hexData;
         }
+
         // ASCII encoding
         $hexData = '';
         foreach (str_split($this->data) as $char) {
             $hexData .= base_convert(ord($char), 10, 16);
         }
+
         return $hexData;
     }
 
@@ -112,6 +113,7 @@ class DataElement
         if (empty($this->data)) {
             return '';
         }
+
         return $this->getHeaderHex() . $this->getDataHex();
     }
 
@@ -152,8 +154,10 @@ class DataElement
             } else {
                 $sum += $number;
             }
+
             $doubleIt = !$doubleIt;
         }
+
         return $sum;
     }
 
@@ -174,7 +178,7 @@ class DataElement
     /**
      * @return string hex representation of object
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->toHex();
     }

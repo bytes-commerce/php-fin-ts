@@ -1,12 +1,15 @@
 <?php
 
-namespace Fhp\Segment\CSE;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseDeg;
+namespace BytesCommerce\Segment\CSE;
+
+use BytesCommerce\Segment\BaseDeg;
 
 class ParameterTerminierteSEPAUeberweisungEinreichenV1 extends BaseDeg
 {
     /** Must be => 1 */
     public int $minimaleVorlaufzeit;
+
     public int $maximaleVorlaufzeit;
 }

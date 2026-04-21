@@ -1,11 +1,15 @@
 <?php
+
+declare(strict_types=1);
+
+
 /** @noinspection PhpUnused */
 
 // NOTE: In FinTsTestCase, this namespace name is hard-coded in order to be able to mock the time() function below.
 
-namespace Fhp\Segment\HNVSK;
+namespace BytesCommerce\Segment\HNVSK;
 
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Sicherheitsdatum und -uhrzeit (Version 2)
@@ -22,6 +26,7 @@ class SicherheitsdatumUndUhrzeitV2 extends BaseDeg
     public int $datumUndZeitbezeichner = 1; // This library does not support recovation, so STS is all we need.
     /** JJJJMMTT gemäß ISO 8601 */
     public ?string $datum = null;
+
     /** hhmmss gemäß ISO 8601, local time (no time zone support). */
     public ?string $uhrzeit = null;
 
@@ -30,14 +35,15 @@ class SicherheitsdatumUndUhrzeitV2 extends BaseDeg
      */
     public static function now(): SicherheitsdatumUndUhrzeitV2
     {
-        $result = new SicherheitsdatumUndUhrzeitV2();
+        $sicherheitsdatumUndUhrzeitV2 = new SicherheitsdatumUndUhrzeitV2();
         try {
             $now = new \DateTime('@' . time()); // Call unqualified time() for unit test mocking to work.
-            $result->datum = $now->format('Ymd');
-            $result->uhrzeit = $now->format('His');
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to get current date', 0, $e);
+            $sicherheitsdatumUndUhrzeitV2->datum = $now->format('Ymd');
+            $sicherheitsdatumUndUhrzeitV2->uhrzeit = $now->format('His');
+        } catch (\Exception $exception) {
+            throw new \RuntimeException('Failed to get current date', 0, $exception);
         }
-        return $result;
+
+        return $sicherheitsdatumUndUhrzeitV2;
     }
 }

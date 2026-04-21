@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\TAB;
 
-namespace Fhp\Segment\TAB;
-
-use Fhp\Segment\BaseSegment;
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: TAN-Generator/Liste anzeigen Bestand (Version 5)
@@ -19,6 +21,7 @@ class HKTABv5 extends BaseSegment
      * 2: Verfügbar
      */
     public int $tanMediumArt = 0;
+
     /**
      * A: Alle Medien
      * L: Liste

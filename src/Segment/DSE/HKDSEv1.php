@@ -1,9 +1,11 @@
 <?php
 
-namespace Fhp\Segment\DSE;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
-use Fhp\Syntax\Bin;
+namespace BytesCommerce\Segment\DSE;
+
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Syntax\Bin;
 
 /**
  * Einreichung terminierter SEPA-Einzellastschriften (Segmentversion 1)
@@ -14,7 +16,7 @@ use Fhp\Syntax\Bin;
 class HKDSEv1 extends BaseSegment
 {
     /** IBAN/BIC must match <DbtrAcct> and <DbtrAgt> in the XML Below. */
-    public \Fhp\Segment\Common\Kti $kontoverbindungInternational;
+    public \BytesCommerce\Segment\Common\Kti $kontoverbindungInternational;
 
     /** Max length: 256 */
     public string $sepaDescriptor;

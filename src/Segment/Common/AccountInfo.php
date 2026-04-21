@@ -1,6 +1,8 @@
 <?php
 
-namespace Fhp\Segment\Common;
+declare(strict_types=1);
+
+namespace BytesCommerce\Segment\Common;
 
 /**
  * Common interface for DEGs that represent accounts.

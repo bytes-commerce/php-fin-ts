@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Model;
+declare(strict_types=1);
 
-use Fhp\Segment\TAN\HKTAN;
+namespace BytesCommerce\Model;
+
+use BytesCommerce\Segment\TAN\HKTAN;
 
 /**
  * This is a placeholder used instead of a real {@link TanMode} in order to signal that the bank's HBCI interface
@@ -14,6 +16,8 @@ use Fhp\Segment\TAN\HKTAN;
  */
 final class NoPsd2TanMode implements TanMode
 {
+    use DecoupledTanModeTrait;
+
     public const ID = -1;
 
     public function getId(): int

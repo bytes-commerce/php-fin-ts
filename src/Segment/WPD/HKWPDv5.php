@@ -1,10 +1,12 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\WPD;
 
-namespace Fhp\Segment\WPD;
-
-use Fhp\Segment\BaseSegment;
-use Fhp\Segment\Paginateable;
+use BytesCommerce\Segment\BaseSegment;
+use BytesCommerce\Segment\Paginateable;
 
 /**
  * Segment: Depotaufstellung anfordern (Version 5)
@@ -14,13 +16,17 @@ use Fhp\Segment\Paginateable;
  */
 class HKWPDv5 extends BaseSegment implements Paginateable
 {
-    public \Fhp\Segment\Common\KtvV3 $depot;
+    public \BytesCommerce\Segment\Common\KtvV3 $depot;
+
     public ?string $waehrungDerDepotaufstellung = null;
-    public ?\Fhp\Segment\Common\Kursqualitaet $kursqualitaet = null;
+
+    public ?\BytesCommerce\Segment\Common\Kursqualitaet $kursqualitaet = null;
+
     public ?int $maximaleAnzahlEintraege = null;
+
     public ?string $aufsetzpunkt = null;
 
-    public function getDepot(): \Fhp\Segment\Common\KtvV3
+    public function getDepot(): \BytesCommerce\Segment\Common\KtvV3
     {
         return $this->depot;
     }
@@ -30,7 +36,7 @@ class HKWPDv5 extends BaseSegment implements Paginateable
         return $this->waehrungDerDepotaufstellung;
     }
 
-    public function getKursqualitaet(): ?\Fhp\Segment\Common\Kursqualitaet
+    public function getKursqualitaet(): ?\BytesCommerce\Segment\Common\Kursqualitaet
     {
         return $this->kursqualitaet;
     }
@@ -45,14 +51,14 @@ class HKWPDv5 extends BaseSegment implements Paginateable
         return $this->aufsetzpunkt;
     }
 
-    public static function create(\Fhp\Segment\Common\KtvV3 $ktv): HKWPDv5
+    public static function create(\BytesCommerce\Segment\Common\KtvV3 $ktvV3): HKWPDv5
     {
-        $result = HKWPDv5::createEmpty();
-        $result->depot = $ktv;
-        return $result;
+        $hkwpDv5 = HKWPDv5::createEmpty();
+        $hkwpDv5->depot = $ktvV3;
+        return $hkwpDv5;
     }
 
-    public function setPaginationToken(string $paginationToken)
+    public function setPaginationToken(string $paginationToken): void
     {
         $this->aufsetzpunkt = $paginationToken;
     }

@@ -1,8 +1,10 @@
 <?php
 
-namespace Fhp\Segment\AUB;
+declare(strict_types=1);
 
-use Fhp\Segment\BaseSegment;
+namespace BytesCommerce\Segment\AUB;
+
+use BytesCommerce\Segment\BaseSegment;
 
 /**
  * Segment: Auslandsüberweisung
@@ -12,10 +14,10 @@ use Fhp\Segment\BaseSegment;
  */
 class HKAUBv9 extends BaseSegment
 {
-    public \Fhp\Segment\Common\Kti $kontoverbindungInternational;
+    public \BytesCommerce\Segment\Common\Kti $kontoverbindungInternational;
 
     /** Max length: 4 */
     public int $DTAZVHandbuch;
 
-    public \Fhp\Syntax\Bin $DTAZVDatensatz;
+    public \BytesCommerce\Syntax\Bin $DTAZVDatensatz;
 }

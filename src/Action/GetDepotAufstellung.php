@@ -1,22 +1,26 @@
 <?php
 
-namespace Fhp\Action;
+declare(strict_types=1);
 
-use Fhp\Model\SEPAAccount;
-use Fhp\Model\StatementOfHoldings\StatementOfHoldings;
-use Fhp\MT535\MT535;
-use Fhp\PaginateableAction;
-use Fhp\Protocol\BPD;
-use Fhp\Protocol\Message;
-use Fhp\Protocol\UnexpectedResponseException;
-use Fhp\Protocol\UPD;
-use Fhp\Segment\Common\KtvV3;
-use Fhp\Segment\HIRMS\Rueckmeldungscode;
-use Fhp\Segment\WPD\HIWPD;
-use Fhp\Segment\WPD\HIWPDS;
-use Fhp\Segment\WPD\HIWPDv5;
-use Fhp\Segment\WPD\HKWPDv5;
-use Fhp\UnsupportedException;
+
+
+namespace BytesCommerce\Action;
+
+use BytesCommerce\Model\SEPAAccount;
+use BytesCommerce\Model\StatementOfHoldings\StatementOfHoldings;
+use BytesCommerce\MT535\MT535;
+use BytesCommerce\PaginateableAction;
+use BytesCommerce\Protocol\BPD;
+use BytesCommerce\Protocol\Message;
+use BytesCommerce\Protocol\UnexpectedResponseException;
+use BytesCommerce\Protocol\UPD;
+use BytesCommerce\Segment\Common\KtvV3;
+use BytesCommerce\Segment\HIRMS\Rueckmeldungscode;
+use BytesCommerce\Segment\WPD\HIWPD;
+use BytesCommerce\Segment\WPD\HIWPDS;
+use BytesCommerce\Segment\WPD\HIWPDv5;
+use BytesCommerce\Segment\WPD\HKWPDv5;
+use BytesCommerce\UnsupportedException;
 
 /**
  * Depotaufstellung HKWPD
@@ -25,29 +29,25 @@ use Fhp\UnsupportedException;
 class GetDepotAufstellung extends PaginateableAction
 {
     // Request (if you add a field here, update __serialize() and __unserialize() as well).
-    /** @var SEPAAccount */
-    private $account;
+    private ?\BytesCommerce\Model\SEPAAccount $sepaAccount = null;
 
     // Response
-    /** @var string */
-    private $rawMT535 = '';
+    private string $rawMT535 = '';
 
-    /** @var StatementOfHoldings */
-    private $statement;
+    private ?\BytesCommerce\Model\StatementOfHoldings\StatementOfHoldings $statementOfHoldings = null;
 
-    /** @var float */
-    private $depotWert;
+    private ?float $depotWert = null;
 
     /**
-     * @param SEPAAccount $account The account to get the statement for. This can be constructed based on information
+     * @param SEPAAccount $sepaAccount The account to get the statement for. This can be constructed based on information
      *     that the user entered, or it can be {@link SEPAAccount} instance retrieved from {@link getAccounts()}.
      * @return GetDepotAufstellung A new action instance.
      */
-    public static function create(SEPAAccount $account): GetDepotAufstellung
+    public static function create(SEPAAccount $sepaAccount): GetDepotAufstellung
     {
-        $result = new GetDepotAufstellung();
-        $result->account = $account;
-        return $result;
+        $getDepotAufstellung = new GetDepotAufstellung();
+        $getDepotAufstellung->sepaAccount = $sepaAccount;
+        return $getDepotAufstellung;
     }
 
     /**
@@ -62,7 +62,7 @@ class GetDepotAufstellung extends PaginateableAction
     {
         return [
             parent::__serialize(),
-            $this->account,
+            $this->sepaAccount,
         ];
     }
 
@@ -70,9 +70,8 @@ class GetDepotAufstellung extends PaginateableAction
      * @deprecated Beginning from PHP7.4 __unserialize is used for new generated strings, then this method is only used for previously generated strings - remove after May 2023
      *
      * @param string $serialized
-     * @return void
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         self::__unserialize(unserialize($serialized));
     }
@@ -81,7 +80,7 @@ class GetDepotAufstellung extends PaginateableAction
     {
         list(
             $parentSerialized,
-            $this->account,
+            $this->sepaAccount,
         ) = $serialized;
 
         is_array($parentSerialized) ?
@@ -102,7 +101,7 @@ class GetDepotAufstellung extends PaginateableAction
     public function getStatement(): StatementOfHoldings
     {
         $this->ensureDone();
-        return $this->statement;
+        return $this->statementOfHoldings;
     }
 
     public function getDepotWert(): float
@@ -113,27 +112,25 @@ class GetDepotAufstellung extends PaginateableAction
 
     protected function createRequest(BPD $bpd, ?UPD $upd)
     {
-        /** @var HIWPDS $hiwpds */
-        $hiwpds = $bpd->requireLatestSupportedParameters('HIWPDS');
+        /** @var HIWPDS $baseSegment */
+        $baseSegment = $bpd->requireLatestSupportedParameters('HIWPDS');
 
-        switch ($hiwpds->getVersion()) {
-            case 5:
-                return HKWPDv5::create(KtvV3::fromAccount($this->account));
-            default:
-                throw new UnsupportedException('Unsupported HKWPD version: ' . $hiwpds->getVersion());
-        }
+        return match ($baseSegment->getVersion()) {
+            5 => HKWPDv5::create(KtvV3::fromAccount($this->sepaAccount)),
+            default => throw new UnsupportedException('Unsupported HKWPD version: ' . $baseSegment->getVersion()),
+        };
     }
 
-    public function processResponse(Message $response)
+    public function processResponse(Message $message): void
     {
-        parent::processResponse($response);
+        parent::processResponse($message);
 
-        $isUnavailable = $response->findRueckmeldung(Rueckmeldungscode::NICHT_VERFUEGBAR) !== null;
-        $responseHiwpd = $response->findSegments(HIWPDv5::class);
+        $isUnavailable = $message->findRueckmeldung(Rueckmeldungscode::NICHT_VERFUEGBAR) instanceof \BytesCommerce\Segment\HIRMS\Rueckmeldung;
+        $responseHiwpd = $message->findSegments(HIWPDv5::class);
 
         $numResponseSegments = count($responseHiwpd);
         if (!$isUnavailable && $numResponseSegments < count($this->getRequestSegmentNumbers())) {
-            throw new UnexpectedResponseException("Only got $numResponseSegments HIWPD response segments!");
+            throw new UnexpectedResponseException(sprintf('Only got %d HIWPD response segments!', $numResponseSegments));
         }
 
         /** @var HIWPD $hiwpd */
@@ -148,18 +145,18 @@ class GetDepotAufstellung extends PaginateableAction
         }
     }
 
-    private function parseMt535()
+    private function parseMt535(): void
     {
         try {
             // Note: Some banks encode their MT 535 data as SWIFT/ISO-8859 like it should be according to the
             // specification, others just send UTF-8, so we try to detect it here.
             $rawMT535 = mb_detect_encoding($this->rawMT535, 'UTF-8', true) === false
                 ? mb_convert_encoding($this->rawMT535, 'UTF-8', 'ISO-8859-1') : $this->rawMT535;
-            $parser = new MT535($rawMT535);
-            $this->statement = $parser->parseHoldings();
-            $this->depotWert = $parser->parseDepotWert();
-        } catch (\Exception $e) {
-            throw new \InvalidArgumentException('Invalid MT535 data', 0, $e);
+            $mt535 = new MT535($rawMT535);
+            $this->statementOfHoldings = $mt535->parseHoldings();
+            $this->depotWert = $mt535->parseDepotWert();
+        } catch (\Exception $exception) {
+            throw new \InvalidArgumentException('Invalid MT535 data', 0, $exception);
         }
     }
 }

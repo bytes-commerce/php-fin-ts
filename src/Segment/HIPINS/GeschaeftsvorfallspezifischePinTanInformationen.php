@@ -1,9 +1,11 @@
 <?php
+
+declare(strict_types=1);
+
 /** @noinspection PhpUnused */
+namespace BytesCommerce\Segment\HIPINS;
 
-namespace Fhp\Segment\HIPINS;
-
-use Fhp\Segment\BaseDeg;
+use BytesCommerce\Segment\BaseDeg;
 
 /**
  * Data Element Group: Geschäftsvorfallspezifische PIN/TAN-Informationen
@@ -15,6 +17,7 @@ use Fhp\Segment\BaseDeg;
 class GeschaeftsvorfallspezifischePinTanInformationen extends BaseDeg
 {
     public string $segmentkennung;
+
     public bool $tanErforderlich;
 
     public function getSegmentkennung(): string
